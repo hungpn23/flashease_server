@@ -1,0 +1,38 @@
+name: flashcard
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: on-failure
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DATABASE_PASSWORD}
+    ports:
+      - '3306:3306'
+    volumes:
+      - mysql:/var/lib/mysql
+    networks:
+      - flashcard
+    command: --default-authentication-plugin=mysql_native_password
+
+  redis:
+    image: redis/redis-stack:6.2.6-v17
+    container_name: redis
+    restart: on-failure
+    ports:
+      - '6379:6379'
+      - '8001:8001'
+    volumes:
+      - redis:/data
+    environment:
+      REDIS_ARGS: '--requirepass ${REDIS_DEFAULT_PASSWORD} --user ${REDIS_USERNAME} on >${REDIS_PASSWORD} ${REDIS_PERMISSIONS}'
+    networks:
+      - flashcard
+
+volumes:
+  mysql:
+  redis:
+
+networks:
+  flashcard:
+    driver: bridge
