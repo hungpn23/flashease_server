@@ -8,10 +8,7 @@ import { DeleteResult } from 'typeorm';
 import { AuthReqDto, LoginResDto, RefreshResDto } from './auth.dto';
 import { AuthService } from './auth.service';
 
-@Controller({
-  path: 'auth',
-  version: '1',
-})
+@Controller({ path: 'auth', version: '1' })
 export class AuthController {
   constructor(private authService: AuthService) {}
 

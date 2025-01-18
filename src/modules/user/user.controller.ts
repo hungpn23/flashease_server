@@ -17,10 +17,7 @@ import { UserEntity } from './entities/user.entity';
 import { UpdateUserDto, UploadAvatarResponseDto } from './user.dto';
 import { UserService } from './user.service';
 
-@Controller({
-  path: 'user',
-  version: '1',
-})
+@Controller({ path: 'user', version: '1' })
 export class UserController {
   constructor(private userService: UserService) {}
 

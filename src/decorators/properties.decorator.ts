@@ -1,3 +1,4 @@
+import { FunctionConstructor } from '@/types/constructor-function.type';
 import { applyDecorators } from '@nestjs/common';
 import { Type } from 'class-transformer';
 import {
@@ -15,6 +16,7 @@ import {
   MaxLength,
   Min,
   MinLength,
+  ValidateNested,
 } from 'class-validator';
 import { ToLowerCase, ToUpperCase } from './transforms.decorator';
 import { IsPassword } from './validators/is-password.decorator';
@@ -135,6 +137,20 @@ export function EnumValidators(
   options?: CommonOptions,
 ): PropertyDecorator {
   let decorators = [IsEnum(entity, { each: options?.isArray })];
+  decorators = checkCommonOptions(decorators, options);
+
+  return applyDecorators(...decorators);
+}
+
+export function ClassValidators<TClass extends FunctionConstructor>(
+  className: TClass,
+  options?: CommonOptions,
+) {
+  let decorators = [
+    Type(() => className),
+    ValidateNested({ each: options?.isArray }),
+  ];
+
   decorators = checkCommonOptions(decorators, options);
 
   return applyDecorators(...decorators);

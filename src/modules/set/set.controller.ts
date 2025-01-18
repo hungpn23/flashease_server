@@ -1,15 +1,26 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { ApiEndpoint } from '@/decorators/endpoint.decorator';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
+import { CreateSetDto, UpdateSetDto } from './set.dto';
 import { SetService } from './set.service';
-import { CreateSetDto } from './dto/create-set.dto';
-import { UpdateSetDto } from './dto/update-set.dto';
 
-@Controller('set')
+@Controller({ path: 'set', version: '1' })
 export class SetController {
-  constructor(private readonly setService: SetService) {}
+  constructor(private setService: SetService) {}
 
+  @ApiEndpoint({ type: CreateSetDto, summary: 'create a new set' })
   @Post()
-  create(@Body() createSetDto: CreateSetDto) {
-    return this.setService.create(createSetDto);
+  create(@Body() dto: CreateSetDto) {
+    console.log('🚀 ~ SetController ~ create ~ CreateSetDto:', dto);
+
+    return 'ok';
   }
 
   @Get()
