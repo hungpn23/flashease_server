@@ -41,4 +41,9 @@ export class CreateSetDto {
   cards: CardDto[];
 }
 
+export class FindOneSetDto {
+  @PasswordValidators({ required: false })
+  visibleToPassword?: string;
+}
+
 export class UpdateSetDto extends PartialType(CreateSetDto) {}

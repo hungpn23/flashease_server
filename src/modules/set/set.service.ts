@@ -1,10 +1,15 @@
 import { OffsetPaginatedDto } from '@/dto/offset-pagination/paginated.dto';
 import { OffsetPaginationQueryDto } from '@/dto/offset-pagination/query.dto';
 import paginate from '@/utils/offset-paginate';
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { CardEntity } from './entities/card.entity';
 import { SetEntity } from './entities/set.entity';
-import { CreateSetDto, UpdateSetDto } from './set.dto';
+import { CreateSetDto, FindOneSetDto, UpdateSetDto } from './set.dto';
 import { VisibleTo } from './set.enum';
 
 @Injectable()
@@ -46,15 +51,81 @@ export class SetService {
     return new OffsetPaginatedDto<SetEntity>(entities, metadata);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} set`;
+  async findMySets(query: OffsetPaginationQueryDto, userId: number) {
+    const builder = SetEntity.createQueryBuilder('set');
+
+    builder.where('set.createdBy = :userId', { userId });
+
+    if (query.search) {
+      const search = query.search.trim();
+      builder
+        .where('set.name LIKE :name', { name: `%${search}%` })
+        .orWhere('set.description LIKE :description', {
+          description: `%${search}%`,
+        });
+    }
+
+    const { entities, metadata } = await paginate<SetEntity>(builder, query);
+
+    return new OffsetPaginatedDto<SetEntity>(entities, metadata);
   }
 
-  update(id: number, updateSetDto: UpdateSetDto) {
-    return `This action updates a #${id} set`;
+  async findOnePublic(setId: number, dto: FindOneSetDto) {
+    const found = await SetEntity.findOneOrFail({
+      where: { id: setId },
+      relations: ['cards'],
+    });
+
+    switch (found.visibleTo) {
+      case VisibleTo.EVERYONE:
+        return found;
+      case VisibleTo.PEOPLE_WITH_A_PASSWORD:
+        if (dto.visibleToPassword === found.visibleToPassword) return found;
+        throw new BadRequestException('invalid password');
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} set`;
+  async findOnePrivate(setId: number, userId: number) {
+    const found = await SetEntity.findOneOrFail({
+      where: { id: setId },
+      relations: ['cards'],
+    });
+
+    if (found.createdBy !== userId)
+      throw new ForbiddenException('you are not allowed to view this set');
+
+    return found;
+  }
+
+  async update(setId: number, dto: UpdateSetDto, userId: number) {
+    const { cards, ...rest } = dto;
+
+    const found = await SetEntity.findOneOrFail({
+      where: { id: setId },
+      relations: ['cards'],
+    });
+
+    if (found.createdBy !== userId)
+      throw new ForbiddenException('you are not allowed to update this set');
+
+    if (cards) {
+      await CardEntity.remove(found.cards);
+      found.cards = cards.map((card) => {
+        return new CardEntity({ ...card, createdBy: userId });
+      });
+    }
+
+    return await SetEntity.save(
+      Object.assign(found, {
+        ...rest,
+        updatedBy: userId,
+      }),
+    );
+  }
+
+  async remove(setId: number) {
+    const found = await SetEntity.findOneOrFail({ where: { id: setId } });
+
+    return await SetEntity.remove(found);
   }
 }

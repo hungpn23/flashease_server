@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { SetService } from './set.service';
 import { SetController } from './set.controller';
+import { SetService } from './set.service';
 
 @Module({
   controllers: [SetController],

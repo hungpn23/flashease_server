@@ -4,7 +4,7 @@ import { UpdateFolderDto } from './dto/update-folder.dto';
 
 @Injectable()
 export class FolderService {
-  create(createFolderDto: CreateFolderDto) {
+  create(_createFolderDto: CreateFolderDto) {
     return 'This action adds a new folder';
   }
 
@@ -16,7 +16,7 @@ export class FolderService {
     return `This action returns a #${id} folder`;
   }
 
-  update(id: number, updateFolderDto: UpdateFolderDto) {
+  update(id: number, _updateFolderDto: UpdateFolderDto) {
     return `This action updates a #${id} folder`;
   }
 
