@@ -1,4 +1,3 @@
-import { SYSTEM } from '@/constants/index';
 import { getOrder, Order } from '@/decorators/order.decorator';
 import { ApiHideProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
@@ -23,18 +22,12 @@ export abstract class AbstractEntity extends BaseEntity {
   updatedAt: Date;
 
   @Order(9998)
-  @Column({
-    name: 'created_by',
-    default: SYSTEM,
-  })
-  createdBy: string;
+  @Column({ name: 'created_by' })
+  createdBy: number;
 
   @Order(9998)
-  @Column({
-    name: 'updated_by',
-    default: null,
-  })
-  updatedBy: string;
+  @Column({ name: 'updated_by', nullable: true, default: null })
+  updatedBy: number;
 
   // issue: https://github.com/typeorm/typeorm/issues/541#issuecomment-2358776943
   static useDataSource(dataSource: DataSource) {
@@ -61,19 +54,12 @@ export abstract class DeletableAbstractEntity extends AbstractEntity {
   @ApiHideProperty()
   @Exclude()
   @Order(9999)
-  @DeleteDateColumn({
-    name: 'deleted_at',
-    type: 'timestamp',
-    default: null,
-  })
+  @DeleteDateColumn({ name: 'deleted_at', type: 'timestamp', default: null })
   deletedAt: Date;
 
   @ApiHideProperty()
   @Exclude()
   @Order(9999)
-  @Column({
-    name: 'deleted_by',
-    default: null,
-  })
-  deletedBy: string;
+  @Column({ name: 'deleted_by', default: null })
+  deletedBy: number;
 }

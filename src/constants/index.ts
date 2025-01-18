@@ -1,4 +1,4 @@
-export const SYSTEM = 'system';
+export const SYSTEM = 0;
 export const IS_PUBLIC_KEY = 'isPublic';
 export const IS_REFRESH_TOKEN_KEY = 'isRefreshToken';
 export const ROLE_KEY = 'role';

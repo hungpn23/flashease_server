@@ -1,5 +1,6 @@
 import { AbstractEntity } from '@/database/entities/abstract.entity';
 import { SetEntity } from '@/modules/set/entities/set.entity';
+import { Expose } from 'class-transformer';
 import {
   Column,
   Entity,
@@ -9,6 +10,7 @@ import {
   Relation,
 } from 'typeorm';
 
+@Expose()
 @Entity('card')
 export class CardEntity extends AbstractEntity {
   constructor(data?: Partial<CardEntity>) {

@@ -1,5 +1,6 @@
 import { AbstractEntity } from '@/database/entities/abstract.entity';
 import { CardEntity } from '@/modules/set/entities/card.entity';
+import { Expose } from 'class-transformer';
 import {
   Column,
   Entity,
@@ -9,6 +10,7 @@ import {
 } from 'typeorm';
 import { EditableBy, VisibleTo } from '../set.enum';
 
+@Expose()
 @Entity('set')
 export class SetEntity extends AbstractEntity {
   constructor(data?: Partial<SetEntity>) {

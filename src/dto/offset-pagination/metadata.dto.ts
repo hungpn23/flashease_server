@@ -10,7 +10,12 @@ export class OffsetMetadataDto {
   nextPage?: number;
   previousPage?: number;
 
-  constructor(totalRecords: number, query: OffsetPaginationQueryDto) {
+  constructor(
+    totalRecords: number,
+
+    // !! temp solution for double init class instance
+    query: OffsetPaginationQueryDto = new OffsetPaginationQueryDto(),
+  ) {
     this.take = query.take;
 
     this.totalRecords = totalRecords;

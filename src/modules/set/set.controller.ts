@@ -1,4 +1,7 @@
 import { ApiEndpoint } from '@/decorators/endpoint.decorator';
+import { JwtPayload } from '@/decorators/jwt-payload.decorator';
+import { OffsetPaginationQueryDto } from '@/dto/offset-pagination/query.dto';
+import { JwtPayloadType } from '@/types/auth.type';
 import {
   Body,
   Controller,
@@ -7,7 +10,9 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
+import { SetEntity } from './entities/set.entity';
 import { CreateSetDto, UpdateSetDto } from './set.dto';
 import { SetService } from './set.service';
 
@@ -15,17 +20,24 @@ import { SetService } from './set.service';
 export class SetController {
   constructor(private setService: SetService) {}
 
-  @ApiEndpoint({ type: CreateSetDto, summary: 'create a new set' })
+  @ApiEndpoint({ type: SetEntity, summary: 'create a new set' })
   @Post()
-  create(@Body() dto: CreateSetDto) {
-    console.log('🚀 ~ SetController ~ create ~ CreateSetDto:', dto);
-
-    return 'ok';
+  async create(
+    @Body() dto: CreateSetDto,
+    @JwtPayload() { userId }: JwtPayloadType,
+  ) {
+    return await this.setService.create(dto, userId);
   }
 
-  @Get()
-  findAll() {
-    return this.setService.findAll();
+  @ApiEndpoint({
+    type: SetEntity,
+    summary: 'get all paginated sets',
+    isPublic: true,
+    isPaginated: true,
+  })
+  @Get('all')
+  async findAll(@Query() query: OffsetPaginationQueryDto) {
+    return await this.setService.findAll(query);
   }
 
   @Get(':id')
