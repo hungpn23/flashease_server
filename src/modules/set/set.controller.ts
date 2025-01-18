@@ -96,8 +96,11 @@ export class SetController {
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) setId: number) {
-    return this.setService.remove(setId);
+  remove(
+    @Param('id', ParseIntPipe) setId: number,
+    @JwtPayload() { userId }: JwtPayloadType,
+  ) {
+    return this.setService.remove(setId, userId);
   }
   /*
    * ===== END PROTECTED ROUTES =====

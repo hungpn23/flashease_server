@@ -123,8 +123,11 @@ export class SetService {
     );
   }
 
-  async remove(setId: number) {
+  async remove(setId: number, userId: number) {
     const found = await SetEntity.findOneOrFail({ where: { id: setId } });
+
+    if (found.createdBy !== userId)
+      throw new ForbiddenException('you are not allowed to remove this set');
 
     return await SetEntity.remove(found);
   }

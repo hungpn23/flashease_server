@@ -18,6 +18,7 @@ export class OffsetPaginationQueryDto {
   @StringValidators({ required: false })
   search?: string;
 
+  @NumberValidators({ isInt: true, required: false })
   get skip() {
     return this.page ? (this.page - 1) * this.take : 0;
   }
