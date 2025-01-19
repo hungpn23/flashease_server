@@ -13,7 +13,12 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { CreateFolderDto, UpdateFolderDto } from './folder.dto';
+import {
+  AddSetsDto,
+  CreateFolderDto,
+  RemoveSetsDto,
+  UpdateFolderDto,
+} from './folder.dto';
 import { FolderEntity } from './folder.entity';
 import { FolderService } from './folder.service';
 
@@ -81,5 +86,31 @@ export class FolderController {
     @JwtPayload() { userId }: JwtPayloadType,
   ) {
     return this.folderService.remove(folderId, userId);
+  }
+
+  @ApiEndpoint({
+    type: FolderEntity,
+    summary: 'add sets by ids',
+  })
+  @Post(':id/add-sets')
+  async addSets(
+    @Param('id', ParseIntPipe) folderId: number,
+    @Body() { setIds }: AddSetsDto,
+    @JwtPayload() { userId }: JwtPayloadType,
+  ) {
+    return await this.folderService.addSets(folderId, setIds, userId);
+  }
+
+  @ApiEndpoint({
+    type: FolderEntity,
+    summary: 'remove sets by ids',
+  })
+  @Post(':id/remove-sets')
+  async removeSets(
+    @Param('id', ParseIntPipe) folderId: number,
+    @Body() { setIds }: RemoveSetsDto,
+    @JwtPayload() { userId }: JwtPayloadType,
+  ) {
+    return await this.folderService.removeSets(folderId, setIds, userId);
   }
 }

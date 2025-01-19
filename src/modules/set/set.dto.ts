@@ -5,9 +5,11 @@ import {
   StringValidators,
 } from '@/decorators/properties.decorator';
 import { PartialType } from '@nestjs/swagger';
+import { Expose } from 'class-transformer';
 import { ValidateIf } from 'class-validator';
 import { EditableBy, VisibleTo } from './set.enum';
 
+@Expose()
 export class CardDto {
   @StringValidators()
   term: string;

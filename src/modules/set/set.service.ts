@@ -7,9 +7,10 @@ import {
   ForbiddenException,
   Injectable,
 } from '@nestjs/common';
+import { plainToInstance } from 'class-transformer';
 import { CardEntity } from './entities/card.entity';
 import { SetEntity } from './entities/set.entity';
-import { CreateSetDto, FindOneSetDto, UpdateSetDto } from './set.dto';
+import { CardDto, CreateSetDto, FindOneSetDto, UpdateSetDto } from './set.dto';
 import { VisibleTo } from './set.enum';
 
 @Injectable()
@@ -127,5 +128,26 @@ export class SetService {
     if (found.createdBy !== userId) throw new ForbiddenException();
 
     return await SetEntity.remove(found);
+  }
+
+  /**
+   * VD:
+   *  apple: táo
+   *  dog: chó
+   *  house: nhà
+   *  book: sách
+   *  car: xe hơi
+   */
+  convertFromText(input: string): CardDto[] {
+    const cards = input.trim().split('\n');
+    const result = cards
+      .map((card) => {
+        const [term, definition] = card.split(':');
+        if (!term || !definition) return;
+        return { term, definition };
+      })
+      .filter((card) => card !== undefined);
+
+    return plainToInstance(CardDto, result);
   }
 }

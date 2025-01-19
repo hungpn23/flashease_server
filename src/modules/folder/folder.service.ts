@@ -6,6 +6,8 @@ import {
   ForbiddenException,
   Injectable,
 } from '@nestjs/common';
+import { In } from 'typeorm';
+import { SetEntity } from '../set/entities/set.entity';
 import { CreateFolderDto, UpdateFolderDto } from './folder.dto';
 import { FolderEntity } from './folder.entity';
 
@@ -72,5 +74,32 @@ export class FolderService {
     if (found.createdBy !== userId) throw new ForbiddenException();
 
     return await FolderEntity.remove(found);
+  }
+
+  async addSets(folderId: number, setIds: number[], userId: number) {
+    const folder = await FolderEntity.findOneOrFail({
+      where: { id: folderId },
+      relations: ['sets'],
+    });
+
+    if (folder.createdBy !== userId) throw new ForbiddenException();
+
+    const sets = await SetEntity.findBy({ id: In(setIds), createdBy: userId });
+    folder.sets = folder.sets.concat(sets);
+
+    return await FolderEntity.save(folder);
+  }
+
+  async removeSets(folderId: number, setIds: number[], userId: number) {
+    const folder = await FolderEntity.findOneOrFail({
+      where: { id: folderId },
+      relations: ['sets'],
+    });
+
+    if (folder.createdBy !== userId) throw new ForbiddenException();
+
+    folder.sets = folder.sets.filter((set) => !setIds.includes(set.id));
+
+    return await FolderEntity.save(folder);
   }
 }

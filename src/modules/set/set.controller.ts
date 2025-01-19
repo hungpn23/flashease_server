@@ -14,7 +14,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { SetEntity } from './entities/set.entity';
-import { CreateSetDto, FindOneSetDto, UpdateSetDto } from './set.dto';
+import { CardDto, CreateSetDto, FindOneSetDto, UpdateSetDto } from './set.dto';
 import { SetService } from './set.service';
 
 @Controller({ path: 'set', version: '1' })
@@ -41,11 +41,21 @@ export class SetController {
     isPublic: true,
   })
   @Get('public/:id')
-  findOnePublic(
+  async findOnePublic(
     @Param('id', ParseIntPipe) setId: number,
     @Body() dto: FindOneSetDto,
   ) {
-    return this.setService.findOnePublic(setId, dto);
+    return await this.setService.findOnePublic(setId, dto);
+  }
+
+  @ApiEndpoint({
+    type: CardDto,
+    summary: 'import cards',
+    isPublic: true,
+  })
+  @Post('convert-from-text')
+  convertFromText(@Body() body: { input: string }) {
+    return this.setService.convertFromText(body.input);
   }
   /*
    * ===== END PUBLIC ROUTES =====
