@@ -1,26 +1,76 @@
-import { Injectable } from '@nestjs/common';
-import { CreateFolderDto } from './dto/create-folder.dto';
-import { UpdateFolderDto } from './dto/update-folder.dto';
+import { OffsetPaginatedDto } from '@/dto/offset-pagination/paginated.dto';
+import { OffsetPaginationQueryDto } from '@/dto/offset-pagination/query.dto';
+import paginate from '@/utils/offset-paginate';
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
+import { CreateFolderDto, UpdateFolderDto } from './folder.dto';
+import { FolderEntity } from './folder.entity';
 
 @Injectable()
 export class FolderService {
-  create(_createFolderDto: CreateFolderDto) {
-    return 'This action adds a new folder';
+  async create(dto: CreateFolderDto, userId: number) {
+    const found = await FolderEntity.findOneBy({ name: dto.name });
+    if (found) throw new ConflictException();
+
+    return await FolderEntity.save(
+      new FolderEntity({ ...dto, createdBy: userId }),
+    );
   }
 
-  findAll() {
-    return `This action returns all folder`;
+  async findAll(query: OffsetPaginationQueryDto, userId: number) {
+    const builder = FolderEntity.createQueryBuilder('folder');
+
+    builder.where('folder.createdBy = :userId', { userId });
+
+    if (query.search) {
+      const search = query.search.trim();
+      builder
+        .where('folder.name LIKE :name', { name: `%${search}%` })
+        .orWhere('folder.description LIKE :description', {
+          description: `%${search}%`,
+        });
+    }
+
+    const { entities, metadata } = await paginate<FolderEntity>(builder, query);
+
+    return new OffsetPaginatedDto<FolderEntity>(entities, metadata);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} folder`;
+  async findOne(folderId: number, userId: number) {
+    const found = await FolderEntity.findOneOrFail({
+      where: { id: folderId },
+      relations: ['sets'],
+    });
+
+    if (found.createdBy !== userId) throw new ForbiddenException();
+
+    return found;
   }
 
-  update(id: number, _updateFolderDto: UpdateFolderDto) {
-    return `This action updates a #${id} folder`;
+  async update(folderId: number, dto: UpdateFolderDto, userId: number) {
+    const found = await FolderEntity.findOneOrFail({
+      where: { id: folderId },
+      relations: ['sets'],
+    });
+
+    if (found.createdBy !== userId) throw new ForbiddenException();
+
+    return await FolderEntity.save(
+      Object.assign(found, {
+        ...dto,
+        updatedBy: userId,
+      } as FolderEntity),
+    );
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} folder`;
+  async remove(folderId: number, userId: number) {
+    const found = await FolderEntity.findOneOrFail({ where: { id: folderId } });
+
+    if (found.createdBy !== userId) throw new ForbiddenException();
+
+    return await FolderEntity.remove(found);
   }
 }

@@ -20,7 +20,7 @@ export class SetService {
       createdBy: userId,
     });
 
-    if (found) throw new ConflictException('set with this name already exists');
+    if (found) throw new ConflictException();
 
     const cards = dto.cards.map((card) => {
       return new CardEntity({ ...card, createdBy: userId });
@@ -91,8 +91,7 @@ export class SetService {
       relations: ['cards'],
     });
 
-    if (found.createdBy !== userId)
-      throw new ForbiddenException('you are not allowed to view this set');
+    if (found.createdBy !== userId) throw new ForbiddenException();
 
     return found;
   }
@@ -105,8 +104,7 @@ export class SetService {
       relations: ['cards'],
     });
 
-    if (found.createdBy !== userId)
-      throw new ForbiddenException('you are not allowed to update this set');
+    if (found.createdBy !== userId) throw new ForbiddenException();
 
     if (cards) {
       await CardEntity.remove(found.cards);
@@ -119,15 +117,14 @@ export class SetService {
       Object.assign(found, {
         ...rest,
         updatedBy: userId,
-      }),
+      } as SetEntity),
     );
   }
 
   async remove(setId: number, userId: number) {
     const found = await SetEntity.findOneOrFail({ where: { id: setId } });
 
-    if (found.createdBy !== userId)
-      throw new ForbiddenException('you are not allowed to remove this set');
+    if (found.createdBy !== userId) throw new ForbiddenException();
 
     return await SetEntity.remove(found);
   }

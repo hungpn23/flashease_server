@@ -1,9 +1,12 @@
 import { AbstractEntity } from '@/database/entities/abstract.entity';
+import { FolderEntity } from '@/modules/folder/folder.entity';
 import { CardEntity } from '@/modules/set/entities/card.entity';
 import { Expose } from 'class-transformer';
 import {
   Column,
   Entity,
+  JoinColumn,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   Relation,
@@ -51,4 +54,10 @@ export class SetEntity extends AbstractEntity {
 
   @OneToMany(() => CardEntity, (card) => card.set, { cascade: true })
   cards: Relation<CardEntity[]>;
+
+  @ManyToOne(() => FolderEntity, (folder) => folder.sets, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'folder_id', referencedColumnName: 'id' })
+  folder: Relation<FolderEntity>;
 }

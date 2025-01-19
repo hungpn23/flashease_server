@@ -95,6 +95,7 @@ export class SetController {
     return this.setService.update(setId, dto, userId);
   }
 
+  @ApiEndpoint({ type: SetEntity, summary: 'remove a set' })
   @Delete(':id')
   remove(
     @Param('id', ParseIntPipe) setId: number,
