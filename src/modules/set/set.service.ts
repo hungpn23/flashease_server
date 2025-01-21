@@ -8,6 +8,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
+import XLSX from 'xlsx';
 import { CardEntity } from './entities/card.entity';
 import { SetEntity } from './entities/set.entity';
 import { CardDto, CreateSetDto, FindOneSetDto, UpdateSetDto } from './set.dto';
@@ -138,9 +139,9 @@ export class SetService {
    *  book: sách
    *  car: xe hơi
    */
-  convertFromText(input: string): CardDto[] {
+  convertFromText(input: string) {
     const cards = input.trim().split('\n');
-    const result = cards
+    const results = cards
       .map((card) => {
         const [term, definition] = card.split(':');
         if (!term || !definition) return;
@@ -148,6 +149,26 @@ export class SetService {
       })
       .filter((card) => card !== undefined);
 
-    return plainToInstance(CardDto, result);
+    return plainToInstance(CardDto, results);
+  }
+
+  convertFromXlsx(buffer: Buffer) {
+    const workbook = XLSX.read(buffer, { type: 'buffer' });
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
+
+    const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+    const results = data
+      .slice(2)
+      .map((row) => ({
+        term: row[0],
+        definition: row[1],
+      }))
+      .filter(
+        (item) => item.term !== undefined || item.definition !== undefined,
+      );
+
+    return plainToInstance(CardDto, results);
   }
 }

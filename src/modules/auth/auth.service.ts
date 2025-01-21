@@ -15,7 +15,6 @@ import argon2 from 'argon2';
 import { Cache } from 'cache-manager';
 import crypto from 'crypto';
 import ms from 'ms';
-import { DeleteResult } from 'typeorm';
 import { SessionEntity } from '../user/entities/session.entity';
 import { UserEntity } from '../user/entities/user.entity';
 import { AuthReqDto } from './auth.dto';
@@ -78,13 +77,14 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  async logout(payload: JwtPayloadType): Promise<DeleteResult> {
+  async logout(payload: JwtPayloadType) {
     const { sessionId, exp, userId } = payload;
     const key = `SESSION_BLACKLIST:${userId}:${sessionId}`;
     const ttl = exp * 1000 - Date.now(); // remaining time in milliseconds
     await this.cacheManager.store.set(key, true, ttl);
 
-    return await SessionEntity.delete({ id: sessionId });
+    const found = await SessionEntity.findOneByOrFail({ id: sessionId });
+    return await SessionEntity.remove(found);
   }
 
   async refreshToken({ sessionId, signature }: JwtRefreshPayloadType) {
@@ -126,8 +126,11 @@ export class AuthService {
       await this.cacheManager.store.get<boolean>(key);
 
     if (isSessionBlacklisted) {
-      await SessionEntity.delete({ user: { id: payload.userId } }); // delete all user's sessions
-      throw new AuthException(AuthError.E03);
+      const sessions = await SessionEntity.findBy({
+        user: { id: payload.userId },
+      });
+      await SessionEntity.remove(sessions); // delete all user's sessions
+      throw new UnauthorizedException(AuthError.E03);
     }
 
     return payload;

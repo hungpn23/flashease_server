@@ -1,0 +1,2 @@
+delete vs remove typeorm: https://stackoverflow.com/questions/54246615/what-s-the-difference-between-remove-and-delete
+--> delete not trigger cascade actions and Entity Listener (such as @BeforeRemove, @AfterRemove), remove DOES

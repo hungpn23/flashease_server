@@ -1,6 +1,7 @@
-import { ApiEndpoint } from '@/decorators/endpoint.decorator';
+import { ApiEndpoint, ApiFile } from '@/decorators/endpoint.decorator';
 import { JwtPayload } from '@/decorators/jwt-payload.decorator';
 import { OffsetPaginationQueryDto } from '@/dto/offset-pagination/query.dto';
+import { validateXlsxPipe } from '@/pipes/validate-file.pipe';
 import { JwtPayloadType } from '@/types/auth.type';
 import {
   Body,
@@ -12,9 +13,16 @@ import {
   Patch,
   Post,
   Query,
+  UploadedFile,
 } from '@nestjs/common';
 import { SetEntity } from './entities/set.entity';
-import { CardDto, CreateSetDto, FindOneSetDto, UpdateSetDto } from './set.dto';
+import {
+  CardDto,
+  ConvertFromTextDto,
+  CreateSetDto,
+  FindOneSetDto,
+  UpdateSetDto,
+} from './set.dto';
 import { SetService } from './set.service';
 
 @Controller({ path: 'set', version: '1' })
@@ -48,15 +56,6 @@ export class SetController {
     return await this.setService.findOnePublic(setId, dto);
   }
 
-  @ApiEndpoint({
-    type: CardDto,
-    summary: 'import cards',
-    isPublic: true,
-  })
-  @Post('convert-from-text')
-  convertFromText(@Body() body: { input: string }) {
-    return this.setService.convertFromText(body.input);
-  }
   /*
    * ===== END PUBLIC ROUTES =====
    */
@@ -112,6 +111,28 @@ export class SetController {
     @JwtPayload() { userId }: JwtPayloadType,
   ) {
     return this.setService.remove(setId, userId);
+  }
+
+  @ApiEndpoint({
+    type: CardDto,
+    summary: 'convert to cards from text',
+  })
+  @Post('convert-from-text')
+  convertFromText(@Body() { input }: ConvertFromTextDto) {
+    return this.setService.convertFromText(input);
+  }
+
+  @ApiFile('xlsx')
+  @ApiEndpoint({
+    type: CardDto,
+    summary: 'convert to cards from xlsx',
+  })
+  @Post('convert-from-xlsx')
+  convertFromXlsx(
+    @UploadedFile(validateXlsxPipe())
+    file: Express.Multer.File,
+  ) {
+    return this.setService.convertFromXlsx(file.buffer);
   }
   /*
    * ===== END PROTECTED ROUTES =====

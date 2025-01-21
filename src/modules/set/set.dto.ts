@@ -49,3 +49,8 @@ export class FindOneSetDto {
 }
 
 export class UpdateSetDto extends PartialType(CreateSetDto) {}
+
+export class ConvertFromTextDto {
+  @StringValidators()
+  input: string;
+}

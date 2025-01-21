@@ -2,7 +2,7 @@ import { Role } from '@/constants';
 import { UseRole } from '@/decorators/auth/role.decorator';
 import { ApiEndpoint, ApiFile } from '@/decorators/endpoint.decorator';
 import { JwtPayload } from '@/decorators/jwt-payload.decorator';
-import { validateImagePipe } from '@/pipes/validate-image.pipe';
+import { validateImagePipe } from '@/pipes/validate-file.pipe';
 import { JwtPayloadType } from '@/types/auth.type';
 import {
   Body,
