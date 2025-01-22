@@ -11,6 +11,7 @@ import {
   PrimaryGeneratedColumn,
   Relation,
 } from 'typeorm';
+import { PracticeEntity } from '../../core/entities/practice.entity';
 import { EditableBy, VisibleTo } from '../set.enum';
 
 @Expose()
@@ -52,8 +53,16 @@ export class SetEntity extends AbstractEntity {
   @Column({ name: 'editable_by_password', nullable: true })
   editableByPassword?: string; // if editableBy is set to PEOPLE_WITH_A_PASSWORD
 
+  @Column({ name: 'total_cards' })
+  totalCards: number;
+
   @OneToMany(() => CardEntity, (card) => card.set, { cascade: true })
   cards: Relation<CardEntity[]>;
+
+  @OneToMany(() => PracticeEntity, (practice) => practice.user, {
+    cascade: true,
+  })
+  practices: Relation<PracticeEntity[]>;
 
   @ManyToOne(() => FolderEntity, (folder) => folder.sets, {
     onDelete: 'CASCADE',
