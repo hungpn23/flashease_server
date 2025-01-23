@@ -1,5 +1,5 @@
 import { AuthEnvVariables } from '@/configs/auth.config';
-import { AuthError, Role } from '@/constants/index';
+import { AuthError, Role, SYSTEM } from '@/constants/index';
 import { AuthException } from '@/exceptions/auth.exception';
 import { JwtPayloadType, JwtRefreshPayloadType } from '@/types/auth.type';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
@@ -36,7 +36,9 @@ export class AuthService {
 
     dto.password = await argon2.hash(dto.password);
 
-    await UserEntity.save(new UserEntity({ ...dto, role: Role.USER }));
+    await UserEntity.save(
+      new UserEntity({ ...dto, role: Role.USER, createdBy: SYSTEM }),
+    );
   }
 
   async login(dto: AuthReqDto) {
@@ -60,6 +62,7 @@ export class AuthService {
         signature,
         user,
         expiresAt: new Date(Date.now() + ms(refreshTokenTtl)),
+        createdBy: SYSTEM,
       }),
     );
 

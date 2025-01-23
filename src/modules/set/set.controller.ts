@@ -14,7 +14,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { SetEntity } from './entities/set.entity';
-import { CreateSetDto, UpdateSetDto } from './set.dto';
+import { CreateSetDto, GetProgressResponseDto, UpdateSetDto } from './set.dto';
 import { SetService } from './set.service';
 
 @Controller({ path: 'set', version: '1' })
@@ -55,20 +55,32 @@ export class SetController {
 
   @ApiEndpoint({ type: SetEntity, summary: 'update a set' })
   @Patch(':id')
-  update(
+  async update(
     @Param('id', ParseIntPipe) setId: number,
     @Body() dto: UpdateSetDto,
     @JwtPayload() { userId }: JwtPayloadType,
   ) {
-    return this.setService.update(setId, dto, userId);
+    return await this.setService.update(setId, dto, userId);
   }
 
   @ApiEndpoint({ type: SetEntity, summary: 'remove a set' })
   @Delete(':id')
-  remove(
+  async remove(
     @Param('id', ParseIntPipe) setId: number,
     @JwtPayload() { userId }: JwtPayloadType,
   ) {
-    return this.setService.remove(setId, userId);
+    return await this.setService.remove(setId, userId);
+  }
+
+  @ApiEndpoint({
+    type: GetProgressResponseDto,
+    summary: "get a set's progresses",
+  })
+  @Get(':id')
+  async getProgress(
+    @Param('id', ParseIntPipe) setId: number,
+    @JwtPayload() { userId }: JwtPayloadType,
+  ) {
+    return await this.setService.getProgress(setId, userId);
   }
 }

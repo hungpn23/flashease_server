@@ -28,7 +28,7 @@ export class ProgressMetadataDto {
 }
 
 @Expose()
-export class FindProgressResponseDto {
+export class GetProgressResponseDto {
   set: SetEntity;
   metadata: ProgressMetadataDto;
 }

@@ -6,10 +6,17 @@ import {
   ForbiddenException,
   Injectable,
 } from '@nestjs/common';
+import { plainToInstance } from 'class-transformer';
+import { UserEntity } from '../user/entities/user.entity';
 import { CardEntity } from './entities/card.entity';
 import { ProgressEntity } from './entities/progress.entity';
 import { SetEntity } from './entities/set.entity';
-import { CreateSetDto, ProgressMetadataDto, UpdateSetDto } from './set.dto';
+import {
+  CreateSetDto,
+  GetProgressResponseDto,
+  ProgressMetadataDto,
+  UpdateSetDto,
+} from './set.dto';
 import { VisibleTo } from './set.enum';
 
 @Injectable()
@@ -103,13 +110,43 @@ export class SetService {
     return await SetEntity.remove(found);
   }
 
+  async getProgress(setId: number, userId: number) {
+    const [user, set] = await Promise.all([
+      UserEntity.findOneByOrFail({ id: userId }),
+      SetEntity.findOneOrFail({ where: { id: setId }, relations: ['cards'] }),
+    ]);
+
+    const found = await ProgressEntity.findBy({
+      user: { id: userId },
+      set: { id: setId },
+    });
+
+    if (found) {
+      return plainToInstance(GetProgressResponseDto, {
+        set,
+        metadata: this.getProgressMetadata(found),
+      } satisfies GetProgressResponseDto);
+    }
+
+    const newProgresses = set.cards.map((card) => {
+      return new ProgressEntity({ user, set, card, createdBy: user.id });
+    });
+
+    await ProgressEntity.save(newProgresses);
+
+    return plainToInstance(GetProgressResponseDto, {
+      set,
+      metadata: this.getProgressMetadata(newProgresses),
+    } satisfies GetProgressResponseDto);
+  }
+
   private getProgressMetadata(progresses: ProgressEntity[]) {
     const metadata = {
       totalCards: progresses.length,
       notStudiedCount: 0,
       learningCount: 0,
       knowCount: 0,
-    } as ProgressMetadataDto;
+    } satisfies ProgressMetadataDto;
 
     progresses.forEach((p) => {
       if (!p.correctCount) {
@@ -121,6 +158,6 @@ export class SetService {
       }
     });
 
-    return metadata;
+    return plainToInstance(ProgressMetadataDto, metadata);
   }
 }
