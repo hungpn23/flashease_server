@@ -2,16 +2,14 @@ import { OffsetPaginatedDto } from '@/dto/offset-pagination/paginated.dto';
 import { OffsetPaginationQueryDto } from '@/dto/offset-pagination/query.dto';
 import paginate from '@/utils/offset-paginate';
 import {
-  BadRequestException,
   ConflictException,
   ForbiddenException,
   Injectable,
 } from '@nestjs/common';
-import { plainToInstance } from 'class-transformer';
-import XLSX from 'xlsx';
 import { CardEntity } from './entities/card.entity';
+import { ProgressEntity } from './entities/progress.entity';
 import { SetEntity } from './entities/set.entity';
-import { CardDto, CreateSetDto, FindOneSetDto, UpdateSetDto } from './set.dto';
+import { CreateSetDto, ProgressMetadataDto, UpdateSetDto } from './set.dto';
 import { VisibleTo } from './set.enum';
 
 @Injectable()
@@ -72,32 +70,6 @@ export class SetService {
     return new OffsetPaginatedDto<SetEntity>(entities, metadata);
   }
 
-  async findOnePublic(setId: number, dto: FindOneSetDto) {
-    const found = await SetEntity.findOneOrFail({
-      where: { id: setId },
-      relations: ['cards'],
-    });
-
-    switch (found.visibleTo) {
-      case VisibleTo.EVERYONE:
-        return found;
-      case VisibleTo.PEOPLE_WITH_A_PASSWORD:
-        if (dto.visibleToPassword === found.visibleToPassword) return found;
-        throw new BadRequestException('invalid password');
-    }
-  }
-
-  async findOnePrivate(setId: number, userId: number) {
-    const found = await SetEntity.findOneOrFail({
-      where: { id: setId },
-      relations: ['cards'],
-    });
-
-    if (found.createdBy !== userId) throw new ForbiddenException();
-
-    return found;
-  }
-
   async update(setId: number, dto: UpdateSetDto, userId: number) {
     const { cards, ...rest } = dto;
 
@@ -131,44 +103,24 @@ export class SetService {
     return await SetEntity.remove(found);
   }
 
-  /**
-   * VD:
-   *  apple: táo
-   *  dog: chó
-   *  house: nhà
-   *  book: sách
-   *  car: xe hơi
-   */
-  convertFromText(input: string) {
-    const cards = input.trim().split('\n');
-    const results: CardDto[] = cards
-      .map((card) => {
-        const [term, definition] = card.split(':');
-        if (!term || !definition) return;
-        return { term, definition };
-      })
-      .filter((card) => card !== undefined);
+  private getProgressMetadata(progresses: ProgressEntity[]) {
+    const metadata = {
+      totalCards: progresses.length,
+      notStudiedCount: 0,
+      learningCount: 0,
+      knowCount: 0,
+    } as ProgressMetadataDto;
 
-    return plainToInstance(CardDto, results);
-  }
+    progresses.forEach((p) => {
+      if (!p.correctCount) {
+        metadata.notStudiedCount += 1;
+      } else if (p.correctCount >= 2) {
+        metadata.knowCount += 1;
+      } else {
+        metadata.learningCount += 1;
+      }
+    });
 
-  convertFromXlsx(buffer: Buffer) {
-    const workbook = XLSX.read(buffer, { type: 'buffer' });
-    const sheetName = workbook.SheetNames[0];
-    const worksheet = workbook.Sheets[sheetName];
-
-    const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-
-    const results: CardDto[] = data
-      .slice(2)
-      .map((row) => ({
-        term: row[0],
-        definition: row[1],
-      }))
-      .filter(
-        (item) => item.term !== undefined || item.definition !== undefined,
-      );
-
-    return plainToInstance(CardDto, results);
+    return metadata;
   }
 }

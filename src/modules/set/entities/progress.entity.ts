@@ -1,5 +1,7 @@
 import { AbstractEntity } from '@/database/entities/abstract.entity';
 import { CardEntity } from '@/modules/set/entities/card.entity';
+import { SetEntity } from '@/modules/set/entities/set.entity';
+import { UserEntity } from '@/modules/user/entities/user.entity';
 import { Expose } from 'class-transformer';
 import {
   Column,
@@ -10,11 +12,10 @@ import {
   Relation,
   Unique,
 } from 'typeorm';
-import { PracticeEntity } from './practice.entity';
 
 @Expose()
 @Entity('progress')
-@Unique(['practice', 'card'])
+@Unique(['user', 'set', 'card'])
 export class ProgressEntity extends AbstractEntity {
   constructor(data?: Partial<ProgressEntity>) {
     super();
@@ -27,11 +28,17 @@ export class ProgressEntity extends AbstractEntity {
   @Column({ name: 'correct_count', nullable: true })
   correctCount?: number;
 
-  @ManyToOne(() => PracticeEntity, (practice) => practice.progresses, {
+  @ManyToOne(() => UserEntity, (user) => user.progresses, {
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'practice_id', referencedColumnName: 'id' })
-  practice: Relation<PracticeEntity>;
+  @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
+  user: Relation<UserEntity>;
+
+  @ManyToOne(() => SetEntity, (set) => set.progresses, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'set_id', referencedColumnName: 'id' })
+  set: Relation<SetEntity>;
 
   @ManyToOne(() => CardEntity, (card) => card.progresses, {
     onDelete: 'CASCADE',

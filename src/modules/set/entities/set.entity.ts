@@ -1,6 +1,7 @@
 import { AbstractEntity } from '@/database/entities/abstract.entity';
 import { FolderEntity } from '@/modules/folder/folder.entity';
 import { CardEntity } from '@/modules/set/entities/card.entity';
+import { ProgressEntity } from '@/modules/set/entities/progress.entity';
 import { Expose } from 'class-transformer';
 import {
   Column,
@@ -11,7 +12,6 @@ import {
   PrimaryGeneratedColumn,
   Relation,
 } from 'typeorm';
-import { PracticeEntity } from '../../core/entities/practice.entity';
 import { EditableBy, VisibleTo } from '../set.enum';
 
 @Expose()
@@ -56,10 +56,10 @@ export class SetEntity extends AbstractEntity {
   @OneToMany(() => CardEntity, (card) => card.set, { cascade: true })
   cards: Relation<CardEntity[]>;
 
-  @OneToMany(() => PracticeEntity, (practice) => practice.user, {
+  @OneToMany(() => ProgressEntity, (progress) => progress.user, {
     cascade: true,
   })
-  practices: Relation<PracticeEntity[]>;
+  progresses: Relation<ProgressEntity[]>;
 
   @ManyToOne(() => FolderEntity, (folder) => folder.sets, {
     onDelete: 'CASCADE',

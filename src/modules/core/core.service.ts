@@ -1,77 +1,40 @@
 import { Injectable } from '@nestjs/common';
-import { InjectDataSource } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
-import { DataSource } from 'typeorm';
-import { SetEntity } from '../set/entities/set.entity';
-import { UserEntity } from '../user/entities/user.entity';
-import { FindPracticeResponseDto, PracticeMetadata } from './core.dto';
-import { PracticeEntity } from './entities/practice.entity';
-import { ProgressEntity } from './entities/progress.entity';
+import XLSX from 'xlsx';
+import { CardDto } from '../set/set.dto';
 
 @Injectable()
 export class CoreService {
-  constructor(@InjectDataSource() private dataSource: DataSource) {}
+  convertFromText(input: string) {
+    const cards = input.trim().split('\n');
+    const results: CardDto[] = cards
+      .map((card) => {
+        const [term, definition] = card.split(':');
+        if (!term || !definition) return;
+        return { term, definition };
+      })
+      .filter((card) => card !== undefined);
 
-  async findPractice(setId: number, userId: number) {
-    return await this.dataSource.transaction(async (manager) => {
-      const practice = await manager.findOne(PracticeEntity, {
-        where: { user: { id: userId }, set: { id: setId } },
-        relations: ['progresses'],
-      });
-
-      if (practice) {
-        return plainToInstance(FindPracticeResponseDto, {
-          set: practice.set,
-          metadata: this.getPracticeMetadata(practice.progresses),
-        } satisfies FindPracticeResponseDto);
-      }
-
-      const [user, set] = await Promise.all([
-        manager.findOneOrFail(UserEntity, {
-          where: { id: userId },
-        }),
-        manager.findOneOrFail(SetEntity, {
-          where: { id: setId },
-          relations: ['cards'],
-        }),
-      ]);
-
-      const newPractice = manager.create(PracticeEntity, { user, set });
-
-      const progresses = set.cards.map((card) =>
-        manager.create(ProgressEntity, {
-          practice: newPractice,
-          card,
-        } as ProgressEntity),
-      );
-
-      await Promise.all([manager.save(newPractice), manager.save(progresses)]);
-
-      return plainToInstance(FindPracticeResponseDto, {
-        set,
-        metadata: this.getPracticeMetadata(progresses),
-      } satisfies FindPracticeResponseDto);
-    });
+    return plainToInstance(CardDto, results);
   }
 
-  private getPracticeMetadata(progresses: ProgressEntity[]) {
-    const metadata = {
-      totalCards: progresses.length,
-      notStudiedCount: 0,
-      learningCount: 0,
-      knowCount: 0,
-    } as PracticeMetadata;
+  convertFromXlsx(buffer: Buffer) {
+    const workbook = XLSX.read(buffer, { type: 'buffer' });
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
 
-    progresses.forEach((p) => {
-      if (!p.correctCount) {
-        metadata.notStudiedCount += 1;
-      } else if (p.correctCount >= 2) {
-        metadata.knowCount += 1;
-      } else {
-        metadata.learningCount += 1;
-      }
-    });
+    const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-    return metadata;
+    const results: CardDto[] = data
+      .slice(2)
+      .map((row) => ({
+        term: row[0],
+        definition: row[1],
+      }))
+      .filter(
+        (item) => item.term !== undefined || item.definition !== undefined,
+      );
+
+    return plainToInstance(CardDto, results);
   }
 }

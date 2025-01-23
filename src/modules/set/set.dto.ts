@@ -7,6 +7,7 @@ import {
 import { PartialType } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 import { ValidateIf } from 'class-validator';
+import { SetEntity } from './entities/set.entity';
 import { EditableBy, VisibleTo } from './set.enum';
 
 @Expose()
@@ -16,6 +17,20 @@ export class CardDto {
 
   @StringValidators()
   definition: string;
+}
+
+@Expose()
+export class ProgressMetadataDto {
+  totalCards: number;
+  notStudiedCount: number;
+  learningCount: number;
+  knowCount: number;
+}
+
+@Expose()
+export class FindProgressResponseDto {
+  set: SetEntity;
+  metadata: ProgressMetadataDto;
 }
 
 export class CreateSetDto {

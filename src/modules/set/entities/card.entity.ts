@@ -1,5 +1,5 @@
 import { AbstractEntity } from '@/database/entities/abstract.entity';
-import { ProgressEntity } from '@/modules/core/entities/progress.entity';
+import { ProgressEntity } from '@/modules/set/entities/progress.entity';
 import { SetEntity } from '@/modules/set/entities/set.entity';
 import { Expose } from 'class-transformer';
 import {
@@ -28,10 +28,6 @@ export class CardEntity extends AbstractEntity {
 
   @Column()
   definition: string;
-
-  // TODO: image upload feature
-  // @Column({ nullable: true })
-  // image?: string;
 
   @OneToMany(() => ProgressEntity, (progress) => progress.card, {
     cascade: true,
