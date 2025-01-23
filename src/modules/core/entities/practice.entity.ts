@@ -5,13 +5,17 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   Relation,
+  Unique,
 } from 'typeorm';
 import { SetEntity } from '../../set/entities/set.entity';
+import { ProgressEntity } from './progress.entity';
 
 @Expose()
-@Entity('user_set_practice')
+@Entity('practice')
+@Unique(['user', 'set'])
 export class PracticeEntity extends AbstractEntity {
   constructor(data?: Partial<PracticeEntity>) {
     super();
@@ -32,4 +36,9 @@ export class PracticeEntity extends AbstractEntity {
   })
   @JoinColumn({ name: 'set_id', referencedColumnName: 'id' })
   set: Relation<SetEntity>;
+
+  @OneToMany(() => ProgressEntity, (progress) => progress.practice, {
+    cascade: true,
+  })
+  progresses: Relation<ProgressEntity[]>;
 }
