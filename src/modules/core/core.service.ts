@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import XLSX from 'xlsx';
-import { CardDto } from '../set/set.dto';
+import { CardDto } from './dtos/card.dto';
 
 @Injectable()
 export class CoreService {

@@ -1,11 +1,7 @@
 import { OffsetPaginatedDto } from '@/dto/offset-pagination/paginated.dto';
 import { OffsetPaginationQueryDto } from '@/dto/offset-pagination/query.dto';
 import paginate from '@/utils/offset-paginate';
-import {
-  ConflictException,
-  ForbiddenException,
-  Injectable,
-} from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { In } from 'typeorm';
 import { SetEntity } from '../set/entities/set.entity';
 import { CreateFolderDto, UpdateFolderDto } from './folder.dto';
@@ -42,23 +38,17 @@ export class FolderService {
   }
 
   async findOne(folderId: number, userId: number) {
-    const found = await FolderEntity.findOneOrFail({
-      where: { id: folderId },
+    return await FolderEntity.findOneOrFail({
+      where: { id: folderId, createdBy: userId },
       relations: ['sets'],
     });
-
-    if (found.createdBy !== userId) throw new ForbiddenException();
-
-    return found;
   }
 
   async update(folderId: number, dto: UpdateFolderDto, userId: number) {
     const found = await FolderEntity.findOneOrFail({
-      where: { id: folderId },
+      where: { id: folderId, createdBy: userId },
       relations: ['sets'],
     });
-
-    if (found.createdBy !== userId) throw new ForbiddenException();
 
     return await FolderEntity.save(
       Object.assign(found, {
@@ -69,37 +59,34 @@ export class FolderService {
   }
 
   async remove(folderId: number, userId: number) {
-    const found = await FolderEntity.findOneOrFail({ where: { id: folderId } });
-
-    if (found.createdBy !== userId) throw new ForbiddenException();
+    const found = await FolderEntity.findOneByOrFail({
+      id: folderId,
+      createdBy: userId,
+    });
 
     return await FolderEntity.remove(found);
   }
 
   async addSets(folderId: number, setIds: number[], userId: number) {
-    const folder = await FolderEntity.findOneOrFail({
-      where: { id: folderId },
+    const found = await FolderEntity.findOneOrFail({
+      where: { id: folderId, createdBy: userId },
       relations: ['sets'],
     });
 
-    if (folder.createdBy !== userId) throw new ForbiddenException();
-
     const sets = await SetEntity.findBy({ id: In(setIds), createdBy: userId });
-    folder.sets = folder.sets.concat(sets);
+    found.sets = found.sets.concat(sets);
 
-    return await FolderEntity.save(folder);
+    return await FolderEntity.save(found);
   }
 
   async removeSets(folderId: number, setIds: number[], userId: number) {
-    const folder = await FolderEntity.findOneOrFail({
-      where: { id: folderId },
+    const found = await FolderEntity.findOneOrFail({
+      where: { id: folderId, createdBy: userId },
       relations: ['sets'],
     });
 
-    if (folder.createdBy !== userId) throw new ForbiddenException();
+    found.sets = found.sets.filter((set) => !setIds.includes(set.id));
 
-    folder.sets = folder.sets.filter((set) => !setIds.includes(set.id));
-
-    return await FolderEntity.save(folder);
+    return await FolderEntity.save(found);
   }
 }

@@ -5,33 +5,9 @@ import {
   StringValidators,
 } from '@/decorators/properties.decorator';
 import { PartialType } from '@nestjs/swagger';
-import { Expose } from 'class-transformer';
 import { ValidateIf } from 'class-validator';
-import { SetEntity } from './entities/set.entity';
-import { EditableBy, VisibleTo } from './set.enum';
-
-@Expose()
-export class CardDto {
-  @StringValidators()
-  term: string;
-
-  @StringValidators()
-  definition: string;
-}
-
-@Expose()
-export class ProgressMetadataDto {
-  totalCards: number;
-  notStudiedCount: number;
-  learningCount: number;
-  knowCount: number;
-}
-
-@Expose()
-export class GetProgressResponseDto {
-  set: SetEntity;
-  metadata: ProgressMetadataDto;
-}
+import { CardDto } from '../../core/dtos/card.dto';
+import { EditableBy, VisibleTo } from '../set.enum';
 
 export class CreateSetDto {
   @StringValidators()
@@ -64,8 +40,3 @@ export class FindOneSetDto {
 }
 
 export class UpdateSetDto extends PartialType(CreateSetDto) {}
-
-export class ConvertFromTextDto {
-  @StringValidators()
-  input: string;
-}

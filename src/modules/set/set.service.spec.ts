@@ -9,9 +9,9 @@ import {
 } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SelectQueryBuilder } from 'typeorm';
+import { CreateSetDto, UpdateSetDto } from './dtos/set.dto';
 import { CardEntity } from './entities/card.entity';
 import { SetEntity } from './entities/set.entity';
-import { CreateSetDto, UpdateSetDto } from './set.dto';
 import { EditableBy, VisibleTo } from './set.enum';
 import { SetService } from './set.service';
 

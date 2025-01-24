@@ -1,8 +1,9 @@
 import { ApiEndpoint, ApiFile } from '@/decorators/endpoint.decorator';
 import { validateXlsxPipe } from '@/pipes/validate-file.pipe';
 import { Body, Controller, Post, UploadedFile } from '@nestjs/common';
-import { CardDto, ConvertFromTextDto } from '../set/set.dto';
 import { CoreService } from './core.service';
+import { CardDto } from './dtos/card.dto';
+import { ConvertFromTextDto } from './dtos/core.dto';
 
 @Controller({ path: 'core', version: '1' })
 export class CoreController {

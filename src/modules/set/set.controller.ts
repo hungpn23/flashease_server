@@ -13,8 +13,9 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import { GetProgressResponseDto } from './dtos/progress.dto';
+import { CreateSetDto, UpdateSetDto } from './dtos/set.dto';
 import { SetEntity } from './entities/set.entity';
-import { CreateSetDto, GetProgressResponseDto, UpdateSetDto } from './set.dto';
 import { SetService } from './set.service';
 
 @Controller({ path: 'set', version: '1' })

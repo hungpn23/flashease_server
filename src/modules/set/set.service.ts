@@ -2,21 +2,20 @@ import { OffsetPaginatedDto } from '@/dto/offset-pagination/paginated.dto';
 import { OffsetPaginationQueryDto } from '@/dto/offset-pagination/query.dto';
 import paginate from '@/utils/offset-paginate';
 import {
+  BadRequestException,
   ConflictException,
-  ForbiddenException,
   Injectable,
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { UserEntity } from '../user/entities/user.entity';
+import {
+  GetProgressResponseDto,
+  ProgressMetadataDto,
+} from './dtos/progress.dto';
+import { CreateSetDto, UpdateSetDto } from './dtos/set.dto';
 import { CardEntity } from './entities/card.entity';
 import { ProgressEntity } from './entities/progress.entity';
 import { SetEntity } from './entities/set.entity';
-import {
-  CreateSetDto,
-  GetProgressResponseDto,
-  ProgressMetadataDto,
-  UpdateSetDto,
-} from './set.dto';
 import { VisibleTo } from './set.enum';
 
 @Injectable()
@@ -28,6 +27,9 @@ export class SetService {
     });
 
     if (found) throw new ConflictException();
+
+    if (dto.cards.length < 4)
+      throw new BadRequestException('Set must have at least 4 cards');
 
     const cards = dto.cards.map((card) => {
       return new CardEntity({ ...card, createdBy: userId });
@@ -81,13 +83,14 @@ export class SetService {
     const { cards, ...rest } = dto;
 
     const found = await SetEntity.findOneOrFail({
-      where: { id: setId },
+      where: { id: setId, createdBy: userId },
       relations: ['cards'],
     });
 
-    if (found.createdBy !== userId) throw new ForbiddenException();
-
     if (cards) {
+      if (cards.length < 4)
+        throw new BadRequestException('Set must have at least 4 cards');
+
       await CardEntity.remove(found.cards);
       found.cards = cards.map((card) => {
         return new CardEntity({ ...card, createdBy: userId });
@@ -103,9 +106,10 @@ export class SetService {
   }
 
   async remove(setId: number, userId: number) {
-    const found = await SetEntity.findOneOrFail({ where: { id: setId } });
-
-    if (found.createdBy !== userId) throw new ForbiddenException();
+    const found = await SetEntity.findOneByOrFail({
+      id: setId,
+      createdBy: userId,
+    });
 
     return await SetEntity.remove(found);
   }
