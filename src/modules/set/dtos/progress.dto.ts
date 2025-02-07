@@ -1,3 +1,7 @@
+import {
+  BooleanValidators,
+  StringValidators,
+} from '@/decorators/properties.decorator';
 import { Expose } from 'class-transformer';
 import { SetEntity } from '../entities/set.entity';
 
@@ -10,7 +14,17 @@ export class ProgressMetadataDto {
 }
 
 @Expose()
-export class GetProgressResponseDto {
+export class GetProgressResDto {
   set: SetEntity;
   metadata: ProgressMetadataDto;
+}
+
+export class GetProgressDto {
+  @StringValidators({ required: false })
+  visibleToPassword?: string;
+}
+
+export class SaveAnswerDto {
+  @BooleanValidators()
+  isCorrect: boolean;
 }

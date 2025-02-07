@@ -4,13 +4,16 @@ import paginate from '@/utils/offset-paginate';
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { UserEntity } from '../user/entities/user.entity';
 import {
-  GetProgressResponseDto,
+  GetProgressDto,
+  GetProgressResDto,
   ProgressMetadataDto,
+  SaveAnswerDto,
 } from './dtos/progress.dto';
 import { CreateSetDto, UpdateSetDto } from './dtos/set.dto';
 import { CardEntity } from './entities/card.entity';
@@ -114,22 +117,35 @@ export class SetService {
     return await SetEntity.remove(found);
   }
 
-  async getProgress(setId: number, userId: number) {
+  async getProgress(setId: number, dto: GetProgressDto, userId: number) {
     const [user, set] = await Promise.all([
       UserEntity.findOneByOrFail({ id: userId }),
-      SetEntity.findOneOrFail({ where: { id: setId }, relations: ['cards'] }),
+      SetEntity.findOneOrFail({
+        where: { id: setId, createdBy: userId },
+        relations: ['cards'],
+      }),
     ]);
 
-    const found = await ProgressEntity.findBy({
+    switch (set.visibleTo) {
+      case VisibleTo.JUST_ME:
+        if (set.createdBy !== userId) throw new ForbiddenException();
+        break;
+      case VisibleTo.PEOPLE_WITH_A_PASSWORD:
+        if (set.visibleToPassword !== dto.visibleToPassword)
+          throw new ForbiddenException();
+        break;
+    }
+
+    const progresses = await ProgressEntity.findBy({
       user: { id: userId },
       set: { id: setId },
     });
 
-    if (found) {
-      return plainToInstance(GetProgressResponseDto, {
+    if (progresses.length > 0) {
+      return plainToInstance(GetProgressResDto, {
         set,
-        metadata: this.getProgressMetadata(found),
-      } satisfies GetProgressResponseDto);
+        metadata: this.getProgressMetadata(progresses),
+      } satisfies GetProgressResDto);
     }
 
     const newProgresses = set.cards.map((card) => {
@@ -138,22 +154,49 @@ export class SetService {
 
     await ProgressEntity.save(newProgresses);
 
-    return plainToInstance(GetProgressResponseDto, {
+    return plainToInstance(GetProgressResDto, {
       set,
       metadata: this.getProgressMetadata(newProgresses),
-    } satisfies GetProgressResponseDto);
+    } satisfies GetProgressResDto);
+  }
+
+  async saveAnswer(progressId: number, dto: SaveAnswerDto, userId: number) {
+    const progress = await ProgressEntity.findOneOrFail({
+      where: {
+        id: progressId,
+        user: { id: userId },
+      },
+      relations: ['set'],
+    });
+
+    if (dto.isCorrect) {
+      progress.correctCount = progress.correctCount
+        ? progress.correctCount + 1
+        : 1;
+    } else {
+      progress.correctCount = progress.correctCount || 0;
+    }
+
+    await ProgressEntity.save(progress);
+
+    const progresses = await ProgressEntity.findBy({
+      user: { id: userId },
+      set: { id: progress.set.id },
+    });
+
+    return this.getProgressMetadata(progresses);
   }
 
   private getProgressMetadata(progresses: ProgressEntity[]) {
-    const metadata = {
+    const metadata: ProgressMetadataDto = {
       totalCards: progresses.length,
       notStudiedCount: 0,
       learningCount: 0,
       knowCount: 0,
-    } satisfies ProgressMetadataDto;
+    };
 
     progresses.forEach((p) => {
-      if (!p.correctCount) {
+      if (p.correctCount === null) {
         metadata.notStudiedCount += 1;
       } else if (p.correctCount >= 2) {
         metadata.knowCount += 1;

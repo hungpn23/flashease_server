@@ -13,7 +13,12 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { GetProgressResponseDto } from './dtos/progress.dto';
+import {
+  GetProgressDto,
+  GetProgressResDto,
+  ProgressMetadataDto,
+  SaveAnswerDto,
+} from './dtos/progress.dto';
 import { CreateSetDto, UpdateSetDto } from './dtos/set.dto';
 import { SetEntity } from './entities/set.entity';
 import { SetService } from './set.service';
@@ -55,9 +60,9 @@ export class SetController {
   }
 
   @ApiEndpoint({ type: SetEntity, summary: 'update a set' })
-  @Patch(':id')
+  @Patch(':setId')
   async update(
-    @Param('id', ParseIntPipe) setId: number,
+    @Param('setId', ParseIntPipe) setId: number,
     @Body() dto: UpdateSetDto,
     @JwtPayload() { userId }: JwtPayloadType,
   ) {
@@ -65,23 +70,37 @@ export class SetController {
   }
 
   @ApiEndpoint({ type: SetEntity, summary: 'remove a set' })
-  @Delete(':id')
+  @Delete(':setId')
   async remove(
-    @Param('id', ParseIntPipe) setId: number,
+    @Param('setId', ParseIntPipe) setId: number,
     @JwtPayload() { userId }: JwtPayloadType,
   ) {
     return await this.setService.remove(setId, userId);
   }
 
   @ApiEndpoint({
-    type: GetProgressResponseDto,
+    type: GetProgressResDto,
     summary: "get a set's progresses",
   })
-  @Get(':id')
+  @Get(':setId')
   async getProgress(
-    @Param('id', ParseIntPipe) setId: number,
+    @Param('setId', ParseIntPipe) setId: number,
+    @Body() dto: GetProgressDto,
     @JwtPayload() { userId }: JwtPayloadType,
   ) {
-    return await this.setService.getProgress(setId, userId);
+    return await this.setService.getProgress(setId, dto, userId);
+  }
+
+  @ApiEndpoint({
+    type: ProgressMetadataDto,
+    summary: 'save an answer',
+  })
+  @Post('save-answer/:progressId')
+  async saveAnswer(
+    @Param('progressId', ParseIntPipe) progressId: number,
+    @Body() dto: SaveAnswerDto,
+    @JwtPayload() { userId }: JwtPayloadType,
+  ) {
+    return await this.setService.saveAnswer(progressId, dto, userId);
   }
 }
