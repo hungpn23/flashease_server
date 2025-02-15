@@ -86,7 +86,7 @@ export class AuthService {
     await this.addToBlacklist(key, exp);
 
     const found = await SessionEntity.findOneByOrFail({ id: sessionId });
-    return await SessionEntity.remove(found);
+    await SessionEntity.remove(found);
   }
 
   async refreshToken({ sessionId, signature }: JwtRefreshPayloadType) {

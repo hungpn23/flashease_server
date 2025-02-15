@@ -13,6 +13,7 @@ import {
   Post,
   UploadedFile,
 } from '@nestjs/common';
+import { SkipThrottle } from '@nestjs/throttler';
 import { UserEntity } from './entities/user.entity';
 import { UpdateUserDto, UploadAvatarResponseDto } from './user.dto';
 import { UserService } from './user.service';
@@ -21,6 +22,7 @@ import { UserService } from './user.service';
 export class UserController {
   constructor(private userService: UserService) {}
 
+  @SkipThrottle()
   @ApiEndpoint({ type: UserEntity, summary: 'get user by id' })
   @Get()
   async getOne(@JwtPayload() { userId }: JwtPayloadType): Promise<UserEntity> {

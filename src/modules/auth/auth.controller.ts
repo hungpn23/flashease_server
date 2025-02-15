@@ -4,7 +4,6 @@ import { JwtPayload } from '@/decorators/jwt-payload.decorator';
 import { JwtPayloadType, JwtRefreshPayloadType } from '@/types/auth.type';
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiExcludeEndpoint } from '@nestjs/swagger';
-import { SessionEntity } from '../user/entities/session.entity';
 import { AuthReqDto, LoginResDto, RefreshResDto } from './auth.dto';
 import { AuthService } from './auth.service';
 
@@ -31,7 +30,7 @@ export class AuthController {
     return await this.authService.login(dto);
   }
 
-  @ApiEndpoint({ summary: 'logout', type: SessionEntity })
+  @ApiEndpoint({ summary: 'logout' })
   @Post('/logout')
   async logout(@JwtPayload() payload: JwtPayloadType) {
     return await this.authService.logout(payload);
