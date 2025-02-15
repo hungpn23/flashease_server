@@ -83,8 +83,7 @@ export class AuthService {
   async logout(payload: JwtPayloadType) {
     const { sessionId, exp, userId } = payload;
     const key = `SESSION_BLACKLIST:${userId}:${sessionId}`;
-    const ttl = exp * 1000 - Date.now(); // remaining time in milliseconds
-    await this.cacheManager.store.set(key, true, ttl);
+    await this.addToBlacklist(key, exp);
 
     const found = await SessionEntity.findOneByOrFail({ id: sessionId });
     return await SessionEntity.remove(found);
@@ -99,14 +98,25 @@ export class AuthService {
     if (!session || session.signature !== signature)
       throw new UnauthorizedException();
 
+    const newSignature = this.createSignature();
+
     const payload: JwtPayloadType = {
       userId: session.user.id,
       sessionId,
       role: session.user.role,
     };
 
-    const accessToken = await this.createAccessToken(payload);
-    return { accessToken };
+    await SessionEntity.update(session.id, { signature: newSignature });
+
+    const [accessToken, refreshToken] = await Promise.all([
+      this.createAccessToken(payload),
+      this.createRefreshToken({
+        ...payload,
+        signature: newSignature,
+      } satisfies JwtRefreshPayloadType),
+    ]);
+
+    return { accessToken, refreshToken };
   }
   // *** END ROUTE ***
 
@@ -116,7 +126,7 @@ export class AuthService {
   async verifyAccessToken(accessToken: string): Promise<JwtPayloadType> {
     let payload: JwtPayloadType;
     try {
-      payload = this.jwtService.verify(accessToken, {
+      payload = await this.jwtService.verifyAsync(accessToken, {
         secret: this.configService.get('AUTH_JWT_SECRET', { infer: true }),
       });
     } catch (error) {
@@ -124,30 +134,32 @@ export class AuthService {
       throw new UnauthorizedException('invalid token');
     }
 
-    const key = `SESSION_BLACKLIST:${payload.userId}:${payload.sessionId}`;
-    const isSessionBlacklisted =
-      await this.cacheManager.store.get<boolean>(key);
-
-    if (isSessionBlacklisted) {
-      const sessions = await SessionEntity.findBy({
-        user: { id: payload.userId },
-      });
-      await SessionEntity.remove(sessions); // delete all user's sessions
-      throw new UnauthorizedException(AuthError.E03);
-    }
+    const { userId, sessionId } = payload;
+    const key = `SESSION_BLACKLIST:${userId}:${sessionId}`;
+    await this.checkBlacklist(userId, key);
 
     return payload;
   }
 
-  verifyRefreshToken(refreshToken: string): JwtRefreshPayloadType {
+  async verifyRefreshToken(
+    refreshToken: string,
+  ): Promise<JwtRefreshPayloadType> {
+    let payload: JwtRefreshPayloadType;
     try {
-      return this.jwtService.verify(refreshToken, {
+      payload = await this.jwtService.verifyAsync(refreshToken, {
         secret: this.configService.get('AUTH_REFRESH_SECRET', { infer: true }),
       });
     } catch (error) {
       this.logger.error(error);
       throw new UnauthorizedException('session expired');
     }
+
+    const { userId, sessionId, signature, exp } = payload;
+    const key = `REFRESH_TOKEN_BLACKLIST:${userId}:${sessionId}:${signature}`;
+    await this.checkBlacklist(userId, key);
+    await this.addToBlacklist(key, exp);
+
+    return payload;
   }
   // *** END GUARD ***
 
@@ -188,6 +200,23 @@ export class AuthService {
 
   private createSignature() {
     return crypto.randomBytes(16).toString('hex');
+  }
+
+  private async checkBlacklist(userId: number, key: string) {
+    const isInBlacklist = await this.cacheManager.store.get<boolean>(key);
+
+    if (isInBlacklist) {
+      const sessions = await SessionEntity.findBy({
+        user: { id: userId },
+      });
+      await SessionEntity.remove(sessions); // delete all user's sessions
+      throw new UnauthorizedException(AuthError.E03);
+    }
+  }
+
+  private async addToBlacklist(key: string, exp: number) {
+    const ttl = exp * 1000 - Date.now(); // remaining time in milliseconds
+    await this.cacheManager.store.set<boolean>(key, true, ttl);
   }
   // *** END PRIVATE ***
 }
