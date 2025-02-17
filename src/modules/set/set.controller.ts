@@ -83,13 +83,16 @@ export class SetController {
     summary: "get a set's progresses",
   })
   @Get(':setId')
-  async getProgress(
+  async findProgressBySetId(
     @Param('setId', ParseIntPipe) setId: number,
     @Body() dto: GetProgressDto,
     @JwtPayload() { userId }: JwtPayloadType,
   ) {
-    return await this.setService.getProgress(setId, dto, userId);
+    return await this.setService.findProgressBySetId(setId, dto, userId);
   }
+
+  // TODO: implement this
+  async getUserProgresses() {}
 
   @ApiEndpoint({
     type: ProgressMetadataDto,

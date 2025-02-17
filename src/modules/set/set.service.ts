@@ -7,7 +7,9 @@ import {
   ForbiddenException,
   Injectable,
 } from '@nestjs/common';
+import argon2 from 'argon2';
 import { plainToInstance } from 'class-transformer';
+import slugify from 'slugify';
 import { UserEntity } from '../user/entities/user.entity';
 import {
   GetProgressDto,
@@ -19,7 +21,7 @@ import { CreateSetDto, UpdateSetDto } from './dtos/set.dto';
 import { CardEntity } from './entities/card.entity';
 import { ProgressEntity } from './entities/progress.entity';
 import { SetEntity } from './entities/set.entity';
-import { VisibleTo } from './set.enum';
+import { EditableBy, VisibleTo } from './set.enum';
 
 @Injectable()
 export class SetService {
@@ -39,6 +41,23 @@ export class SetService {
     });
 
     const set = new SetEntity({ ...dto, cards, createdBy: userId });
+
+    if (
+      dto.visibleTo === VisibleTo.PEOPLE_WITH_A_PASSWORD &&
+      dto.visibleToPassword
+    ) {
+      set.visibleToPassword = await argon2.hash(dto.visibleToPassword);
+    }
+
+    if (
+      dto.editableBy === EditableBy.PEOPLE_WITH_A_PASSWORD &&
+      dto.editableByPassword
+    ) {
+      set.editableByPassword = await argon2.hash(dto.editableByPassword);
+    }
+
+    set.slug = slugify(set.name, { lower: true, strict: true });
+
     return await SetEntity.save(set);
   }
 
@@ -90,6 +109,20 @@ export class SetService {
       relations: ['cards'],
     });
 
+    if (
+      dto.visibleTo === VisibleTo.PEOPLE_WITH_A_PASSWORD &&
+      dto.visibleToPassword
+    ) {
+      found.visibleToPassword = await argon2.hash(dto.visibleToPassword);
+    }
+
+    if (
+      dto.editableBy === EditableBy.PEOPLE_WITH_A_PASSWORD &&
+      dto.editableByPassword
+    ) {
+      found.editableByPassword = await argon2.hash(dto.editableByPassword);
+    }
+
     if (cards) {
       if (cards.length < 4)
         throw new BadRequestException('Set must have at least 4 cards');
@@ -99,6 +132,8 @@ export class SetService {
         return new CardEntity({ ...card, createdBy: userId });
       });
     }
+
+    found.slug = slugify(found.name, { lower: true, strict: true });
 
     return await SetEntity.save(
       Object.assign(found, {
@@ -117,7 +152,11 @@ export class SetService {
     return await SetEntity.remove(found);
   }
 
-  async getProgress(setId: number, dto: GetProgressDto, userId: number) {
+  async findProgressBySetId(
+    setId: number,
+    dto: GetProgressDto,
+    userId: number,
+  ) {
     const [user, set] = await Promise.all([
       UserEntity.findOneByOrFail({ id: userId }),
       SetEntity.findOneOrFail({

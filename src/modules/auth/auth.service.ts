@@ -96,6 +96,7 @@ export class AuthService {
     });
 
     if (!session || session.signature !== signature)
+      // TODO: phân biệt
       throw new UnauthorizedException();
 
     const newSignature = this.createSignature();

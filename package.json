@@ -39,6 +39,7 @@
     "@nestjs/swagger": "^8.1.1",
     "@nestjs/throttler": "^6.4.0",
     "@nestjs/typeorm": "^10.0.2",
+    "@vitalets/google-translate-api": "^9.2.1",
     "argon2": "^0.41.1",
     "cache-manager": "^5.7.6",
     "cache-manager-redis-yet": "^5.1.5",
@@ -121,5 +122,14 @@
       "^@/(.*)$": "<rootDir>/$1"
     }
   },
-  "packageManager": "pnpm@9.14.3"
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@nestjs/core",
+      "bcrypt",
+      "nestjs-pino"
+    ],
+    "ignoredBuiltDependencies": [
+      "bcrypt"
+    ]
+  }
 }

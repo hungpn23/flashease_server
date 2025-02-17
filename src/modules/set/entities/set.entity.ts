@@ -3,10 +3,7 @@ import { FolderEntity } from '@/modules/folder/folder.entity';
 import { CardEntity } from '@/modules/set/entities/card.entity';
 import { ProgressEntity } from '@/modules/set/entities/progress.entity';
 import { Expose } from 'class-transformer';
-import slugify from 'slugify';
 import {
-  BeforeInsert,
-  BeforeUpdate,
   Column,
   Entity,
   JoinColumn,
@@ -72,10 +69,4 @@ export class SetEntity extends AbstractEntity {
   })
   @JoinColumn({ name: 'folder_id', referencedColumnName: 'id' })
   folder: Relation<FolderEntity>;
-
-  @BeforeInsert()
-  @BeforeUpdate()
-  getSlug() {
-    this.slug = slugify(this.name, { lower: true, strict: true });
-  }
 }

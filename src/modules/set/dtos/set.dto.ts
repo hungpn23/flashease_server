@@ -21,14 +21,14 @@ export class CreateSetDto {
 
   @ValidateIf((o) => o.visibleTo === VisibleTo.PEOPLE_WITH_A_PASSWORD)
   @PasswordValidators()
-  visibleToPassword: string;
+  visibleToPassword?: string;
 
   @EnumValidators(EditableBy)
   editableBy: EditableBy;
 
   @ValidateIf((o) => o.editableBy === EditableBy.PEOPLE_WITH_A_PASSWORD)
   @PasswordValidators()
-  editableByPassword: string;
+  editableByPassword?: string;
 
   @ClassValidators(CardDto, { isArray: true })
   cards: CardDto[];

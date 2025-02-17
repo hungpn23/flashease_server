@@ -1,3 +1,4 @@
+import { SYSTEM } from '@/constants';
 import { getOrder, Order } from '@/decorators/order.decorator';
 import { ApiHideProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
@@ -22,7 +23,7 @@ export abstract class AbstractEntity extends BaseEntity {
   updatedAt: Date;
 
   @Order(9998)
-  @Column({ name: 'created_by' })
+  @Column({ name: 'created_by', default: SYSTEM })
   createdBy: number;
 
   @Order(9998)
