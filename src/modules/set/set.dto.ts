@@ -6,8 +6,8 @@ import {
 } from '@/decorators/properties.decorator';
 import { PartialType } from '@nestjs/swagger';
 import { ValidateIf } from 'class-validator';
-import { CardDto } from '../../core/dtos/card.dto';
-import { EditableBy, VisibleTo } from '../set.enum';
+import { CardDto } from '../core/dtos/card.dto';
+import { EditableBy, VisibleTo } from './set.enum';
 
 export class CreateSetDto {
   @StringValidators()

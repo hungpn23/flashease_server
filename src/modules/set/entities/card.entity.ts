@@ -1,5 +1,5 @@
 import { AbstractEntity } from '@/database/entities/abstract.entity';
-import { ProgressEntity } from '@/modules/set/entities/progress.entity';
+import { ProgressEntity } from '@/modules/progress/progress.entity';
 import { SetEntity } from '@/modules/set/entities/set.entity';
 import { Expose } from 'class-transformer';
 import {

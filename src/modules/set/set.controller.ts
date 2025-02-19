@@ -13,28 +13,13 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import {
-  GetProgressDto,
-  GetProgressResDto,
-  ProgressMetadataDto,
-  SaveAnswerDto,
-} from './dtos/progress.dto';
-import { CreateSetDto, UpdateSetDto } from './dtos/set.dto';
 import { SetEntity } from './entities/set.entity';
+import { CreateSetDto, UpdateSetDto } from './set.dto';
 import { SetService } from './set.service';
 
 @Controller({ path: 'set', version: '1' })
 export class SetController {
   constructor(private setService: SetService) {}
-
-  @ApiEndpoint({ type: SetEntity, summary: 'create a new set' })
-  @Post()
-  async create(
-    @Body() dto: CreateSetDto,
-    @JwtPayload() { userId }: JwtPayloadType,
-  ) {
-    return await this.setService.create(dto, userId);
-  }
 
   @ApiEndpoint({
     type: SetEntity,
@@ -43,7 +28,7 @@ export class SetController {
   })
   @Get('all')
   async findAll(@Query() query: OffsetPaginationQueryDto) {
-    return await this.setService.findAll(query);
+    return await this.setService.findPublicSets(query);
   }
 
   @ApiEndpoint({
@@ -51,12 +36,21 @@ export class SetController {
     summary: 'find my sets',
     isPaginated: true,
   })
-  @Get()
+  @Get('my-sets')
   async findMySets(
     @Query() query: OffsetPaginationQueryDto,
     @JwtPayload() { userId }: JwtPayloadType,
   ) {
     return await this.setService.findMySets(query, userId);
+  }
+
+  @ApiEndpoint({ type: SetEntity, summary: 'create a new set' })
+  @Post()
+  async create(
+    @Body() dto: CreateSetDto,
+    @JwtPayload() { userId }: JwtPayloadType,
+  ) {
+    return await this.setService.create(dto, userId);
   }
 
   @ApiEndpoint({ type: SetEntity, summary: 'update a set' })
@@ -76,34 +70,5 @@ export class SetController {
     @JwtPayload() { userId }: JwtPayloadType,
   ) {
     return await this.setService.remove(setId, userId);
-  }
-
-  @ApiEndpoint({
-    type: GetProgressResDto,
-    summary: "get a set's progresses",
-  })
-  @Get(':setId')
-  async findProgressBySetId(
-    @Param('setId', ParseIntPipe) setId: number,
-    @Body() dto: GetProgressDto,
-    @JwtPayload() { userId }: JwtPayloadType,
-  ) {
-    return await this.setService.findProgressBySetId(setId, dto, userId);
-  }
-
-  // TODO: implement this
-  async getUserProgresses() {}
-
-  @ApiEndpoint({
-    type: ProgressMetadataDto,
-    summary: 'save an answer',
-  })
-  @Post('save-answer/:progressId')
-  async saveAnswer(
-    @Param('progressId', ParseIntPipe) progressId: number,
-    @Body() dto: SaveAnswerDto,
-    @JwtPayload() { userId }: JwtPayloadType,
-  ) {
-    return await this.setService.saveAnswer(progressId, dto, userId);
   }
 }

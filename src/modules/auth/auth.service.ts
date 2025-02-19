@@ -89,15 +89,21 @@ export class AuthService {
     await SessionEntity.remove(found);
   }
 
-  async refreshToken({ sessionId, signature }: JwtRefreshPayloadType) {
+  async refreshToken({ sessionId, signature, userId }: JwtRefreshPayloadType) {
     const session = await SessionEntity.findOne({
       where: { id: sessionId },
       relations: { user: true },
     });
 
-    if (!session || session.signature !== signature)
-      // TODO: phân biệt
-      throw new UnauthorizedException();
+    if (!session) throw new UnauthorizedException();
+    if (session.signature !== signature) {
+      // ** remove all sessions
+      const sessions = await SessionEntity.findBy({
+        user: { id: userId },
+      });
+      await SessionEntity.remove(sessions);
+      throw new UnauthorizedException(AuthError.E03);
+    }
 
     const newSignature = this.createSignature();
 

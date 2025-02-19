@@ -3,7 +3,7 @@ import {
   StringValidators,
 } from '@/decorators/properties.decorator';
 import { Expose } from 'class-transformer';
-import { SetEntity } from '../entities/set.entity';
+import { SetEntity } from '../set/entities/set.entity';
 
 @Expose()
 export class ProgressMetadataDto {
@@ -14,15 +14,22 @@ export class ProgressMetadataDto {
 }
 
 @Expose()
-export class GetProgressResDto {
+export class FindProgressResDto {
   set: SetEntity;
   metadata: ProgressMetadataDto;
 }
 
-export class GetProgressDto {
+@Expose()
+export class FindUserProgressesResDto {
+  sets: SetEntity[];
+}
+
+export class StartProgressDto {
   @StringValidators({ required: false })
   visibleToPassword?: string;
 }
+
+export class FindProgressDto extends StartProgressDto {}
 
 export class SaveAnswerDto {
   @BooleanValidators()

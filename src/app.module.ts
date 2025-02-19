@@ -107,7 +107,7 @@ import { Milliseconds } from './types/branded.type';
           },
           username: configService.get('REDIS_USERNAME', { infer: true }),
           password: configService.get('REDIS_PASSWORD', { infer: true }),
-          ttl: 1 as Milliseconds,
+          ttl: 100 as Milliseconds,
         });
 
         return {

@@ -1,8 +1,8 @@
 import { AbstractEntity } from '@/database/entities/abstract.entity';
 import { FolderEntity } from '@/modules/folder/folder.entity';
 import { CardEntity } from '@/modules/set/entities/card.entity';
-import { ProgressEntity } from '@/modules/set/entities/progress.entity';
-import { Expose } from 'class-transformer';
+import { ApiHideProperty } from '@nestjs/swagger';
+import { Exclude, Expose } from 'class-transformer';
 import {
   Column,
   Entity,
@@ -13,6 +13,7 @@ import {
   Relation,
 } from 'typeorm';
 import { EditableBy, VisibleTo } from '../set.enum';
+import { SavedSetEntity } from './saved-set.entity';
 
 @Expose()
 @Entity('set')
@@ -42,6 +43,8 @@ export class SetEntity extends AbstractEntity {
   })
   visibleTo: VisibleTo;
 
+  @ApiHideProperty()
+  @Exclude()
   @Column({ name: 'visible_to_password', nullable: true })
   visibleToPassword?: string; // if visibleTo is set to PEOPLE_WITH_A_PASSWORD
 
@@ -53,16 +56,18 @@ export class SetEntity extends AbstractEntity {
   })
   editableBy: EditableBy;
 
+  @ApiHideProperty()
+  @Exclude()
   @Column({ name: 'editable_by_password', nullable: true })
   editableByPassword?: string; // if editableBy is set to PEOPLE_WITH_A_PASSWORD
 
   @OneToMany(() => CardEntity, (card) => card.set, { cascade: true })
   cards: Relation<CardEntity[]>;
 
-  @OneToMany(() => ProgressEntity, (progress) => progress.user, {
+  @OneToMany(() => SavedSetEntity, (savedSets) => savedSets.set, {
     cascade: true,
   })
-  progresses: Relation<ProgressEntity[]>;
+  savedSets: Relation<SavedSetEntity[]>;
 
   @ManyToOne(() => FolderEntity, (folder) => folder.sets, {
     onDelete: 'CASCADE',
