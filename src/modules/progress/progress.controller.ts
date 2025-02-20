@@ -39,7 +39,7 @@ export class ProgressController {
     type: Boolean,
     summary: 'start a progress by set id',
   })
-  @Post(':setId')
+  @Post('/start-progress/:setId')
   async startProgress(
     @Param('setId', ParseIntPipe) setId: number,
     @JwtPayload() { userId }: JwtPayloadType,

@@ -23,11 +23,11 @@ export class SetController {
 
   @ApiEndpoint({
     type: SetEntity,
-    summary: 'find all paginated sets',
+    summary: 'find public sets',
     isPaginated: true,
   })
   @Get('all')
-  async findAll(@Query() query: OffsetPaginationQueryDto) {
+  async findPublicSets(@Query() query: OffsetPaginationQueryDto) {
     return await this.setService.findPublicSets(query);
   }
 
