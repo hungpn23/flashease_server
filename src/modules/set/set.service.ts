@@ -46,13 +46,15 @@ export class SetService {
     return await SetEntity.save(set);
   }
 
-  async findPublicSets(query: OffsetPaginationQueryDto) {
+  async findPublicSets(query: OffsetPaginationQueryDto, userId: number) {
     await delay(1000);
     const builder = SetEntity.createQueryBuilder('set');
 
-    builder.where('set.visibleTo = :visibleTo', {
-      visibleTo: VisibleTo.EVERYONE,
-    });
+    builder
+      .where('set.visibleTo = :visibleTo', {
+        visibleTo: VisibleTo.EVERYONE,
+      })
+      .andWhere('set.createdBy != :userId', { userId });
 
     if (query.search) {
       const search = query.search.trim();

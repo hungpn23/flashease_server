@@ -27,8 +27,11 @@ export class SetController {
     isPaginated: true,
   })
   @Get('all')
-  async findPublicSets(@Query() query: OffsetPaginationQueryDto) {
-    return await this.setService.findPublicSets(query);
+  async findPublicSets(
+    @Query() query: OffsetPaginationQueryDto,
+    @JwtPayload() { userId }: JwtPayloadType,
+  ) {
+    return await this.setService.findPublicSets(query, userId);
   }
 
   @ApiEndpoint({
