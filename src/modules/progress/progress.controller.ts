@@ -52,11 +52,11 @@ export class ProgressController {
     type: ProgressMetadataDto,
     summary: 'save an answer',
   })
-  @Post('save-answer/:progressId')
+  @Post('save-answer/:itemId')
   async saveAnswer(
-    @Param('progressId', ParseIntPipe) progressId: number,
+    @Param('itemId', ParseIntPipe) itemId: number,
     @Body() dto: SaveAnswerDto,
   ) {
-    return await this.progressService.saveAnswer(progressId, dto);
+    return await this.progressService.saveAnswer(itemId, dto);
   }
 }

@@ -101,9 +101,9 @@ export class ProgressService {
     } satisfies FindProgressResDto);
   }
 
-  async saveAnswer(progressId: number, dto: SaveAnswerDto) {
+  async saveAnswer(itemId: number, dto: SaveAnswerDto) {
     const item = await ProgressItemEntity.findOneOrFail({
-      where: { id: progressId },
+      where: { id: itemId },
       relations: { progress: true },
     });
 
