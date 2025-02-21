@@ -13,7 +13,7 @@ import {
 import { ProgressEntity } from './progress.entity';
 
 @Expose()
-@Entity('progress')
+@Entity('item')
 @Unique(['progress', 'card'])
 export class ProgressItemEntity extends AbstractEntity {
   constructor(data?: Partial<ProgressItemEntity>) {

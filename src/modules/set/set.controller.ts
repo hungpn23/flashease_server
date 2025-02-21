@@ -36,7 +36,7 @@ export class SetController {
     summary: 'find my sets',
     isPaginated: true,
   })
-  @Get('my-sets')
+  @Get('my-set')
   async findMySets(
     @Query() query: OffsetPaginationQueryDto,
     @JwtPayload() { userId }: JwtPayloadType,
