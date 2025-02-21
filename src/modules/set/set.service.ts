@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import argon2 from 'argon2';
 import slugify from 'slugify';
+import { UserEntity } from '../user/entities/user.entity';
 import { CardEntity } from './entities/card.entity';
 import { SetEntity } from './entities/set.entity';
 import { CreateSetDto, UpdateSetDto } from './set.dto';
@@ -16,10 +17,13 @@ import { EditableBy, VisibleTo } from './set.enum';
 @Injectable()
 export class SetService {
   async create(dto: CreateSetDto, userId: number) {
-    const found = await SetEntity.findOneBy({
-      name: dto.name,
-      createdBy: userId,
-    });
+    const [found, user] = await Promise.all([
+      SetEntity.findOneBy({
+        name: dto.name,
+        createdBy: userId,
+      }),
+      UserEntity.findOneByOrFail({ id: userId }),
+    ]);
 
     if (found) throw new ConflictException();
 
@@ -30,7 +34,12 @@ export class SetService {
       return new CardEntity({ ...card, createdBy: userId });
     });
 
-    const set = new SetEntity({ ...dto, cards, createdBy: userId });
+    const set = new SetEntity({
+      ...dto,
+      author: user.username,
+      cards,
+      createdBy: userId,
+    });
 
     if (
       dto.visibleTo === VisibleTo.PEOPLE_WITH_A_PASSWORD &&

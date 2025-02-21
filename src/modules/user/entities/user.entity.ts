@@ -27,8 +27,8 @@ export class UserEntity extends AbstractEntity {
   @Column({ type: 'enum', enum: Role, default: Role.USER })
   role: Role;
 
-  @Column({ nullable: true, unique: true })
-  username?: string;
+  @Column({ unique: true })
+  username: string;
 
   @Column({ unique: true })
   email: string;

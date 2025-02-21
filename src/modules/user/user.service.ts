@@ -36,7 +36,7 @@ export class UserService {
     const found = await UserEntity.findOneOrFail({ where: { id: userId } });
 
     return await UserEntity.save(
-      Object.assign(found, { ...dto, updatedBy: found.username }),
+      Object.assign(found, { ...dto, updatedBy: found.id }),
     );
   }
 
@@ -53,7 +53,7 @@ export class UserService {
     await UserEntity.save(
       Object.assign(user, {
         avatar: fileName,
-        updatedBy: user.username,
+        updatedBy: user.id,
       }),
     );
 
@@ -69,7 +69,7 @@ export class UserService {
     const user = await UserEntity.findOneByOrFail({ id: userId });
     await this.s3Service.deleteFile(user.avatar);
     await UserEntity.save(
-      Object.assign(user, { avatar: null, updatedBy: user.username }),
+      Object.assign(user, { avatar: null, updatedBy: user.id }),
     );
   }
 }

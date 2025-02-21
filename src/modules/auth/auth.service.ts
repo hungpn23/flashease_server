@@ -36,8 +36,10 @@ export class AuthService {
 
     dto.password = await argon2.hash(dto.password);
 
+    const username = email.split('@')[0];
+
     await UserEntity.save(
-      new UserEntity({ ...dto, role: Role.USER, createdBy: SYSTEM }),
+      new UserEntity({ ...dto, username, role: Role.USER, createdBy: SYSTEM }),
     );
   }
 

@@ -35,6 +35,9 @@ export class SetEntity extends AbstractEntity {
   @Column({ nullable: true })
   description?: string;
 
+  @Column()
+  author: string;
+
   @Column({
     name: 'visible_to',
     type: 'enum',
