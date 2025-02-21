@@ -1,5 +1,5 @@
 import { AbstractEntity } from '@/database/entities/abstract.entity';
-import { ProgressEntity } from '@/modules/progress/progress.entity';
+import { ProgressItemEntity } from '@/modules/progress/entities/progress-item.entity';
 import { SetEntity } from '@/modules/set/entities/set.entity';
 import { UserEntity } from '@/modules/user/entities/user.entity';
 import { Expose } from 'class-transformer';
@@ -14,10 +14,10 @@ import {
 } from 'typeorm';
 
 @Expose()
-@Entity('saved_set')
+@Entity('progress')
 @Unique(['user', 'set'])
-export class SavedSetEntity extends AbstractEntity {
-  constructor(data?: Partial<SavedSetEntity>) {
+export class ProgressEntity extends AbstractEntity {
+  constructor(data?: Partial<ProgressEntity>) {
     super();
     Object.assign(this, data);
   }
@@ -25,20 +25,20 @@ export class SavedSetEntity extends AbstractEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => UserEntity, (user) => user.savedSets, {
+  @ManyToOne(() => UserEntity, (user) => user.progresses, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
   user: Relation<UserEntity>;
 
-  @ManyToOne(() => SetEntity, (set) => set.savedSets, {
+  @ManyToOne(() => SetEntity, (set) => set.progresses, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'set_id', referencedColumnName: 'id' })
   set: Relation<SetEntity>;
 
-  @OneToMany(() => ProgressEntity, (progress) => progress.savedSet, {
+  @OneToMany(() => ProgressItemEntity, (item) => item.progress, {
     cascade: true,
   })
-  progresses: Relation<ProgressEntity[]>;
+  items: Relation<ProgressItemEntity[]>;
 }

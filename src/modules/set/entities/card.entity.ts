@@ -1,5 +1,5 @@
 import { AbstractEntity } from '@/database/entities/abstract.entity';
-import { ProgressEntity } from '@/modules/progress/progress.entity';
+import { ProgressItemEntity } from '@/modules/progress/entities/progress-item.entity';
 import { SetEntity } from '@/modules/set/entities/set.entity';
 import { Expose } from 'class-transformer';
 import {
@@ -29,10 +29,10 @@ export class CardEntity extends AbstractEntity {
   @Column()
   definition: string;
 
-  @OneToMany(() => ProgressEntity, (progress) => progress.card, {
+  @OneToMany(() => ProgressItemEntity, (progress) => progress.card, {
     cascade: true,
   })
-  progresses: Relation<ProgressEntity[]>;
+  progresses: Relation<ProgressItemEntity[]>;
 
   @ManyToOne(() => SetEntity, (set) => set.cards, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'set_id', referencedColumnName: 'id' })

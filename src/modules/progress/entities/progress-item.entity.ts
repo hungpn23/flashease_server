@@ -10,13 +10,13 @@ import {
   Relation,
   Unique,
 } from 'typeorm';
-import { SavedSetEntity } from '../set/entities/saved-set.entity';
+import { ProgressEntity } from './progress.entity';
 
 @Expose()
 @Entity('progress')
-@Unique(['savedSet', 'card'])
-export class ProgressEntity extends AbstractEntity {
-  constructor(data?: Partial<ProgressEntity>) {
+@Unique(['progress', 'card'])
+export class ProgressItemEntity extends AbstractEntity {
+  constructor(data?: Partial<ProgressItemEntity>) {
     super();
     Object.assign(this, data);
   }
@@ -27,11 +27,11 @@ export class ProgressEntity extends AbstractEntity {
   @Column({ name: 'correct_count', nullable: true })
   correctCount?: number;
 
-  @ManyToOne(() => SavedSetEntity, (savedSet) => savedSet.progresses, {
+  @ManyToOne(() => ProgressEntity, (progress) => progress.items, {
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'saved_set_id', referencedColumnName: 'id' })
-  savedSet: Relation<SavedSetEntity>;
+  @JoinColumn({ name: 'progress_id', referencedColumnName: 'id' })
+  progress: Relation<ProgressEntity>;
 
   @ManyToOne(() => CardEntity, (card) => card.progresses, {
     onDelete: 'CASCADE',

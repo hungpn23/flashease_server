@@ -5,10 +5,11 @@ import {
 } from '@nestjs/common';
 import argon2 from 'argon2';
 import { plainToInstance } from 'class-transformer';
-import { SavedSetEntity } from '../set/entities/saved-set.entity';
 import { SetEntity } from '../set/entities/set.entity';
 import { VisibleTo } from '../set/set.enum';
 import { UserEntity } from '../user/entities/user.entity';
+import { ProgressItemEntity } from './entities/progress-item.entity';
+import { ProgressEntity } from './entities/progress.entity';
 import {
   FindProgressDto,
   FindProgressResDto,
@@ -16,7 +17,6 @@ import {
   SaveAnswerDto,
   StartProgressDto,
 } from './progress.dto';
-import { ProgressEntity } from './progress.entity';
 
 @Injectable()
 export class ProgressService {
@@ -56,87 +56,83 @@ export class ProgressService {
         'the set must have at least 4 cards to start progress',
       );
 
-    const newSavedSet = await SavedSetEntity.save(
-      new SavedSetEntity({ user, set }),
+    const newProgress = await ProgressEntity.save(
+      new ProgressEntity({ user, set }),
     );
 
-    const newProgresses = newSavedSet.set.cards.map((card) => {
-      return new ProgressEntity({
-        savedSet: newSavedSet,
+    const newItems = newProgress.set.cards.map((card) => {
+      return new ProgressItemEntity({
+        progress: newProgress,
         card,
         createdBy: user.id,
       });
     });
 
-    await ProgressEntity.save(newProgresses);
+    await ProgressItemEntity.save(newItems);
 
     return true;
   }
 
-  async findProgress(savedSetId: number, userId: number, dto: FindProgressDto) {
-    const found = await SavedSetEntity.findOneOrFail({
-      where: { id: savedSetId },
+  async findProgress(progressId: number, userId: number, dto: FindProgressDto) {
+    const progress = await ProgressEntity.findOneOrFail({
+      where: { id: progressId },
       relations: ['set'],
     });
 
-    switch (found.set.visibleTo) {
+    switch (progress.set.visibleTo) {
       case VisibleTo.JUST_ME:
-        if (found.set.createdBy !== userId) throw new ForbiddenException();
+        if (progress.set.createdBy !== userId) throw new ForbiddenException();
       case VisibleTo.PEOPLE_WITH_A_PASSWORD:
         const isPasswordMatch = await argon2.verify(
-          found.set.visibleToPassword,
+          progress.set.visibleToPassword,
           dto.visibleToPassword,
         );
 
         if (!isPasswordMatch) throw new ForbiddenException();
     }
 
-    const progresses = await ProgressEntity.findBy({
-      savedSet: found,
-    });
+    const progressItems = await ProgressItemEntity.findBy({ progress });
 
-    if (!progresses.length) throw new BadRequestException();
+    if (!progressItems.length) throw new BadRequestException();
 
     return plainToInstance(FindProgressResDto, {
-      set: found.set,
-      metadata: this.getProgressMetadata(progresses),
+      set: progress.set,
+      metadata: this.getProgressMetadata(progressItems),
     } satisfies FindProgressResDto);
   }
 
   async saveAnswer(progressId: number, dto: SaveAnswerDto) {
-    const progress = await ProgressEntity.findOneOrFail({
+    const item = await ProgressItemEntity.findOneOrFail({
       where: { id: progressId },
-      relations: { savedSet: true },
+      relations: { progress: true },
     });
 
     if (dto.isCorrect) {
-      progress.correctCount = progress.correctCount
-        ? progress.correctCount + 1
-        : 1;
+      item.correctCount = item.correctCount ? item.correctCount + 1 : 1;
     } else {
-      progress.correctCount = progress.correctCount || 0;
+      item.correctCount = item.correctCount || 0;
     }
 
-    await ProgressEntity.save(progress);
+    await ProgressItemEntity.save(item);
 
-    const progresses = await ProgressEntity.findBy({
-      savedSet: { id: progress.savedSet.id },
+    const items = await ProgressItemEntity.findBy({
+      progress: { id: item.progress.id },
     });
 
-    return this.getProgressMetadata(progresses);
+    return this.getProgressMetadata(items);
   }
 
   async findUserProgresses() {}
 
-  private getProgressMetadata(progresses: ProgressEntity[]) {
+  private getProgressMetadata(items: ProgressItemEntity[]) {
     const metadata: ProgressMetadataDto = {
-      totalCards: progresses.length,
+      totalCards: items.length,
       notStudiedCount: 0,
       learningCount: 0,
       knowCount: 0,
     };
 
-    progresses.forEach((p) => {
+    items.forEach((p) => {
       if (p.correctCount === null) {
         metadata.notStudiedCount += 1;
       } else if (p.correctCount >= 2) {

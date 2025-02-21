@@ -24,15 +24,15 @@ export class ProgressController {
 
   @ApiEndpoint({
     type: FindProgressResDto,
-    summary: 'find progresses by saved_set id',
+    summary: 'find items by progress id',
   })
-  @Get(':savedSetId')
+  @Get(':progressId')
   async findProgress(
-    @Param('savedSetId', ParseIntPipe) savedSetId: number,
+    @Param('progressId', ParseIntPipe) progressId: number,
     @JwtPayload() { userId }: JwtPayloadType,
     @Body() dto: FindProgressDto,
   ) {
-    return await this.progressService.findProgress(savedSetId, userId, dto);
+    return await this.progressService.findProgress(progressId, userId, dto);
   }
 
   @ApiEndpoint({

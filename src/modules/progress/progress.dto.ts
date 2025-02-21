@@ -19,11 +19,6 @@ export class FindProgressResDto {
   metadata: ProgressMetadataDto;
 }
 
-@Expose()
-export class FindUserProgressesResDto {
-  sets: SetEntity[];
-}
-
 export class StartProgressDto {
   @StringValidators({ required: false })
   visibleToPassword?: string;
