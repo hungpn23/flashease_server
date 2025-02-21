@@ -1,5 +1,6 @@
 import { OffsetPaginatedDto } from '@/dto/offset-pagination/paginated.dto';
 import { OffsetPaginationQueryDto } from '@/dto/offset-pagination/query.dto';
+import { delay } from '@/utils/delay';
 import paginate from '@/utils/offset-paginate';
 import {
   BadRequestException,
@@ -61,6 +62,7 @@ export class SetService {
   }
 
   async findPublicSets(query: OffsetPaginationQueryDto) {
+    await delay(1000);
     const builder = SetEntity.createQueryBuilder('set');
 
     builder.where('set.visibleTo = :visibleTo', {
@@ -82,6 +84,7 @@ export class SetService {
   }
 
   async findMySets(query: OffsetPaginationQueryDto, userId: number) {
+    await delay(1000);
     const builder = SetEntity.createQueryBuilder('set');
 
     builder.where('set.createdBy = :userId', { userId });
