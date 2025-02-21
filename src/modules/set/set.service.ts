@@ -7,13 +7,12 @@ import {
   ConflictException,
   Injectable,
 } from '@nestjs/common';
-import argon2 from 'argon2';
 import slugify from 'slugify';
 import { UserEntity } from '../user/entities/user.entity';
 import { CardEntity } from './entities/card.entity';
 import { SetEntity } from './entities/set.entity';
 import { CreateSetDto, UpdateSetDto } from './set.dto';
-import { EditableBy, VisibleTo } from './set.enum';
+import { VisibleTo } from './set.enum';
 
 @Injectable()
 export class SetService {
@@ -41,20 +40,6 @@ export class SetService {
       cards,
       createdBy: userId,
     });
-
-    if (
-      dto.visibleTo === VisibleTo.PEOPLE_WITH_A_PASSWORD &&
-      dto.visibleToPassword
-    ) {
-      set.visibleToPassword = await argon2.hash(dto.visibleToPassword);
-    }
-
-    if (
-      dto.editableBy === EditableBy.PEOPLE_WITH_A_PASSWORD &&
-      dto.editableByPassword
-    ) {
-      set.editableByPassword = await argon2.hash(dto.editableByPassword);
-    }
 
     set.slug = slugify(set.name, { lower: true, strict: true });
 
@@ -110,20 +95,6 @@ export class SetService {
       where: { id: setId, createdBy: userId },
       relations: ['cards'],
     });
-
-    if (
-      dto.visibleTo === VisibleTo.PEOPLE_WITH_A_PASSWORD &&
-      dto.visibleToPassword
-    ) {
-      found.visibleToPassword = await argon2.hash(dto.visibleToPassword);
-    }
-
-    if (
-      dto.editableBy === EditableBy.PEOPLE_WITH_A_PASSWORD &&
-      dto.editableByPassword
-    ) {
-      found.editableByPassword = await argon2.hash(dto.editableByPassword);
-    }
 
     if (cards) {
       if (cards.length < 4)

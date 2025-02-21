@@ -1,8 +1,7 @@
 import { AbstractEntity } from '@/database/entities/abstract.entity';
 import { FolderEntity } from '@/modules/folder/folder.entity';
 import { CardEntity } from '@/modules/set/entities/card.entity';
-import { ApiHideProperty } from '@nestjs/swagger';
-import { Exclude, Expose } from 'class-transformer';
+import { Expose } from 'class-transformer';
 import {
   Column,
   Entity,
@@ -46,8 +45,6 @@ export class SetEntity extends AbstractEntity {
   })
   visibleTo: VisibleTo;
 
-  @ApiHideProperty()
-  @Exclude()
   @Column({ name: 'visible_to_password', nullable: true })
   visibleToPassword?: string; // if visibleTo is set to PEOPLE_WITH_A_PASSWORD
 
@@ -59,8 +56,6 @@ export class SetEntity extends AbstractEntity {
   })
   editableBy: EditableBy;
 
-  @ApiHideProperty()
-  @Exclude()
   @Column({ name: 'editable_by_password', nullable: true })
   editableByPassword?: string; // if editableBy is set to PEOPLE_WITH_A_PASSWORD
 

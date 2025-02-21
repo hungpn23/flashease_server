@@ -3,7 +3,6 @@ import {
   ForbiddenException,
   Injectable,
 } from '@nestjs/common';
-import argon2 from 'argon2';
 import { plainToInstance } from 'class-transformer';
 import { SetEntity } from '../set/entities/set.entity';
 import { VisibleTo } from '../set/set.enum';
@@ -32,12 +31,7 @@ export class ProgressService {
       case VisibleTo.JUST_ME:
         if (set.createdBy !== userId) return false;
       case VisibleTo.PEOPLE_WITH_A_PASSWORD:
-        const isPasswordMatch = await argon2.verify(
-          set.visibleToPassword,
-          dto.visibleToPassword,
-        );
-
-        if (!isPasswordMatch) return false;
+        if (set.visibleToPassword !== dto.visibleToPassword) return false;
     }
 
     if (set.visibleTo === VisibleTo.JUST_ME && set.createdBy !== userId) {
@@ -46,7 +40,7 @@ export class ProgressService {
 
     if (
       set.visibleTo === VisibleTo.PEOPLE_WITH_A_PASSWORD &&
-      !(await argon2.verify(set.visibleToPassword, dto.visibleToPassword))
+      set.visibleToPassword !== dto.visibleToPassword
     ) {
       return false;
     }
@@ -83,12 +77,8 @@ export class ProgressService {
       case VisibleTo.JUST_ME:
         if (progress.set.createdBy !== userId) throw new ForbiddenException();
       case VisibleTo.PEOPLE_WITH_A_PASSWORD:
-        const isPasswordMatch = await argon2.verify(
-          progress.set.visibleToPassword,
-          dto.visibleToPassword,
-        );
-
-        if (!isPasswordMatch) throw new ForbiddenException();
+        if (progress.set.visibleToPassword !== dto.visibleToPassword)
+          throw new ForbiddenException();
     }
 
     const progressItems = await ProgressItemEntity.findBy({ progress });
