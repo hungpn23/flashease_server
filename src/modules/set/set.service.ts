@@ -35,8 +35,8 @@ export class SetService {
 
     const set = new SetEntity({
       ...dto,
-      author: user.username,
       cards,
+      user,
       createdBy: userId,
     });
 
@@ -47,6 +47,7 @@ export class SetService {
     await delay(2000);
     const builder = SetEntity.createQueryBuilder('set');
 
+    builder.leftJoinAndSelect('set.user', 'user');
     builder
       .where('set.visibleTo = :visibleTo', {
         visibleTo: VisibleTo.EVERYONE,
@@ -67,10 +68,11 @@ export class SetService {
     return new OffsetPaginatedDto<SetEntity>(entities, metadata);
   }
 
-  async findMySets(query: OffsetPaginationQueryDto, userId: number) {
+  async findMySet(query: OffsetPaginationQueryDto, userId: number) {
     await delay(2000);
     const builder = SetEntity.createQueryBuilder('set');
 
+    builder.leftJoinAndSelect('set.user', 'user');
     builder.where('set.createdBy = :userId', { userId });
 
     if (query.search) {
@@ -85,6 +87,16 @@ export class SetService {
     const { entities, metadata } = await paginate<SetEntity>(builder, query);
 
     return new OffsetPaginatedDto<SetEntity>(entities, metadata);
+  }
+
+  async findMySetDetail(setId: number, userId: number) {
+    return await SetEntity.findOneOrFail({
+      where: {
+        id: setId,
+        createdBy: userId,
+      },
+      relations: ['cards'],
+    });
   }
 
   async update(setId: number, dto: UpdateSetDto, userId: number) {

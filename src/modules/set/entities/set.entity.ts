@@ -1,6 +1,7 @@
 import { AbstractEntity } from '@/database/entities/abstract.entity';
 import { FolderEntity } from '@/modules/folder/folder.entity';
 import { CardEntity } from '@/modules/set/entities/card.entity';
+import { UserEntity } from '@/modules/user/entities/user.entity';
 import { Expose } from 'class-transformer';
 import {
   Column,
@@ -30,9 +31,6 @@ export class SetEntity extends AbstractEntity {
 
   @Column({ nullable: true })
   description?: string;
-
-  @Column()
-  author: string;
 
   @Column({
     name: 'visible_to',
@@ -69,4 +67,10 @@ export class SetEntity extends AbstractEntity {
   })
   @JoinColumn({ name: 'folder_id', referencedColumnName: 'id' })
   folder: Relation<FolderEntity>;
+
+  @ManyToOne(() => UserEntity, (user) => user.sets, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
+  user: Relation<UserEntity>;
 }

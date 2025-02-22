@@ -1,6 +1,7 @@
 import { Role } from '@/constants';
 import { AbstractEntity } from '@/database/entities/abstract.entity';
 import { ProgressEntity } from '@/modules/progress/entities/progress.entity';
+import { SetEntity } from '@/modules/set/entities/set.entity';
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose } from 'class-transformer';
 import {
@@ -49,6 +50,11 @@ export class UserEntity extends AbstractEntity {
 
   @OneToMany(() => SessionEntity, (session) => session.user, { cascade: true })
   sessions: Relation<SessionEntity[]>;
+
+  @OneToMany(() => SetEntity, (set) => set.user, {
+    cascade: true,
+  })
+  sets: Relation<SetEntity[]>;
 
   @OneToMany(() => ProgressEntity, (progresses) => progresses.user, {
     cascade: true,

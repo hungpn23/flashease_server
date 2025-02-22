@@ -40,11 +40,23 @@ export class SetController {
     isPaginated: true,
   })
   @Get('my-set')
-  async findMySets(
+  async findMySet(
     @Query() query: OffsetPaginationQueryDto,
     @JwtPayload() { userId }: JwtPayloadType,
   ) {
-    return await this.setService.findMySets(query, userId);
+    return await this.setService.findMySet(query, userId);
+  }
+
+  @ApiEndpoint({
+    type: SetEntity,
+    summary: 'find my set detail',
+  })
+  @Get('my-set/:setId')
+  async findMySetDetail(
+    @Param('setId', ParseIntPipe) setId: number,
+    @JwtPayload() { userId }: JwtPayloadType,
+  ) {
+    return await this.setService.findMySetDetail(setId, userId);
   }
 
   @ApiEndpoint({ type: SetEntity, summary: 'create a new set' })

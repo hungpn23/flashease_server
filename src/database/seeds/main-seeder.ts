@@ -44,56 +44,56 @@ export class MainSeeder implements Seeder {
       new SetEntity({
         name: 'hungpn23 public',
         description: 'hungpn23 public set',
-        author: hungpn23.username,
         visibleTo: VisibleTo.EVERYONE,
         visibleToPassword: null,
         editableBy: EditableBy.JUST_ME,
         editableByPassword: null,
         createdBy: hungpn23.id,
+        user: hungpn23,
       }),
 
       new SetEntity({
         name: 'hungpn23 protected',
         description: 'hungpn23 protected set',
-        author: hungpn23.username,
         visibleTo: VisibleTo.PEOPLE_WITH_A_PASSWORD,
         visibleToPassword: 'password',
         editableBy: EditableBy.JUST_ME,
         editableByPassword: null,
         createdBy: hungpn23.id,
+        user: hungpn23,
       }),
 
       new SetEntity({
         name: 'hungpn23 private',
         description: 'hungpn23 private set',
-        author: hungpn23.username,
         visibleTo: VisibleTo.JUST_ME,
         visibleToPassword: null,
         editableBy: EditableBy.JUST_ME,
         editableByPassword: null,
         createdBy: hungpn23.id,
+        user: hungpn23,
       }),
 
       new SetEntity({
         name: 'andy public',
         description: 'public set',
-        author: andy.username,
         visibleTo: VisibleTo.EVERYONE,
         visibleToPassword: null,
         editableBy: EditableBy.PEOPLE_WITH_A_PASSWORD,
         editableByPassword: 'password',
         createdBy: andy.id,
+        user: andy,
       }),
 
       new SetEntity({
         name: 'andy protected',
         description: 'protected set',
-        author: andy.username,
         visibleTo: VisibleTo.PEOPLE_WITH_A_PASSWORD,
         visibleToPassword: 'password',
         editableBy: EditableBy.PEOPLE_WITH_A_PASSWORD,
         editableByPassword: 'password',
         createdBy: andy.id,
+        user: andy,
       }),
     ]);
 
