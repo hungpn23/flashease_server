@@ -26,12 +26,24 @@ export class SetController {
     summary: 'find public sets',
     isPaginated: true,
   })
-  @Get('all')
+  @Get('public')
   async findPublicSets(
     @Query() query: OffsetPaginationQueryDto,
     @JwtPayload() { userId }: JwtPayloadType,
   ) {
     return await this.setService.findPublicSets(query, userId);
+  }
+
+  @ApiEndpoint({
+    type: SetEntity,
+    summary: 'find public set detail',
+  })
+  @Get('public/:setId')
+  async findPublicSetDetail(
+    @Param('setId', ParseIntPipe) setId: number,
+    @JwtPayload() { userId }: JwtPayloadType,
+  ) {
+    return await this.setService.findPublicSetDetail(setId, userId);
   }
 
   @ApiEndpoint({

@@ -68,6 +68,13 @@ export class SetService {
     return new OffsetPaginatedDto<SetEntity>(entities, metadata);
   }
 
+  async findPublicSetDetail(setId: number, _userId: number) {
+    return await SetEntity.findOneOrFail({
+      where: { id: setId, visibleTo: VisibleTo.EVERYONE },
+      relations: ['cards'],
+    });
+  }
+
   async findMySet(query: OffsetPaginationQueryDto, userId: number) {
     await delay(2000);
     const builder = SetEntity.createQueryBuilder('set');
