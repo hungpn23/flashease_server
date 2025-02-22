@@ -4,7 +4,6 @@ import { SetEntity } from '@/modules/set/entities/set.entity';
 import { EditableBy, VisibleTo } from '@/modules/set/set.enum';
 import { UserEntity } from '@/modules/user/entities/user.entity';
 import argon2 from 'argon2';
-import slugify from 'slugify';
 import { DataSource } from 'typeorm';
 import { Seeder, SeederFactory, SeederFactoryManager } from 'typeorm-extension';
 
@@ -44,7 +43,6 @@ export class MainSeeder implements Seeder {
     ] = await SetEntity.save([
       new SetEntity({
         name: 'hungpn23 public',
-        slug: slugify('hungpn23 public', { lower: true, strict: true }),
         description: 'hungpn23 public set',
         author: hungpn23.username,
         visibleTo: VisibleTo.EVERYONE,
@@ -56,7 +54,6 @@ export class MainSeeder implements Seeder {
 
       new SetEntity({
         name: 'hungpn23 protected',
-        slug: slugify('hungpn23 protected', { lower: true, strict: true }),
         description: 'hungpn23 protected set',
         author: hungpn23.username,
         visibleTo: VisibleTo.PEOPLE_WITH_A_PASSWORD,
@@ -68,7 +65,6 @@ export class MainSeeder implements Seeder {
 
       new SetEntity({
         name: 'hungpn23 private',
-        slug: slugify('hungpn23 private', { lower: true, strict: true }),
         description: 'hungpn23 private set',
         author: hungpn23.username,
         visibleTo: VisibleTo.JUST_ME,
@@ -80,7 +76,6 @@ export class MainSeeder implements Seeder {
 
       new SetEntity({
         name: 'andy public',
-        slug: slugify('andy public', { lower: true, strict: true }),
         description: 'public set',
         author: andy.username,
         visibleTo: VisibleTo.EVERYONE,
@@ -92,7 +87,6 @@ export class MainSeeder implements Seeder {
 
       new SetEntity({
         name: 'andy protected',
-        slug: slugify('andy protected', { lower: true, strict: true }),
         description: 'protected set',
         author: andy.username,
         visibleTo: VisibleTo.PEOPLE_WITH_A_PASSWORD,

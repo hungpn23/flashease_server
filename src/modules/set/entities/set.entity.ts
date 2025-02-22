@@ -28,9 +28,6 @@ export class SetEntity extends AbstractEntity {
   @Column()
   name: string;
 
-  @Column()
-  slug: string;
-
   @Column({ nullable: true })
   description?: string;
 

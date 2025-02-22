@@ -7,7 +7,6 @@ import {
   ConflictException,
   Injectable,
 } from '@nestjs/common';
-import slugify from 'slugify';
 import { UserEntity } from '../user/entities/user.entity';
 import { CardEntity } from './entities/card.entity';
 import { SetEntity } from './entities/set.entity';
@@ -41,13 +40,11 @@ export class SetService {
       createdBy: userId,
     });
 
-    set.slug = slugify(set.name, { lower: true, strict: true });
-
     return await SetEntity.save(set);
   }
 
   async findPublicSets(query: OffsetPaginationQueryDto, userId: number) {
-    await delay(1000);
+    await delay(2000);
     const builder = SetEntity.createQueryBuilder('set');
 
     builder
@@ -71,7 +68,7 @@ export class SetService {
   }
 
   async findMySets(query: OffsetPaginationQueryDto, userId: number) {
-    await delay(1000);
+    await delay(2000);
     const builder = SetEntity.createQueryBuilder('set');
 
     builder.where('set.createdBy = :userId', { userId });
@@ -107,8 +104,6 @@ export class SetService {
         return new CardEntity({ ...card, createdBy: userId });
       });
     }
-
-    found.slug = slugify(found.name, { lower: true, strict: true });
 
     return await SetEntity.save(
       Object.assign(found, {
