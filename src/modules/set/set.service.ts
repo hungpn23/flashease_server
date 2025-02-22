@@ -7,6 +7,7 @@ import {
   ConflictException,
   Injectable,
 } from '@nestjs/common';
+import { In } from 'typeorm';
 import { UserEntity } from '../user/entities/user.entity';
 import { CardEntity } from './entities/card.entity';
 import { SetEntity } from './entities/set.entity';
@@ -49,10 +50,10 @@ export class SetService {
 
     builder.leftJoinAndSelect('set.user', 'user');
     builder
-      .where('set.visibleTo = :visibleTo', {
-        visibleTo: VisibleTo.EVERYONE,
-      })
-      .andWhere('set.createdBy != :userId', { userId });
+      .where('set.createdBy != :userId', { userId })
+      .andWhere('set.visibleTo IN (:...visibleTos)', {
+        visibleTos: [VisibleTo.EVERYONE, VisibleTo.PEOPLE_WITH_A_PASSWORD],
+      });
 
     if (query.search) {
       const search = query.search.trim();
@@ -68,9 +69,12 @@ export class SetService {
     return new OffsetPaginatedDto<SetEntity>(entities, metadata);
   }
 
-  async findPublicSetDetail(setId: number, _userId: number) {
+  async findPublicSetDetail(setId: number) {
     return await SetEntity.findOneOrFail({
-      where: { id: setId, visibleTo: VisibleTo.EVERYONE },
+      where: {
+        id: setId,
+        visibleTo: In([VisibleTo.EVERYONE, VisibleTo.PEOPLE_WITH_A_PASSWORD]),
+      },
       relations: ['cards'],
     });
   }

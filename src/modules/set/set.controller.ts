@@ -39,11 +39,8 @@ export class SetController {
     summary: 'find public set detail',
   })
   @Get('public/:setId')
-  async findPublicSetDetail(
-    @Param('setId', ParseIntPipe) setId: number,
-    @JwtPayload() { userId }: JwtPayloadType,
-  ) {
-    return await this.setService.findPublicSetDetail(setId, userId);
+  async findPublicSetDetail(@Param('setId', ParseIntPipe) setId: number) {
+    return await this.setService.findPublicSetDetail(setId);
   }
 
   @ApiEndpoint({
