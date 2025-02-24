@@ -11,10 +11,10 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { ProgressEntity } from './entities/progress.entity';
 import {
-  FindProgressDto,
-  FindProgressResponseDto,
+  FindMyProgressDto,
+  FindProgressDetailDto,
+  FindProgressDetailResDto,
   ProgressMetadataDto,
   SaveAnswerDto,
   StartProgressDto,
@@ -26,7 +26,7 @@ export class ProgressController {
   constructor(private progressService: ProgressService) {}
 
   @ApiEndpoint({
-    type: ProgressEntity,
+    type: FindMyProgressDto,
     summary: 'find my progress',
     isPaginated: true,
   })
@@ -39,16 +39,20 @@ export class ProgressController {
   }
 
   @ApiEndpoint({
-    type: FindProgressResponseDto,
+    type: FindProgressDetailResDto,
     summary: 'find items by progress id',
   })
   @Get(':progressId')
-  async findProgress(
+  async findProgressDetail(
     @Param('progressId', ParseIntPipe) progressId: number,
     @JwtPayload() { userId }: JwtPayloadType,
-    @Body() dto: FindProgressDto,
+    @Body() dto: FindProgressDetailDto,
   ) {
-    return await this.progressService.findProgress(progressId, userId, dto);
+    return await this.progressService.findProgressDetail(
+      progressId,
+      userId,
+      dto,
+    );
   }
 
   @ApiEndpoint({

@@ -1,4 +1,5 @@
 import { OffsetPaginationQueryDto } from '@/dto/offset-pagination/query.dto';
+import { delay } from '@/utils/delay';
 import paginate from '@/utils/offset-paginate';
 import {
   BadRequestException,
@@ -12,8 +13,9 @@ import { UserEntity } from '../user/entities/user.entity';
 import { ProgressItemEntity } from './entities/progress-item.entity';
 import { ProgressEntity } from './entities/progress.entity';
 import {
-  FindProgressDto,
-  FindProgressResponseDto,
+  FindMyProgressDto,
+  FindProgressDetailDto,
+  FindProgressDetailResDto,
   ProgressMetadataDto,
   SaveAnswerDto,
   StartProgressDto,
@@ -70,7 +72,11 @@ export class ProgressService {
     return true;
   }
 
-  async findProgress(progressId: number, userId: number, dto: FindProgressDto) {
+  async findProgressDetail(
+    progressId: number,
+    userId: number,
+    dto: FindProgressDetailDto,
+  ) {
     const progress = await ProgressEntity.findOneOrFail({
       where: { id: progressId },
       relations: ['set', 'items'],
@@ -86,10 +92,10 @@ export class ProgressService {
 
     if (!progress.items.length) throw new BadRequestException();
 
-    return plainToInstance(FindProgressResponseDto, {
+    return plainToInstance(FindProgressDetailResDto, {
       set: progress.set,
       metadata: this.getProgressMetadata(progress.items),
-    } satisfies FindProgressResponseDto);
+    } satisfies FindProgressDetailResDto);
   }
 
   async saveAnswer(itemId: number, dto: SaveAnswerDto) {
@@ -114,16 +120,26 @@ export class ProgressService {
   }
 
   async findMyProgress(query: OffsetPaginationQueryDto, userId: number) {
-    // await delay(2000);
+    await delay(2000);
     const builder = ProgressEntity.createQueryBuilder('progress');
 
     builder.leftJoinAndSelect('progress.items', 'items');
+    builder.leftJoinAndSelect('progress.set', 'set');
+    builder.leftJoinAndSelect('progress.user', 'user');
     builder.where('progress.createdBy = :userId', { userId });
 
     const res = await paginate(builder, query);
-    console.log('🚀 ~ ProgressService ~ findMyProgress ~ res:', res.data);
+    const formatted = res.data.map((p) => {
+      return plainToInstance(FindMyProgressDto, {
+        name: p.set.name,
+        description: p.set.description,
+        username: p.user.username,
+        createdAt: p.createdAt,
+        metadata: this.getProgressMetadata(p.items),
+      } satisfies FindMyProgressDto);
+    });
 
-    return res;
+    return formatted;
   }
 
   private getProgressMetadata(items: ProgressItemEntity[]) {
@@ -131,14 +147,14 @@ export class ProgressService {
       totalCards: items.length,
       notStudiedCount: 0,
       learningCount: 0,
-      knowCount: 0,
+      knownCount: 0,
     };
 
     items.forEach((p) => {
       if (p.correctCount === null) {
         metadata.notStudiedCount += 1;
       } else if (p.correctCount >= 2) {
-        metadata.knowCount += 1;
+        metadata.knownCount += 1;
       } else {
         metadata.learningCount += 1;
       }
