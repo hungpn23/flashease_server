@@ -1,3 +1,4 @@
+import { OffsetPaginatedDto } from '@/dto/offset-pagination/paginated.dto';
 import { OffsetPaginationQueryDto } from '@/dto/offset-pagination/query.dto';
 import { delay } from '@/utils/delay';
 import paginate from '@/utils/offset-paginate';
@@ -139,7 +140,7 @@ export class ProgressService {
       } satisfies FindMyProgressDto);
     });
 
-    return formatted;
+    return new OffsetPaginatedDto<FindMyProgressDto>(formatted, res.metadata);
   }
 
   private getProgressMetadata(items: ProgressItemEntity[]) {
