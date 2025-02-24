@@ -14,7 +14,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { SetEntity } from './entities/set.entity';
-import { CreateSetDto, UpdateSetDto } from './set.dto';
+import { CreateSetDto, FindSetDetailDto, UpdateSetDto } from './set.dto';
 import { SetService } from './set.service';
 
 @Controller({ path: 'set', version: '1' })
@@ -39,13 +39,16 @@ export class SetController {
     summary: 'find public set detail',
   })
   @Get('public/:setId')
-  async findPublicSetDetail(@Param('setId', ParseIntPipe) setId: number) {
-    return await this.setService.findPublicSetDetail(setId);
+  async findPublicSetDetail(
+    @Param('setId', ParseIntPipe) setId: number,
+    @JwtPayload() { userId }: JwtPayloadType,
+  ) {
+    return await this.setService.findPublicSetDetail(setId, userId);
   }
 
   @ApiEndpoint({
     type: SetEntity,
-    summary: 'find my sets',
+    summary: 'find my set',
     isPaginated: true,
   })
   @Get('my-set')
@@ -57,7 +60,7 @@ export class SetController {
   }
 
   @ApiEndpoint({
-    type: SetEntity,
+    type: FindSetDetailDto,
     summary: 'find my set detail',
   })
   @Get('my-set/:setId')

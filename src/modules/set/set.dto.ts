@@ -5,8 +5,10 @@ import {
   StringValidators,
 } from '@/decorators/properties.decorator';
 import { PartialType } from '@nestjs/swagger';
+import { Expose } from 'class-transformer';
 import { ValidateIf } from 'class-validator';
 import { CardDto } from '../core/dtos/card.dto';
+import { SetEntity } from './entities/set.entity';
 import { EditableBy, VisibleTo } from './set.enum';
 
 export class CreateSetDto {
@@ -34,9 +36,10 @@ export class CreateSetDto {
   cards: CardDto[];
 }
 
-export class FindOneSetDto {
-  @PasswordValidators({ required: false })
-  visibleToPassword?: string;
-}
-
 export class UpdateSetDto extends PartialType(CreateSetDto) {}
+
+@Expose()
+export class FindSetDetailDto {
+  set: SetEntity;
+  isLearning: boolean;
+}

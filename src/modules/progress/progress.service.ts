@@ -1,3 +1,5 @@
+import { OffsetPaginationQueryDto } from '@/dto/offset-pagination/query.dto';
+import paginate from '@/utils/offset-paginate';
 import {
   BadRequestException,
   ForbiddenException,
@@ -11,7 +13,7 @@ import { ProgressItemEntity } from './entities/progress-item.entity';
 import { ProgressEntity } from './entities/progress.entity';
 import {
   FindProgressDto,
-  FindProgressResDto,
+  FindProgressResponseDto,
   ProgressMetadataDto,
   SaveAnswerDto,
   StartProgressDto,
@@ -24,6 +26,7 @@ export class ProgressService {
       UserEntity.findOneByOrFail({ id: userId }),
       SetEntity.findOneOrFail({
         where: { id: setId },
+        relations: ['cards'],
       }),
     ]);
 
@@ -51,7 +54,7 @@ export class ProgressService {
       );
 
     const newProgress = await ProgressEntity.save(
-      new ProgressEntity({ user, set }),
+      new ProgressEntity({ user, set, createdBy: user.id }),
     );
 
     const newItems = newProgress.set.cards.map((card) => {
@@ -70,7 +73,7 @@ export class ProgressService {
   async findProgress(progressId: number, userId: number, dto: FindProgressDto) {
     const progress = await ProgressEntity.findOneOrFail({
       where: { id: progressId },
-      relations: ['set'],
+      relations: ['set', 'items'],
     });
 
     switch (progress.set.visibleTo) {
@@ -81,14 +84,12 @@ export class ProgressService {
           throw new ForbiddenException();
     }
 
-    const progressItems = await ProgressItemEntity.findBy({ progress });
+    if (!progress.items.length) throw new BadRequestException();
 
-    if (!progressItems.length) throw new BadRequestException();
-
-    return plainToInstance(FindProgressResDto, {
+    return plainToInstance(FindProgressResponseDto, {
       set: progress.set,
-      metadata: this.getProgressMetadata(progressItems),
-    } satisfies FindProgressResDto);
+      metadata: this.getProgressMetadata(progress.items),
+    } satisfies FindProgressResponseDto);
   }
 
   async saveAnswer(itemId: number, dto: SaveAnswerDto) {
@@ -112,7 +113,18 @@ export class ProgressService {
     return this.getProgressMetadata(items);
   }
 
-  async findUserProgresses() {}
+  async findMyProgress(query: OffsetPaginationQueryDto, userId: number) {
+    // await delay(2000);
+    const builder = ProgressEntity.createQueryBuilder('progress');
+
+    builder.leftJoinAndSelect('progress.items', 'items');
+    builder.where('progress.createdBy = :userId', { userId });
+
+    const res = await paginate(builder, query);
+    console.log('🚀 ~ ProgressService ~ findMyProgress ~ res:', res.data);
+
+    return res;
+  }
 
   private getProgressMetadata(items: ProgressItemEntity[]) {
     const metadata: ProgressMetadataDto = {

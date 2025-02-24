@@ -1,5 +1,6 @@
 import { ApiEndpoint } from '@/decorators/endpoint.decorator';
 import { JwtPayload } from '@/decorators/jwt-payload.decorator';
+import { OffsetPaginationQueryDto } from '@/dto/offset-pagination/query.dto';
 import { JwtPayloadType } from '@/types/auth.type';
 import {
   Body,
@@ -8,10 +9,12 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Query,
 } from '@nestjs/common';
+import { ProgressEntity } from './entities/progress.entity';
 import {
   FindProgressDto,
-  FindProgressResDto,
+  FindProgressResponseDto,
   ProgressMetadataDto,
   SaveAnswerDto,
   StartProgressDto,
@@ -23,7 +26,20 @@ export class ProgressController {
   constructor(private progressService: ProgressService) {}
 
   @ApiEndpoint({
-    type: FindProgressResDto,
+    type: ProgressEntity,
+    summary: 'find my progress',
+    isPaginated: true,
+  })
+  @Get('/my-progress')
+  async findMyProgress(
+    @Query() query: OffsetPaginationQueryDto,
+    @JwtPayload() { userId }: JwtPayloadType,
+  ) {
+    return await this.progressService.findMyProgress(query, userId);
+  }
+
+  @ApiEndpoint({
+    type: FindProgressResponseDto,
     summary: 'find items by progress id',
   })
   @Get(':progressId')

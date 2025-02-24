@@ -1,4 +1,3 @@
-import { OffsetPaginatedDto } from '@/dto/offset-pagination/paginated.dto';
 import { OffsetPaginationQueryDto } from '@/dto/offset-pagination/query.dto';
 import paginate from '@/utils/offset-paginate';
 import { ConflictException, Injectable } from '@nestjs/common';
@@ -23,18 +22,7 @@ export class FolderService {
 
     builder.where('folder.createdBy = :userId', { userId });
 
-    if (query.search) {
-      const search = query.search.trim();
-      builder
-        .where('folder.name LIKE :name', { name: `%${search}%` })
-        .orWhere('folder.description LIKE :description', {
-          description: `%${search}%`,
-        });
-    }
-
-    const { entities, metadata } = await paginate<FolderEntity>(builder, query);
-
-    return new OffsetPaginatedDto<FolderEntity>(entities, metadata);
+    return await paginate(builder, query);
   }
 
   async findOne(folderId: number, userId: number) {

@@ -1,4 +1,3 @@
-import { OffsetPaginatedDto } from '@/dto/offset-pagination/paginated.dto';
 import { OffsetPaginationQueryDto } from '@/dto/offset-pagination/query.dto';
 import { delay } from '@/utils/delay';
 import paginate from '@/utils/offset-paginate';
@@ -7,15 +6,53 @@ import {
   ConflictException,
   Injectable,
 } from '@nestjs/common';
-import { In } from 'typeorm';
+import { plainToInstance } from 'class-transformer';
+import { FindOptionsWhere, In } from 'typeorm';
+import { ProgressEntity } from '../progress/entities/progress.entity';
 import { UserEntity } from '../user/entities/user.entity';
 import { CardEntity } from './entities/card.entity';
 import { SetEntity } from './entities/set.entity';
-import { CreateSetDto, UpdateSetDto } from './set.dto';
+import { CreateSetDto, FindSetDetailDto, UpdateSetDto } from './set.dto';
 import { VisibleTo } from './set.enum';
 
 @Injectable()
 export class SetService {
+  async findPublicSets(query: OffsetPaginationQueryDto, userId: number) {
+    await delay(2000);
+    const builder = SetEntity.createQueryBuilder('set');
+
+    builder.leftJoinAndSelect('set.user', 'user');
+    builder
+      .where('set.createdBy != :userId', { userId })
+      .andWhere('set.visibleTo IN (:...visibleTos)', {
+        visibleTos: [VisibleTo.EVERYONE, VisibleTo.PEOPLE_WITH_A_PASSWORD],
+      });
+
+    return await paginate(builder, query);
+  }
+
+  async findPublicSetDetail(setId: number, userId: number) {
+    return await this.findSetDetail(setId, userId, {
+      visibleTo: In([VisibleTo.EVERYONE, VisibleTo.PEOPLE_WITH_A_PASSWORD]),
+    });
+  }
+
+  async findMySet(query: OffsetPaginationQueryDto, userId: number) {
+    await delay(2000);
+    const builder = SetEntity.createQueryBuilder('set');
+
+    builder.leftJoinAndSelect('set.user', 'user');
+    builder.where('set.createdBy = :userId', { userId });
+
+    return await paginate(builder, query);
+  }
+
+  async findMySetDetail(setId: number, userId: number) {
+    return await this.findSetDetail(setId, userId, {
+      createdBy: userId,
+    });
+  }
+
   async create(dto: CreateSetDto, userId: number) {
     const [found, user] = await Promise.all([
       SetEntity.findOneBy({
@@ -42,72 +79,6 @@ export class SetService {
     });
 
     return await SetEntity.save(set);
-  }
-
-  async findPublicSets(query: OffsetPaginationQueryDto, userId: number) {
-    await delay(2000);
-    const builder = SetEntity.createQueryBuilder('set');
-
-    builder.leftJoinAndSelect('set.user', 'user');
-    builder
-      .where('set.createdBy != :userId', { userId })
-      .andWhere('set.visibleTo IN (:...visibleTos)', {
-        visibleTos: [VisibleTo.EVERYONE, VisibleTo.PEOPLE_WITH_A_PASSWORD],
-      });
-
-    if (query.search) {
-      const search = query.search.trim();
-      builder
-        .where('set.name LIKE :name', { name: `%${search}%` })
-        .orWhere('set.description LIKE :description', {
-          description: `%${search}%`,
-        });
-    }
-
-    const { entities, metadata } = await paginate<SetEntity>(builder, query);
-
-    return new OffsetPaginatedDto<SetEntity>(entities, metadata);
-  }
-
-  async findPublicSetDetail(setId: number) {
-    return await SetEntity.findOneOrFail({
-      where: {
-        id: setId,
-        visibleTo: In([VisibleTo.EVERYONE, VisibleTo.PEOPLE_WITH_A_PASSWORD]),
-      },
-      relations: ['cards'],
-    });
-  }
-
-  async findMySet(query: OffsetPaginationQueryDto, userId: number) {
-    await delay(2000);
-    const builder = SetEntity.createQueryBuilder('set');
-
-    builder.leftJoinAndSelect('set.user', 'user');
-    builder.where('set.createdBy = :userId', { userId });
-
-    if (query.search) {
-      const search = query.search.trim();
-      builder
-        .where('set.name LIKE :name', { name: `%${search}%` })
-        .orWhere('set.description LIKE :description', {
-          description: `%${search}%`,
-        });
-    }
-
-    const { entities, metadata } = await paginate<SetEntity>(builder, query);
-
-    return new OffsetPaginatedDto<SetEntity>(entities, metadata);
-  }
-
-  async findMySetDetail(setId: number, userId: number) {
-    return await SetEntity.findOneOrFail({
-      where: {
-        id: setId,
-        createdBy: userId,
-      },
-      relations: ['cards'],
-    });
   }
 
   async update(setId: number, dto: UpdateSetDto, userId: number) {
@@ -143,5 +114,34 @@ export class SetService {
     });
 
     return await SetEntity.remove(found);
+  }
+
+  // ================================================= //
+  // ================ PRIVATE METHODS ================ //
+  // ================================================= //
+  private async findSetDetail(
+    setId: number,
+    userId: number,
+    options: FindOptionsWhere<SetEntity>,
+  ) {
+    const set = await SetEntity.findOneOrFail({
+      where: {
+        id: setId,
+        ...options,
+      },
+      relations: ['cards'],
+    });
+
+    const progress = await ProgressEntity.findOneBy({
+      set: { id: set.id },
+      user: { id: userId },
+    });
+
+    const isLearning = !!progress;
+
+    return plainToInstance(FindSetDetailDto, {
+      set,
+      isLearning,
+    } satisfies FindSetDetailDto);
   }
 }
