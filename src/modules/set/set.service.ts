@@ -18,7 +18,7 @@ import { VisibleTo } from './set.enum';
 @Injectable()
 export class SetService {
   async findPublicSets(query: OffsetPaginationQueryDto, userId: number) {
-    await delay(2000);
+    await delay(500);
     const builder = SetEntity.createQueryBuilder('set');
 
     builder.leftJoinAndSelect('set.user', 'user');
@@ -38,7 +38,7 @@ export class SetService {
   }
 
   async findMySet(query: OffsetPaginationQueryDto, userId: number) {
-    await delay(2000);
+    await delay(500);
     const builder = SetEntity.createQueryBuilder('set');
 
     builder.leftJoinAndSelect('set.user', 'user');

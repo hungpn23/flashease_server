@@ -12,10 +12,10 @@ import {
   Query,
 } from '@nestjs/common';
 import {
-  FindMyProgressDto,
   FindProgressDetailDto,
   FindProgressDetailResDto,
   ProgressMetadataDto,
+  ProgressWithMetadataDto,
   SaveAnswerDto,
   StartProgressDto,
 } from './progress.dto';
@@ -26,7 +26,7 @@ export class ProgressController {
   constructor(private progressService: ProgressService) {}
 
   @ApiEndpoint({
-    type: FindMyProgressDto,
+    type: ProgressWithMetadataDto,
     summary: 'find my progress',
     isPaginated: true,
   })

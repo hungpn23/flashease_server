@@ -33,7 +33,7 @@ export class ProgressItemEntity extends AbstractEntity {
   @JoinColumn({ name: 'progress_id', referencedColumnName: 'id' })
   progress: Relation<ProgressEntity>;
 
-  @ManyToOne(() => CardEntity, (card) => card.progresses, {
+  @ManyToOne(() => CardEntity, (card) => card.progressItems, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'card_id', referencedColumnName: 'id' })

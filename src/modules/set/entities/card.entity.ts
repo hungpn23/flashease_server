@@ -29,10 +29,10 @@ export class CardEntity extends AbstractEntity {
   @Column()
   definition: string;
 
-  @OneToMany(() => ProgressItemEntity, (progress) => progress.card, {
+  @OneToMany(() => ProgressItemEntity, (progressItem) => progressItem.card, {
     cascade: true,
   })
-  progresses: Relation<ProgressItemEntity[]>;
+  progressItems: Relation<ProgressItemEntity[]>;
 
   @ManyToOne(() => SetEntity, (set) => set.cards, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'set_id', referencedColumnName: 'id' })

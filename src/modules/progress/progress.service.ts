@@ -14,10 +14,10 @@ import { UserEntity } from '../user/entities/user.entity';
 import { ProgressItemEntity } from './entities/progress-item.entity';
 import { ProgressEntity } from './entities/progress.entity';
 import {
-  FindMyProgressDto,
   FindProgressDetailDto,
   FindProgressDetailResDto,
   ProgressMetadataDto,
+  ProgressWithMetadataDto,
   SaveAnswerDto,
   StartProgressDto,
 } from './progress.dto';
@@ -121,7 +121,7 @@ export class ProgressService {
   }
 
   async findMyProgress(query: OffsetPaginationQueryDto, userId: number) {
-    await delay(2000);
+    await delay(500);
     const builder = ProgressEntity.createQueryBuilder('progress');
 
     builder.leftJoinAndSelect('progress.items', 'items');
@@ -130,17 +130,17 @@ export class ProgressService {
     builder.where('progress.createdBy = :userId', { userId });
 
     const res = await paginate(builder, query);
-    const formatted = res.data.map((p) => {
-      return plainToInstance(FindMyProgressDto, {
-        name: p.set.name,
-        description: p.set.description,
-        username: p.user.username,
-        createdAt: p.createdAt,
+    const formatted = res.data.map((p, i) => {
+      return plainToInstance(ProgressWithMetadataDto, {
+        ...res.data[i],
         metadata: this.getProgressMetadata(p.items),
-      } satisfies FindMyProgressDto);
+      });
     });
 
-    return new OffsetPaginatedDto<FindMyProgressDto>(formatted, res.metadata);
+    return new OffsetPaginatedDto<ProgressWithMetadataDto>(
+      formatted,
+      res.metadata,
+    );
   }
 
   private getProgressMetadata(items: ProgressItemEntity[]) {

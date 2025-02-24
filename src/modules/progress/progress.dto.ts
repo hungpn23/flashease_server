@@ -2,10 +2,8 @@ import {
   BooleanValidators,
   StringValidators,
 } from '@/decorators/properties.decorator';
-import { IntersectionType, PickType } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 import { SetEntity } from '../set/entities/set.entity';
-import { UserEntity } from '../user/entities/user.entity';
 import { ProgressEntity } from './entities/progress.entity';
 
 export class StartProgressDto {
@@ -35,10 +33,6 @@ export class FindProgressDetailResDto {
 }
 
 @Expose()
-export class FindMyProgressDto extends IntersectionType(
-  PickType(SetEntity, ['name', 'description'] as const),
-  PickType(UserEntity, ['username'] as const),
-  PickType(ProgressEntity, ['createdAt'] as const),
-) {
+export class ProgressWithMetadataDto extends ProgressEntity {
   metadata: ProgressMetadataDto;
 }
