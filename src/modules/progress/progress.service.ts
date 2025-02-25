@@ -15,9 +15,8 @@ import { ProgressItemEntity } from './entities/progress-item.entity';
 import { ProgressEntity } from './entities/progress.entity';
 import {
   FindProgressDetailDto,
-  FindProgressDetailResDto,
+  ProgressDetailDto,
   ProgressMetadataDto,
-  ProgressWithMetadataDto,
   SaveAnswerDto,
   StartProgressDto,
 } from './progress.dto';
@@ -33,44 +32,21 @@ export class ProgressService {
       }),
     ]);
 
-    switch (set.visibleTo) {
-      case VisibleTo.JUST_ME:
-        if (set.createdBy !== userId) return false;
-      case VisibleTo.PEOPLE_WITH_A_PASSWORD:
-        if (set.visibleToPassword !== dto.visibleToPassword) return false;
-    }
-
-    if (set.visibleTo === VisibleTo.JUST_ME && set.createdBy !== userId) {
-      return false;
-    }
-
-    if (
-      set.visibleTo === VisibleTo.PEOPLE_WITH_A_PASSWORD &&
-      set.visibleToPassword !== dto.visibleToPassword
-    ) {
-      return false;
-    }
+    this.validate(set, userId, dto.visibleToPassword);
 
     if (set.cards.length < 4)
       throw new BadRequestException(
         'the set must have at least 4 cards to start progress',
       );
 
-    const newProgress = await ProgressEntity.save(
-      new ProgressEntity({ user, set, createdBy: user.id }),
-    );
+    const newProgress = new ProgressEntity({ user, set, createdBy: user.id });
 
     const newItems = newProgress.set.cards.map((card) => {
-      return new ProgressItemEntity({
-        progress: newProgress,
-        card,
-        createdBy: user.id,
-      });
+      return new ProgressItemEntity({ card, createdBy: user.id });
     });
+    newProgress.items = newItems;
 
-    await ProgressItemEntity.save(newItems);
-
-    return true;
+    return await ProgressEntity.save(newProgress);
   }
 
   async findProgressDetail(
@@ -80,23 +56,17 @@ export class ProgressService {
   ) {
     const progress = await ProgressEntity.findOneOrFail({
       where: { id: progressId },
-      relations: ['set', 'items'],
+      relations: ['user', 'set', 'items.card'],
     });
 
-    switch (progress.set.visibleTo) {
-      case VisibleTo.JUST_ME:
-        if (progress.set.createdBy !== userId) throw new ForbiddenException();
-      case VisibleTo.PEOPLE_WITH_A_PASSWORD:
-        if (progress.set.visibleToPassword !== dto.visibleToPassword)
-          throw new ForbiddenException();
-    }
+    this.validate(progress.set, userId, dto.visibleToPassword);
 
     if (!progress.items.length) throw new BadRequestException();
 
-    return plainToInstance(FindProgressDetailResDto, {
-      set: progress.set,
+    return plainToInstance(ProgressDetailDto, {
+      progress,
       metadata: this.getProgressMetadata(progress.items),
-    } satisfies FindProgressDetailResDto);
+    } satisfies ProgressDetailDto);
   }
 
   async saveAnswer(itemId: number, dto: SaveAnswerDto) {
@@ -120,6 +90,9 @@ export class ProgressService {
     return this.getProgressMetadata(items);
   }
 
+  // ============================= //
+  // ======== IMPLEMENTED ======== //
+  // ============================= //
   async findMyProgress(query: OffsetPaginationQueryDto, userId: number) {
     await delay(500);
     const builder = ProgressEntity.createQueryBuilder('progress');
@@ -130,17 +103,14 @@ export class ProgressService {
     builder.where('progress.createdBy = :userId', { userId });
 
     const res = await paginate(builder, query);
-    const formatted = res.data.map((p, i) => {
-      return plainToInstance(ProgressWithMetadataDto, {
-        ...res.data[i],
-        metadata: this.getProgressMetadata(p.items),
+    const formatted = res.data.map((progress, i) => {
+      return plainToInstance(ProgressDetailDto, {
+        progress,
+        metadata: this.getProgressMetadata(progress.items),
       });
     });
 
-    return new OffsetPaginatedDto<ProgressWithMetadataDto>(
-      formatted,
-      res.metadata,
-    );
+    return new OffsetPaginatedDto<ProgressDetailDto>(formatted, res.metadata);
   }
 
   private getProgressMetadata(items: ProgressItemEntity[]) {
@@ -161,6 +131,23 @@ export class ProgressService {
       }
     });
 
-    return plainToInstance(ProgressMetadataDto, metadata);
+    return plainToInstance(
+      ProgressMetadataDto,
+      metadata satisfies ProgressMetadataDto,
+    );
+  }
+
+  private validate(set: SetEntity, userId: number, visibleToPassword?: string) {
+    if (set.visibleTo === VisibleTo.JUST_ME && set.createdBy !== userId) {
+      throw new ForbiddenException();
+    }
+
+    if (
+      set.createdBy !== userId &&
+      set.visibleTo === VisibleTo.PEOPLE_WITH_A_PASSWORD &&
+      set.visibleToPassword !== visibleToPassword
+    ) {
+      throw new ForbiddenException();
+    }
   }
 }

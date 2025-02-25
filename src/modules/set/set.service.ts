@@ -17,6 +17,9 @@ import { VisibleTo } from './set.enum';
 
 @Injectable()
 export class SetService {
+  // ============================= //
+  // ======== IMPLEMENTED ======== //
+  // ============================= //
   async findPublicSets(query: OffsetPaginationQueryDto, userId: number) {
     await delay(500);
     const builder = SetEntity.createQueryBuilder('set');
@@ -31,12 +34,18 @@ export class SetService {
     return await paginate(builder, query);
   }
 
+  // ============================= //
+  // ======== IMPLEMENTED ======== //
+  // ============================= //
   async findPublicSetDetail(setId: number, userId: number) {
     return await this.findSetDetail(setId, userId, {
       visibleTo: In([VisibleTo.EVERYONE, VisibleTo.PEOPLE_WITH_A_PASSWORD]),
     });
   }
 
+  // ============================= //
+  // ======== IMPLEMENTED ======== //
+  // ============================= //
   async findMySet(query: OffsetPaginationQueryDto, userId: number) {
     await delay(500);
     const builder = SetEntity.createQueryBuilder('set');
@@ -47,6 +56,9 @@ export class SetService {
     return await paginate(builder, query);
   }
 
+  // ============================= //
+  // ======== IMPLEMENTED ======== //
+  // ============================= //
   async findMySetDetail(setId: number, userId: number) {
     return await this.findSetDetail(setId, userId, {
       createdBy: userId,
@@ -81,6 +93,9 @@ export class SetService {
     return await SetEntity.save(set);
   }
 
+  // ============================= //
+  // ======== IMPLEMENTED ======== //
+  // ============================= //
   async update(setId: number, dto: UpdateSetDto, userId: number) {
     const { cards, ...rest } = dto;
 
@@ -137,11 +152,9 @@ export class SetService {
       user: { id: userId },
     });
 
-    const isLearning = !!progress;
-
     return plainToInstance(FindSetDetailDto, {
       set,
-      isLearning,
+      progress,
     } satisfies FindSetDetailDto);
   }
 }

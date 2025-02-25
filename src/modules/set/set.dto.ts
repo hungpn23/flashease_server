@@ -8,6 +8,7 @@ import { PartialType } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 import { ValidateIf } from 'class-validator';
 import { CardDto } from '../core/dtos/card.dto';
+import { ProgressEntity } from '../progress/entities/progress.entity';
 import { SetEntity } from './entities/set.entity';
 import { EditableBy, VisibleTo } from './set.enum';
 
@@ -41,5 +42,5 @@ export class UpdateSetDto extends PartialType(CreateSetDto) {}
 @Expose()
 export class FindSetDetailDto {
   set: SetEntity;
-  isLearning: boolean;
+  progress?: ProgressEntity;
 }

@@ -15,7 +15,7 @@ export class CoreService {
       })
       .filter((card) => card !== undefined);
 
-    return plainToInstance(CardDto, results);
+    return plainToInstance(CardDto, results satisfies CardDto[]);
   }
 
   convertFromXlsx(buffer: Buffer) {
@@ -35,6 +35,6 @@ export class CoreService {
         (item) => item.term !== undefined || item.definition !== undefined,
       );
 
-    return plainToInstance(CardDto, results);
+    return plainToInstance(CardDto, results satisfies CardDto[]);
   }
 }

@@ -3,7 +3,6 @@ import {
   StringValidators,
 } from '@/decorators/properties.decorator';
 import { Expose } from 'class-transformer';
-import { SetEntity } from '../set/entities/set.entity';
 import { ProgressEntity } from './entities/progress.entity';
 
 export class StartProgressDto {
@@ -27,12 +26,7 @@ export class ProgressMetadataDto {
 }
 
 @Expose()
-export class FindProgressDetailResDto {
-  set: SetEntity;
-  metadata: ProgressMetadataDto;
-}
-
-@Expose()
-export class ProgressWithMetadataDto extends ProgressEntity {
+export class ProgressDetailDto {
+  progress: ProgressEntity;
   metadata: ProgressMetadataDto;
 }
