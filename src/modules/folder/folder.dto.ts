@@ -16,7 +16,7 @@ export class UpdateFolderDto extends PartialType(CreateFolderDto) {}
 
 export class AddSetsDto {
   @NumberValidators({ isArray: true })
-  setIds: number[];
+  setIds: string[];
 }
 
 export class RemoveSetsDto extends AddSetsDto {}

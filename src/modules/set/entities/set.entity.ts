@@ -12,7 +12,6 @@ import {
   PrimaryGeneratedColumn,
   Relation,
 } from 'typeorm';
-import { ProgressEntity } from '../../progress/entities/progress.entity';
 import { EditableBy, VisibleTo } from '../set.enum';
 
 @Expose()
@@ -56,11 +55,6 @@ export class SetEntity extends AbstractEntity {
 
   @OneToMany(() => CardEntity, (card) => card.set, { cascade: true })
   cards: Relation<CardEntity[]>;
-
-  @OneToMany(() => ProgressEntity, (progresses) => progresses.set, {
-    cascade: true,
-  })
-  progresses: Relation<ProgressEntity[]>;
 
   @ManyToOne(() => FolderEntity, (folder) => folder.sets, {
     onDelete: 'CASCADE',

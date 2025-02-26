@@ -55,7 +55,7 @@ export class FolderService {
     return await FolderEntity.remove(found);
   }
 
-  async addSets(folderId: string, setIds: number[], userId: string) {
+  async addSets(folderId: string, setIds: string[], userId: string) {
     const found = await FolderEntity.findOneOrFail({
       where: { id: folderId, createdBy: userId },
       relations: ['sets'],
@@ -67,7 +67,7 @@ export class FolderService {
     return await FolderEntity.save(found);
   }
 
-  async removeSets(folderId: string, setIds: number[], userId: string) {
+  async removeSets(folderId: string, setIds: string[], userId: string) {
     const found = await FolderEntity.findOneOrFail({
       where: { id: folderId, createdBy: userId },
       relations: ['sets'],

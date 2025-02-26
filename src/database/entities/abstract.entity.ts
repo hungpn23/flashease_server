@@ -13,19 +13,28 @@ import {
 import { ColumnMetadata } from 'typeorm/metadata/ColumnMetadata';
 
 // use Active Record pattern
+
 export abstract class AbstractEntity extends BaseEntity {
+  @ApiHideProperty()
+  @Exclude()
   @Order(9998)
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt: Date;
 
+  @ApiHideProperty()
+  @Exclude()
   @Order(9998)
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamp' })
   updatedAt: Date;
 
+  @ApiHideProperty()
+  @Exclude()
   @Order(9998)
   @Column({ name: 'created_by', default: SYSTEM })
   createdBy: string;
 
+  @ApiHideProperty()
+  @Exclude()
   @Order(9998)
   @Column({ name: 'updated_by', nullable: true, default: null })
   updatedBy: string;

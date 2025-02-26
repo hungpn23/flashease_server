@@ -13,7 +13,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { SetEntity } from './entities/set.entity';
-import { CreateSetDto, FindSetDetailDto, UpdateSetDto } from './set.dto';
+import { CreateSetDto, SetDetailDto, UpdateSetDto } from './set.dto';
 import { SetService } from './set.service';
 
 @Controller({ path: 'set', version: '1' })
@@ -38,28 +38,25 @@ export class SetController {
     summary: 'find public set detail',
   })
   @Get('public/:setId')
-  async findPublicSetDetail(
-    @Param('setId') setId: string,
+  async findPublicSetDetail(@Param('setId') setId: string) {
+    return await this.setService.findPublicSetDetail(setId);
+  }
+
+  @ApiEndpoint({
+    type: SetDetailDto,
+    summary: 'find my sets',
+    isPaginated: true,
+  })
+  @Get('my-sets')
+  async findMySets(
+    @Query() query: OffsetPaginationQueryDto,
     @JwtPayload() { userId }: JwtPayloadType,
   ) {
-    return await this.setService.findPublicSetDetail(setId, userId);
+    return await this.setService.findMySets(query, userId);
   }
 
   @ApiEndpoint({
     type: SetEntity,
-    summary: 'find my set',
-    isPaginated: true,
-  })
-  @Get('my-set')
-  async findMySet(
-    @Query() query: OffsetPaginationQueryDto,
-    @JwtPayload() { userId }: JwtPayloadType,
-  ) {
-    return await this.setService.findMySet(query, userId);
-  }
-
-  @ApiEndpoint({
-    type: FindSetDetailDto,
     summary: 'find my set detail',
   })
   @Get('my-set/:setId')

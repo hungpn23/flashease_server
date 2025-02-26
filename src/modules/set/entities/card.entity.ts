@@ -1,5 +1,4 @@
 import { AbstractEntity } from '@/database/entities/abstract.entity';
-import { ProgressItemEntity } from '@/modules/progress/entities/progress-item.entity';
 import { SetEntity } from '@/modules/set/entities/set.entity';
 import { Expose } from 'class-transformer';
 import {
@@ -7,7 +6,6 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
   Relation,
 } from 'typeorm';
@@ -29,10 +27,8 @@ export class CardEntity extends AbstractEntity {
   @Column()
   definition: string;
 
-  @OneToMany(() => ProgressItemEntity, (progressItem) => progressItem.card, {
-    cascade: true,
-  })
-  progressItems: Relation<ProgressItemEntity[]>;
+  @Column({ name: 'correct_count', nullable: true })
+  correctCount?: number;
 
   @ManyToOne(() => SetEntity, (set) => set.cards, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'set_id', referencedColumnName: 'id' })
