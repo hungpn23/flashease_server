@@ -23,7 +23,7 @@ export class ProgressEntity extends AbstractEntity {
   }
 
   @PrimaryGeneratedColumn()
-  id: number;
+  id: string;
 
   @ManyToOne(() => UserEntity, (user) => user.progresses, {
     onDelete: 'CASCADE',

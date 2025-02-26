@@ -2,18 +2,9 @@ import { ApiEndpoint } from '@/decorators/endpoint.decorator';
 import { JwtPayload } from '@/decorators/jwt-payload.decorator';
 import { OffsetPaginationQueryDto } from '@/dto/offset-pagination/query.dto';
 import { JwtPayloadType } from '@/types/auth.type';
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseIntPipe,
-  Post,
-  Query,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ProgressEntity } from './entities/progress.entity';
 import {
-  FindProgressDetailDto,
   ProgressDetailDto,
   ProgressMetadataDto,
   SaveAnswerDto,
@@ -43,22 +34,14 @@ export class ProgressController {
     summary: 'find items by progress id',
   })
   @Get(':progressId')
-  async findProgressDetail(
-    @Param('progressId', ParseIntPipe) progressId: number,
-    @JwtPayload() { userId }: JwtPayloadType,
-    @Body() dto: FindProgressDetailDto,
-  ) {
-    return await this.progressService.findProgressDetail(
-      progressId,
-      userId,
-      dto,
-    );
+  async findProgressDetail(@Param('progressId') progressId: string) {
+    return await this.progressService.findProgressDetail(progressId);
   }
 
   @ApiEndpoint({ type: ProgressEntity, summary: 'start a progress by set id' })
   @Post('/start-progress/:setId')
   async startProgress(
-    @Param('setId', ParseIntPipe) setId: number,
+    @Param('setId') setId: string,
     @JwtPayload() { userId }: JwtPayloadType,
     @Body() dto: StartProgressDto,
   ) {
@@ -71,7 +54,7 @@ export class ProgressController {
   })
   @Post('save-answer/:itemId')
   async saveAnswer(
-    @Param('itemId', ParseIntPipe) itemId: number,
+    @Param('itemId') itemId: string,
     @Body() dto: SaveAnswerDto,
   ) {
     return await this.progressService.saveAnswer(itemId, dto);

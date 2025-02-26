@@ -8,7 +8,6 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -40,7 +39,7 @@ export class SetController {
   })
   @Get('public/:setId')
   async findPublicSetDetail(
-    @Param('setId', ParseIntPipe) setId: number,
+    @Param('setId') setId: string,
     @JwtPayload() { userId }: JwtPayloadType,
   ) {
     return await this.setService.findPublicSetDetail(setId, userId);
@@ -65,7 +64,7 @@ export class SetController {
   })
   @Get('my-set/:setId')
   async findMySetDetail(
-    @Param('setId', ParseIntPipe) setId: number,
+    @Param('setId') setId: string,
     @JwtPayload() { userId }: JwtPayloadType,
   ) {
     return await this.setService.findMySetDetail(setId, userId);
@@ -83,7 +82,7 @@ export class SetController {
   @ApiEndpoint({ type: SetEntity, summary: 'update a set' })
   @Patch(':setId')
   async update(
-    @Param('setId', ParseIntPipe) setId: number,
+    @Param('setId') setId: string,
     @Body() dto: UpdateSetDto,
     @JwtPayload() { userId }: JwtPayloadType,
   ) {
@@ -93,7 +92,7 @@ export class SetController {
   @ApiEndpoint({ type: SetEntity, summary: 'remove a set' })
   @Delete(':setId')
   async remove(
-    @Param('setId', ParseIntPipe) setId: number,
+    @Param('setId') setId: string,
     @JwtPayload() { userId }: JwtPayloadType,
   ) {
     return await this.setService.remove(setId, userId);

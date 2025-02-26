@@ -15,7 +15,7 @@ export class UserService {
     private cloudfrontService: CloudfrontService,
   ) {}
 
-  async findOne(userId: number): Promise<UserEntity> {
+  async findOne(userId: string): Promise<UserEntity> {
     const user = await UserEntity.findOneOrFail({
       where: { id: userId },
     });
@@ -32,7 +32,7 @@ export class UserService {
     return await UserEntity.find();
   }
 
-  async update(userId: number, dto: UpdateUserDto) {
+  async update(userId: string, dto: UpdateUserDto) {
     const found = await UserEntity.findOneOrFail({ where: { id: userId } });
 
     return await UserEntity.save(
@@ -40,7 +40,7 @@ export class UserService {
     );
   }
 
-  async uploadAvatar(userId: number, file: Express.Multer.File) {
+  async uploadAvatar(userId: string, file: Express.Multer.File) {
     file.buffer = await sharp(file.buffer)
       .resize({ height: 200, width: 200, fit: 'contain' })
       .toBuffer();
@@ -65,7 +65,7 @@ export class UserService {
     } as UploadAvatarResponseDto;
   }
 
-  async deleteAvatar(userId: number) {
+  async deleteAvatar(userId: string) {
     const user = await UserEntity.findOneByOrFail({ id: userId });
     await this.s3Service.deleteFile(user.avatar);
     await UserEntity.save(

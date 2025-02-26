@@ -18,7 +18,7 @@ export class FolderEntity extends AbstractEntity {
   }
 
   @PrimaryGeneratedColumn()
-  id: number;
+  id: string;
 
   @Column()
   name: string;

@@ -23,7 +23,7 @@ export class UserEntity extends AbstractEntity {
 
   @ApiProperty({ type: () => String })
   @PrimaryGeneratedColumn()
-  id: number;
+  id: string;
 
   @Column({ type: 'enum', enum: Role, default: Role.USER })
   role: Role;

@@ -4,7 +4,7 @@ import {
   PasswordValidators,
   StringValidators,
 } from '@/decorators/properties.decorator';
-import { PartialType } from '@nestjs/swagger';
+import { OmitType, PartialType } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 import { ValidateIf } from 'class-validator';
 import { CardDto } from '../core/dtos/card.dto';
@@ -37,7 +37,14 @@ export class CreateSetDto {
   cards: CardDto[];
 }
 
-export class UpdateSetDto extends PartialType(CreateSetDto) {}
+export class UpdateSetDto extends PartialType(
+  OmitType(CreateSetDto, ['cards'] as const),
+) {}
+
+export class UpdateCardsDto {
+  @ClassValidators(CardDto, { isArray: true })
+  cards: CardDto[];
+}
 
 @Expose()
 export class FindSetDetailDto {

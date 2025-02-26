@@ -21,7 +21,7 @@ export class SessionEntity extends AbstractEntity {
 
   @ApiProperty({ type: () => String })
   @PrimaryGeneratedColumn()
-  id: number;
+  id: string;
 
   @ApiHideProperty()
   @Exclude()

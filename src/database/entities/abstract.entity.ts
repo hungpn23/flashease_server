@@ -24,11 +24,11 @@ export abstract class AbstractEntity extends BaseEntity {
 
   @Order(9998)
   @Column({ name: 'created_by', default: SYSTEM })
-  createdBy: number;
+  createdBy: string;
 
   @Order(9998)
   @Column({ name: 'updated_by', nullable: true, default: null })
-  updatedBy: number;
+  updatedBy: string;
 
   // issue: https://github.com/typeorm/typeorm/issues/541#issuecomment-2358776943
   static useDataSource(dataSource: DataSource) {

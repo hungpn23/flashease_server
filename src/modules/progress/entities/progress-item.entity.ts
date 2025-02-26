@@ -22,7 +22,7 @@ export class ProgressItemEntity extends AbstractEntity {
   }
 
   @PrimaryGeneratedColumn()
-  id: number;
+  id: string;
 
   @Column({ name: 'correct_count', nullable: true })
   correctCount?: number;

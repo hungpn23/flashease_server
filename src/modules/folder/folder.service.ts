@@ -8,7 +8,7 @@ import { FolderEntity } from './folder.entity';
 
 @Injectable()
 export class FolderService {
-  async create(dto: CreateFolderDto, userId: number) {
+  async create(dto: CreateFolderDto, userId: string) {
     const found = await FolderEntity.findOneBy({ name: dto.name });
     if (found) throw new ConflictException();
 
@@ -17,7 +17,7 @@ export class FolderService {
     );
   }
 
-  async findAll(query: OffsetPaginationQueryDto, userId: number) {
+  async findAll(query: OffsetPaginationQueryDto, userId: string) {
     const builder = FolderEntity.createQueryBuilder('folder');
 
     builder.where('folder.createdBy = :userId', { userId });
@@ -25,14 +25,14 @@ export class FolderService {
     return await paginate(builder, query);
   }
 
-  async findOne(folderId: number, userId: number) {
+  async findOne(folderId: string, userId: string) {
     return await FolderEntity.findOneOrFail({
       where: { id: folderId, createdBy: userId },
       relations: ['sets'],
     });
   }
 
-  async update(folderId: number, dto: UpdateFolderDto, userId: number) {
+  async update(folderId: string, dto: UpdateFolderDto, userId: string) {
     const found = await FolderEntity.findOneOrFail({
       where: { id: folderId, createdBy: userId },
       relations: ['sets'],
@@ -46,7 +46,7 @@ export class FolderService {
     );
   }
 
-  async remove(folderId: number, userId: number) {
+  async remove(folderId: string, userId: string) {
     const found = await FolderEntity.findOneByOrFail({
       id: folderId,
       createdBy: userId,
@@ -55,7 +55,7 @@ export class FolderService {
     return await FolderEntity.remove(found);
   }
 
-  async addSets(folderId: number, setIds: number[], userId: number) {
+  async addSets(folderId: string, setIds: number[], userId: string) {
     const found = await FolderEntity.findOneOrFail({
       where: { id: folderId, createdBy: userId },
       relations: ['sets'],
@@ -67,7 +67,7 @@ export class FolderService {
     return await FolderEntity.save(found);
   }
 
-  async removeSets(folderId: number, setIds: number[], userId: number) {
+  async removeSets(folderId: string, setIds: number[], userId: string) {
     const found = await FolderEntity.findOneOrFail({
       where: { id: folderId, createdBy: userId },
       relations: ['sets'],

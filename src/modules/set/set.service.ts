@@ -1,5 +1,4 @@
 import { OffsetPaginationQueryDto } from '@/dto/offset-pagination/query.dto';
-import { delay } from '@/utils/delay';
 import paginate from '@/utils/offset-paginate';
 import {
   BadRequestException,
@@ -17,11 +16,7 @@ import { VisibleTo } from './set.enum';
 
 @Injectable()
 export class SetService {
-  // ============================= //
-  // ======== IMPLEMENTED ======== //
-  // ============================= //
-  async findPublicSets(query: OffsetPaginationQueryDto, userId: number) {
-    await delay(500);
+  async findPublicSets(query: OffsetPaginationQueryDto, userId: string) {
     const builder = SetEntity.createQueryBuilder('set');
 
     builder.leftJoinAndSelect('set.user', 'user');
@@ -34,20 +29,13 @@ export class SetService {
     return await paginate(builder, query);
   }
 
-  // ============================= //
-  // ======== IMPLEMENTED ======== //
-  // ============================= //
-  async findPublicSetDetail(setId: number, userId: number) {
+  async findPublicSetDetail(setId: string, userId: string) {
     return await this.findSetDetail(setId, userId, {
       visibleTo: In([VisibleTo.EVERYONE, VisibleTo.PEOPLE_WITH_A_PASSWORD]),
     });
   }
 
-  // ============================= //
-  // ======== IMPLEMENTED ======== //
-  // ============================= //
-  async findMySet(query: OffsetPaginationQueryDto, userId: number) {
-    await delay(500);
+  async findMySet(query: OffsetPaginationQueryDto, userId: string) {
     const builder = SetEntity.createQueryBuilder('set');
 
     builder.leftJoinAndSelect('set.user', 'user');
@@ -56,16 +44,13 @@ export class SetService {
     return await paginate(builder, query);
   }
 
-  // ============================= //
-  // ======== IMPLEMENTED ======== //
-  // ============================= //
-  async findMySetDetail(setId: number, userId: number) {
+  async findMySetDetail(setId: string, userId: string) {
     return await this.findSetDetail(setId, userId, {
       createdBy: userId,
     });
   }
 
-  async create(dto: CreateSetDto, userId: number) {
+  async create(dto: CreateSetDto, userId: string) {
     const [found, user] = await Promise.all([
       SetEntity.findOneBy({
         name: dto.name,
@@ -77,7 +62,7 @@ export class SetService {
     if (found) throw new ConflictException();
 
     if (dto.cards.length < 4)
-      throw new BadRequestException('Set must have at least 4 cards');
+      throw new BadRequestException('Minimum 4 cards required');
 
     const cards = dto.cards.map((card) => {
       return new CardEntity({ ...card, createdBy: userId });
@@ -93,36 +78,32 @@ export class SetService {
     return await SetEntity.save(set);
   }
 
-  // ============================= //
-  // ======== IMPLEMENTED ======== //
-  // ============================= //
-  async update(setId: number, dto: UpdateSetDto, userId: number) {
-    const { cards, ...rest } = dto;
-
-    const found = await SetEntity.findOneOrFail({
+  async update(setId: string, dto: UpdateSetDto, userId: string) {
+    const set = await SetEntity.findOneOrFail({
       where: { id: setId, createdBy: userId },
-      relations: ['cards'],
     });
 
-    if (cards) {
-      if (cards.length < 4)
-        throw new BadRequestException('Set must have at least 4 cards');
+    // if (cards) {
+    //   if (cards.length < 4)
+    //     throw new BadRequestException('Minimum 4 cards required');
 
-      await CardEntity.remove(found.cards);
-      found.cards = cards.map((card) => {
-        return new CardEntity({ ...card, createdBy: userId });
-      });
-    }
+    //   console.log('🚀 ~ SetService ~ update ~ cards:', cards);
+    //   await delay(300000);
+    //   await CardEntity.remove(set.cards); // ! ERROR: khi update set cards, thì lại xoá hết progress items
+    //   set.cards = cards.map((card) => {
+    //     return new CardEntity({ ...card, createdBy: userId });
+    //   });
+    // }
 
     return await SetEntity.save(
-      Object.assign(found, {
-        ...rest,
+      Object.assign(set, {
+        ...dto,
         updatedBy: userId,
       } as SetEntity),
     );
   }
 
-  async remove(setId: number, userId: number) {
+  async remove(setId: string, userId: string) {
     const found = await SetEntity.findOneByOrFail({
       id: setId,
       createdBy: userId,
@@ -135,8 +116,8 @@ export class SetService {
   // ================ PRIVATE METHODS ================ //
   // ================================================= //
   private async findSetDetail(
-    setId: number,
-    userId: number,
+    setId: string,
+    userId: string,
     options: FindOptionsWhere<SetEntity>,
   ) {
     const set = await SetEntity.findOneOrFail({

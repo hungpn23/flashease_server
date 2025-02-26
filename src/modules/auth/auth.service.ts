@@ -211,7 +211,7 @@ export class AuthService {
     return crypto.randomBytes(16).toString('hex');
   }
 
-  private async checkBlacklist(userId: number, key: string) {
+  private async checkBlacklist(userId: string, key: string) {
     const isInBlacklist = await this.cacheManager.store.get<boolean>(key);
 
     if (isInBlacklist) {

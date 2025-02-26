@@ -4,6 +4,9 @@ import { Expose } from 'class-transformer';
 @Expose()
 export class CardDto {
   @StringValidators()
+  id: string;
+
+  @StringValidators()
   term: string;
 
   @StringValidators()

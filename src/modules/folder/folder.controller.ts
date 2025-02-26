@@ -8,7 +8,6 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -57,7 +56,7 @@ export class FolderController {
   })
   @Get(':id')
   findOne(
-    @Param('id', ParseIntPipe) folderId: number,
+    @Param('id') folderId: string,
     @JwtPayload() { userId }: JwtPayloadType,
   ) {
     return this.folderService.findOne(folderId, userId);
@@ -69,7 +68,7 @@ export class FolderController {
   })
   @Patch(':id')
   update(
-    @Param('id', ParseIntPipe) folderId: number,
+    @Param('id') folderId: string,
     @Body() dto: UpdateFolderDto,
     @JwtPayload() { userId }: JwtPayloadType,
   ) {
@@ -82,7 +81,7 @@ export class FolderController {
   })
   @Delete(':id')
   remove(
-    @Param('id', ParseIntPipe) folderId: number,
+    @Param('id') folderId: string,
     @JwtPayload() { userId }: JwtPayloadType,
   ) {
     return this.folderService.remove(folderId, userId);
@@ -94,7 +93,7 @@ export class FolderController {
   })
   @Post(':id/add-sets')
   async addSets(
-    @Param('id', ParseIntPipe) folderId: number,
+    @Param('id') folderId: string,
     @Body() { setIds }: AddSetsDto,
     @JwtPayload() { userId }: JwtPayloadType,
   ) {
@@ -107,7 +106,7 @@ export class FolderController {
   })
   @Post(':id/remove-sets')
   async removeSets(
-    @Param('id', ParseIntPipe) folderId: number,
+    @Param('id') folderId: string,
     @Body() { setIds }: RemoveSetsDto,
     @JwtPayload() { userId }: JwtPayloadType,
   ) {

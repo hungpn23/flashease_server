@@ -7,7 +7,7 @@ import { ProgressEntity } from './entities/progress.entity';
 
 export class StartProgressDto {
   @StringValidators({ required: false })
-  visibleToPassword?: string;
+  password?: string;
 }
 
 export class FindProgressDetailDto extends StartProgressDto {}

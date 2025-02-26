@@ -21,7 +21,7 @@ export class CardEntity extends AbstractEntity {
   }
 
   @PrimaryGeneratedColumn()
-  id: number;
+  id: string;
 
   @Column()
   term: string;

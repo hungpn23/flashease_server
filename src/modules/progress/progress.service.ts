@@ -1,6 +1,5 @@
 import { OffsetPaginatedDto } from '@/dto/offset-pagination/paginated.dto';
 import { OffsetPaginationQueryDto } from '@/dto/offset-pagination/query.dto';
-import { delay } from '@/utils/delay';
 import paginate from '@/utils/offset-paginate';
 import {
   BadRequestException,
@@ -14,7 +13,6 @@ import { UserEntity } from '../user/entities/user.entity';
 import { ProgressItemEntity } from './entities/progress-item.entity';
 import { ProgressEntity } from './entities/progress.entity';
 import {
-  FindProgressDetailDto,
   ProgressDetailDto,
   ProgressMetadataDto,
   SaveAnswerDto,
@@ -23,7 +21,7 @@ import {
 
 @Injectable()
 export class ProgressService {
-  async startProgress(setId: number, userId: number, dto: StartProgressDto) {
+  async startProgress(setId: string, userId: string, dto: StartProgressDto) {
     const [user, set] = await Promise.all([
       UserEntity.findOneByOrFail({ id: userId }),
       SetEntity.findOneOrFail({
@@ -32,7 +30,7 @@ export class ProgressService {
       }),
     ]);
 
-    this.validate(set, userId, dto.visibleToPassword);
+    this.validate(set, userId, dto.password);
 
     if (set.cards.length < 4)
       throw new BadRequestException(
@@ -49,19 +47,11 @@ export class ProgressService {
     return await ProgressEntity.save(newProgress);
   }
 
-  async findProgressDetail(
-    progressId: number,
-    userId: number,
-    dto: FindProgressDetailDto,
-  ) {
+  async findProgressDetail(progressId: string) {
     const progress = await ProgressEntity.findOneOrFail({
       where: { id: progressId },
       relations: ['user', 'set', 'items.card'],
     });
-
-    this.validate(progress.set, userId, dto.visibleToPassword);
-
-    if (!progress.items.length) throw new BadRequestException();
 
     return plainToInstance(ProgressDetailDto, {
       progress,
@@ -69,7 +59,7 @@ export class ProgressService {
     } satisfies ProgressDetailDto);
   }
 
-  async saveAnswer(itemId: number, dto: SaveAnswerDto) {
+  async saveAnswer(itemId: string, dto: SaveAnswerDto) {
     const item = await ProgressItemEntity.findOneOrFail({
       where: { id: itemId },
       relations: { progress: true },
@@ -93,8 +83,7 @@ export class ProgressService {
   // ============================= //
   // ======== IMPLEMENTED ======== //
   // ============================= //
-  async findMyProgress(query: OffsetPaginationQueryDto, userId: number) {
-    await delay(500);
+  async findMyProgress(query: OffsetPaginationQueryDto, userId: string) {
     const builder = ProgressEntity.createQueryBuilder('progress');
 
     builder.leftJoinAndSelect('progress.items', 'items');
@@ -137,7 +126,7 @@ export class ProgressService {
     );
   }
 
-  private validate(set: SetEntity, userId: number, visibleToPassword?: string) {
+  private validate(set: SetEntity, userId: string, password?: string) {
     if (set.visibleTo === VisibleTo.JUST_ME && set.createdBy !== userId) {
       throw new ForbiddenException();
     }
@@ -145,9 +134,9 @@ export class ProgressService {
     if (
       set.createdBy !== userId &&
       set.visibleTo === VisibleTo.PEOPLE_WITH_A_PASSWORD &&
-      set.visibleToPassword !== visibleToPassword
+      set.visibleToPassword !== password
     ) {
-      throw new ForbiddenException();
+      throw new BadRequestException('Incorrect password');
     }
   }
 }
