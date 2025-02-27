@@ -9,7 +9,7 @@ import { Expose } from 'class-transformer';
 import { ValidateIf } from 'class-validator';
 import { CardDto } from '../core/dtos/card.dto';
 import { SetEntity } from './entities/set.entity';
-import { EditableBy, VisibleTo } from './set.enum';
+import { VisibleTo } from './set.enum';
 
 export class CreateSetDto {
   @StringValidators()
@@ -24,13 +24,6 @@ export class CreateSetDto {
   @ValidateIf((o) => o.visibleTo === VisibleTo.PEOPLE_WITH_A_PASSWORD)
   @PasswordValidators()
   visibleToPassword?: string;
-
-  @EnumValidators(EditableBy)
-  editableBy: EditableBy;
-
-  @ValidateIf((o) => o.editableBy === EditableBy.PEOPLE_WITH_A_PASSWORD)
-  @PasswordValidators()
-  editableByPassword?: string;
 
   @ClassValidators(CardDto, { isArray: true })
   cards: CardDto[];

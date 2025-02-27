@@ -12,7 +12,7 @@ import {
   PrimaryGeneratedColumn,
   Relation,
 } from 'typeorm';
-import { EditableBy, VisibleTo } from '../set.enum';
+import { VisibleTo } from '../set.enum';
 
 @Expose()
 @Entity('set')
@@ -31,6 +31,9 @@ export class SetEntity extends AbstractEntity {
   @Column({ nullable: true })
   description?: string;
 
+  @Column()
+  author: string;
+
   @Column({
     name: 'visible_to',
     type: 'enum',
@@ -41,17 +44,6 @@ export class SetEntity extends AbstractEntity {
 
   @Column({ name: 'visible_to_password', nullable: true })
   visibleToPassword?: string; // if visibleTo is set to PEOPLE_WITH_A_PASSWORD
-
-  @Column({
-    name: 'editable_by',
-    type: 'enum',
-    enum: EditableBy,
-    default: EditableBy.JUST_ME,
-  })
-  editableBy: EditableBy;
-
-  @Column({ name: 'editable_by_password', nullable: true })
-  editableByPassword?: string; // if editableBy is set to PEOPLE_WITH_A_PASSWORD
 
   @OneToMany(() => CardEntity, (card) => card.set, { cascade: true })
   cards: Relation<CardEntity[]>;

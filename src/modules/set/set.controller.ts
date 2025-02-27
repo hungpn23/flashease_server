@@ -25,7 +25,7 @@ export class SetController {
     summary: 'find public sets',
     isPaginated: true,
   })
-  @Get('public')
+  @Get('public-sets')
   async findPublicSets(
     @Query() query: OffsetPaginationQueryDto,
     @JwtPayload() { userId }: JwtPayloadType,
@@ -37,7 +37,7 @@ export class SetController {
     type: SetEntity,
     summary: 'find public set detail',
   })
-  @Get('public/:setId')
+  @Get('public-sets/:setId')
   async findPublicSetDetail(@Param('setId') setId: string) {
     return await this.setService.findPublicSetDetail(setId);
   }
@@ -59,16 +59,16 @@ export class SetController {
     type: SetEntity,
     summary: 'find my set detail',
   })
-  @Get('my-set/:setId')
-  async findMySetDetail(
+  @Get('my-sets/:setId')
+  async findMySetsDetail(
     @Param('setId') setId: string,
     @JwtPayload() { userId }: JwtPayloadType,
   ) {
-    return await this.setService.findMySetDetail(setId, userId);
+    return await this.setService.findMySetsDetail(setId, userId);
   }
 
   @ApiEndpoint({ type: SetEntity, summary: 'create a new set' })
-  @Post()
+  @Post('/create-set')
   async create(
     @Body() dto: CreateSetDto,
     @JwtPayload() { userId }: JwtPayloadType,

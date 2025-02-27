@@ -17,7 +17,7 @@ import {
   SetMetadataDto,
   UpdateSetDto,
 } from './set.dto';
-import { EditableBy, VisibleTo } from './set.enum';
+import { VisibleTo } from './set.enum';
 
 @Injectable()
 export class SetService {
@@ -61,7 +61,7 @@ export class SetService {
     return new OffsetPaginatedDto<SetDetailDto>(formatted, metadata);
   }
 
-  async findMySetDetail(setId: string, userId: string) {
+  async findMySetsDetail(setId: string, userId: string) {
     return await SetEntity.findOneOrFail({
       where: {
         id: setId,
@@ -114,19 +114,14 @@ export class SetService {
       visibleToPassword = dto.visibleToPassword;
     }
 
-    let editableByPassword = undefined;
-    if (dto.editableBy === EditableBy.PEOPLE_WITH_A_PASSWORD) {
-      editableByPassword = dto.editableByPassword;
-    }
-
     const cards = dto.cards.map((card) => {
       return new CardEntity({ ...card, createdBy: userId });
     });
 
     const set = new SetEntity({
       ...dto,
+      author: user.username,
       visibleToPassword,
-      editableByPassword,
       cards,
       user,
       createdBy: userId,
@@ -145,16 +140,10 @@ export class SetService {
       visibleToPassword = dto.visibleToPassword;
     }
 
-    let editableByPassword = set.editableByPassword;
-    if (dto.editableBy === EditableBy.PEOPLE_WITH_A_PASSWORD) {
-      editableByPassword = dto.editableByPassword;
-    }
-
     return await SetEntity.save(
       Object.assign(set, {
         ...dto,
         visibleToPassword,
-        editableByPassword,
         updatedBy: userId,
       } as SetEntity),
     );
