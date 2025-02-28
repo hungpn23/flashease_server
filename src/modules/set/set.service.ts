@@ -7,7 +7,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
-import { In } from 'typeorm';
+import { In, Not } from 'typeorm';
 import { UserEntity } from '../user/entities/user.entity';
 import { CardEntity } from './entities/card.entity';
 import { SetEntity } from './entities/set.entity';
@@ -21,29 +21,30 @@ import { VisibleTo } from './set.enum';
 
 @Injectable()
 export class SetService {
-  async findPublicSets(query: OffsetPaginationQueryDto, userId: string) {
+  async findManyPublic(query: OffsetPaginationQueryDto, userId: string) {
     const builder = SetEntity.createQueryBuilder('set')
       .leftJoin('set.user', 'user')
       .where('set.createdBy != :userId', { userId })
       .andWhere('set.visibleTo IN (:...visibleTos)', {
-        visibleTos: [VisibleTo.EVERYONE, VisibleTo.PEOPLE_WITH_A_PASSWORD],
+        visibleTos: [VisibleTo.EVERYONE, VisibleTo.PEOPLE_WITH_A_PASSCODE],
       })
       .select(['set', 'user.username']);
 
     return await paginate(builder, query);
   }
 
-  async findPublicSetDetail(setId: string) {
+  async findOnePublic(setId: string, userId: string) {
     return await SetEntity.findOneOrFail({
       where: {
         id: setId,
-        visibleTo: In([VisibleTo.EVERYONE, VisibleTo.PEOPLE_WITH_A_PASSWORD]),
+        visibleTo: In([VisibleTo.EVERYONE, VisibleTo.PEOPLE_WITH_A_PASSCODE]),
+        user: { id: Not(userId) },
       },
-      relations: ['cards'],
+      relations: ['cards', 'user'],
     });
   }
 
-  async findMySets(query: OffsetPaginationQueryDto, userId: string) {
+  async findMany(query: OffsetPaginationQueryDto, userId: string) {
     const builder = SetEntity.createQueryBuilder('set')
       .leftJoin('set.user', 'user')
       .leftJoin('set.cards', 'cards')
@@ -61,14 +62,13 @@ export class SetService {
     return new OffsetPaginatedDto<SetDetailDto>(formatted, metadata);
   }
 
-  async findMySetsDetail(setId: string, userId: string) {
+  async findOne(setId: string, userId: string) {
     return await SetEntity.findOneOrFail({
       where: {
         id: setId,
         createdBy: userId,
       },
       relations: ['cards'],
-      select: ['id', 'name', 'description', 'cards'],
     });
   }
 
@@ -109,9 +109,9 @@ export class SetService {
     if (dto.cards.length < 4)
       throw new BadRequestException('Minimum 4 cards required');
 
-    let visibleToPassword = undefined;
-    if (dto.visibleTo === VisibleTo.PEOPLE_WITH_A_PASSWORD) {
-      visibleToPassword = dto.visibleToPassword;
+    let passcode = undefined;
+    if (dto.visibleTo === VisibleTo.PEOPLE_WITH_A_PASSCODE) {
+      passcode = dto.passcode;
     }
 
     const cards = dto.cards.map((card) => {
@@ -121,7 +121,7 @@ export class SetService {
     const set = new SetEntity({
       ...dto,
       author: user.username,
-      visibleToPassword,
+      passcode,
       cards,
       user,
       createdBy: userId,
@@ -135,18 +135,28 @@ export class SetService {
       where: { id: setId, createdBy: userId },
     });
 
-    let visibleToPassword = set.visibleToPassword;
-    if (dto.visibleTo === VisibleTo.PEOPLE_WITH_A_PASSWORD) {
-      visibleToPassword = dto.visibleToPassword;
+    switch (dto.visibleTo) {
+      case VisibleTo.EVERYONE:
+      case VisibleTo.JUST_ME:
+        set.passcode = null;
+        break;
+      case VisibleTo.PEOPLE_WITH_A_PASSCODE:
+        set.passcode = dto.passcode;
+        break;
     }
 
-    return await SetEntity.save(
+    const updated = await SetEntity.save(
       Object.assign(set, {
         ...dto,
-        visibleToPassword,
+        passcode: set.passcode,
         updatedBy: userId,
       } as SetEntity),
     );
+
+    return await SetEntity.findOne({
+      where: { id: updated.id },
+      relations: ['cards'],
+    });
   }
 
   async remove(setId: string, userId: string) {

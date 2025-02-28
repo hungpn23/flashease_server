@@ -20,54 +20,43 @@ import { SetService } from './set.service';
 export class SetController {
   constructor(private setService: SetService) {}
 
-  @ApiEndpoint({
-    type: SetEntity,
-    summary: 'find public sets',
-    isPaginated: true,
-  })
-  @Get('public-sets')
-  async findPublicSets(
+  @ApiEndpoint({ type: SetEntity, isPaginated: true })
+  @Get('explore')
+  async findManyPublic(
     @Query() query: OffsetPaginationQueryDto,
     @JwtPayload() { userId }: JwtPayloadType,
   ) {
-    return await this.setService.findPublicSets(query, userId);
+    return await this.setService.findManyPublic(query, userId);
   }
 
-  @ApiEndpoint({
-    type: SetEntity,
-    summary: 'find public set detail',
-  })
-  @Get('public-sets/:setId')
-  async findPublicSetDetail(@Param('setId') setId: string) {
-    return await this.setService.findPublicSetDetail(setId);
-  }
-
-  @ApiEndpoint({
-    type: SetDetailDto,
-    summary: 'find my sets',
-    isPaginated: true,
-  })
-  @Get('my-sets')
-  async findMySets(
-    @Query() query: OffsetPaginationQueryDto,
-    @JwtPayload() { userId }: JwtPayloadType,
-  ) {
-    return await this.setService.findMySets(query, userId);
-  }
-
-  @ApiEndpoint({
-    type: SetEntity,
-    summary: 'find my set detail',
-  })
-  @Get('my-sets/:setId')
-  async findMySetsDetail(
+  @ApiEndpoint({ type: SetEntity })
+  @Get('explore/:setId')
+  async findOnePublic(
     @Param('setId') setId: string,
     @JwtPayload() { userId }: JwtPayloadType,
   ) {
-    return await this.setService.findMySetsDetail(setId, userId);
+    return await this.setService.findOnePublic(setId, userId);
   }
 
-  @ApiEndpoint({ type: SetEntity, summary: 'create a new set' })
+  @ApiEndpoint({ type: SetDetailDto, isPaginated: true })
+  @Get('library')
+  async findMany(
+    @Query() query: OffsetPaginationQueryDto,
+    @JwtPayload() { userId }: JwtPayloadType,
+  ) {
+    return await this.setService.findMany(query, userId);
+  }
+
+  @ApiEndpoint({ type: SetEntity })
+  @Get('library/:setId')
+  async findOne(
+    @Param('setId') setId: string,
+    @JwtPayload() { userId }: JwtPayloadType,
+  ) {
+    return await this.setService.findOne(setId, userId);
+  }
+
+  @ApiEndpoint({ type: SetEntity })
   @Post('/create-set')
   async create(
     @Body() dto: CreateSetDto,
@@ -76,8 +65,8 @@ export class SetController {
     return await this.setService.create(dto, userId);
   }
 
-  @ApiEndpoint({ type: SetEntity, summary: 'update a set' })
-  @Patch(':setId')
+  @ApiEndpoint({ type: SetEntity })
+  @Patch('/edit-set/:setId')
   async update(
     @Param('setId') setId: string,
     @Body() dto: UpdateSetDto,
@@ -86,7 +75,7 @@ export class SetController {
     return await this.setService.update(setId, dto, userId);
   }
 
-  @ApiEndpoint({ type: SetEntity, summary: 'remove a set' })
+  @ApiEndpoint({ type: SetEntity })
   @Delete(':setId')
   async remove(
     @Param('setId') setId: string,

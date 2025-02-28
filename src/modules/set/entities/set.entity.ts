@@ -42,8 +42,8 @@ export class SetEntity extends AbstractEntity {
   })
   visibleTo: VisibleTo;
 
-  @Column({ name: 'visible_to_password', nullable: true })
-  visibleToPassword?: string; // if visibleTo is set to PEOPLE_WITH_A_PASSWORD
+  @Column({ name: 'passcode', nullable: true })
+  passcode?: string; // if visibleTo is set to PEOPLE_WITH_A_PASSCODE
 
   @OneToMany(() => CardEntity, (card) => card.set, { cascade: true })
   cards: Relation<CardEntity[]>;

@@ -1,9 +1,10 @@
 import { AuthEnvVariables } from '@/configs/auth.config';
-import { AuthError, Role, SYSTEM } from '@/constants/index';
+import { AuthError, SYSTEM } from '@/constants/index';
 import { AuthException } from '@/exceptions/auth.exception';
 import { JwtPayloadType, JwtRefreshPayloadType } from '@/types/auth.type';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import {
+  BadRequestException,
   Inject,
   Injectable,
   Logger,
@@ -17,7 +18,7 @@ import crypto from 'crypto';
 import ms from 'ms';
 import { SessionEntity } from '../user/entities/session.entity';
 import { UserEntity } from '../user/entities/user.entity';
-import { AuthReqDto } from './auth.dto';
+import { LoginDto, RegisterDto } from './auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -29,21 +30,25 @@ export class AuthService {
   ) {}
 
   // *** START ROUTE ***
-  async register(dto: AuthReqDto) {
-    const { email } = dto;
-    const found = await UserEntity.existsBy({ email });
-    if (found) throw new AuthException(AuthError.E01);
-
-    dto.password = await argon2.hash(dto.password);
-
-    const username = email.split('@')[0];
+  async register(dto: RegisterDto) {
+    const { username, email, password, confirmPassword } = dto;
+    const user = await UserEntity.findOne({
+      where: [{ username }, { email }],
+    });
+    if (user) throw new BadRequestException('username or email already exists');
+    if (password !== confirmPassword)
+      throw new BadRequestException('passwords do not match');
 
     await UserEntity.save(
-      new UserEntity({ ...dto, username, role: Role.USER, createdBy: SYSTEM }),
+      new UserEntity({
+        username,
+        email,
+        password: await argon2.hash(password),
+      }),
     );
   }
 
-  async login(dto: AuthReqDto) {
+  async login(dto: LoginDto) {
     const { email, password } = dto;
     const user = await UserEntity.findOne({
       where: { email },

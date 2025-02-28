@@ -1,11 +1,11 @@
 import {
   EmailValidators,
   PasswordValidators,
+  StringValidators,
 } from '@/decorators/properties.decorator';
-import { PickType } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 
-export class AuthReqDto {
+export class LoginDto {
   @EmailValidators()
   email: string;
 
@@ -13,16 +13,27 @@ export class AuthReqDto {
   password: string;
 }
 
+export class RegisterDto {
+  @StringValidators({ minLength: 6, maxLength: 20 })
+  username: string;
+
+  @EmailValidators()
+  email: string;
+
+  @PasswordValidators()
+  password: string;
+
+  @PasswordValidators()
+  confirmPassword: string;
+}
+
 @Expose()
-export class AuthResDto {
+export class LoginResDto {
   accessToken: string;
   refreshToken: string;
 }
 
 @Expose()
-export class LoginResDto extends AuthResDto {}
-
-@Expose()
-export class RefreshResDto extends PickType(AuthResDto, [
-  'accessToken',
-] as const) {}
+export class RefreshResDto {
+  accessToken: string;
+}

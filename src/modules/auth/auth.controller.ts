@@ -4,7 +4,7 @@ import { JwtPayload } from '@/decorators/jwt-payload.decorator';
 import { JwtPayloadType, JwtRefreshPayloadType } from '@/types/auth.type';
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiExcludeEndpoint } from '@nestjs/swagger';
-import { AuthReqDto, LoginResDto, RefreshResDto } from './auth.dto';
+import { LoginDto, LoginResDto, RefreshResDto, RegisterDto } from './auth.dto';
 import { AuthService } from './auth.service';
 
 @Controller({ path: 'auth', version: '1' })
@@ -16,7 +16,7 @@ export class AuthController {
     summary: 'register a new account',
   })
   @Post('/register')
-  async register(@Body() dto: AuthReqDto): Promise<void> {
+  async register(@Body() dto: RegisterDto): Promise<void> {
     await this.authService.register(dto);
   }
 
@@ -26,7 +26,7 @@ export class AuthController {
     type: LoginResDto,
   })
   @Post('/login')
-  async login(@Body() dto: AuthReqDto): Promise<LoginResDto> {
+  async login(@Body() dto: LoginDto): Promise<LoginResDto> {
     return await this.authService.login(dto);
   }
 

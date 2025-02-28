@@ -21,9 +21,9 @@ export class CreateSetDto {
   @EnumValidators(VisibleTo)
   visibleTo: VisibleTo;
 
-  @ValidateIf((o) => o.visibleTo === VisibleTo.PEOPLE_WITH_A_PASSWORD)
+  @ValidateIf((o) => o.visibleTo === VisibleTo.PEOPLE_WITH_A_PASSCODE)
   @PasswordValidators()
-  visibleToPassword?: string;
+  passcode?: string;
 
   @ClassValidators(CardDto, { isArray: true })
   cards: CardDto[];
