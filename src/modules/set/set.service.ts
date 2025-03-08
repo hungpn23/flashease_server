@@ -65,6 +65,16 @@ export class SetService {
   }
 
   async findOne(setId: string, userId: string) {
+    return await SetEntity.findOneOrFail({
+      where: {
+        id: setId,
+        createdBy: userId,
+      },
+      relations: ['cards'],
+    });
+  }
+
+  async findOneAndMetadata(setId: string, userId: string) {
     const set = await SetEntity.findOneOrFail({
       where: {
         id: setId,
@@ -73,10 +83,27 @@ export class SetService {
       relations: ['cards'],
     });
 
+    // set.cards = this.reorderCards(set.cards);
+
     return plainToInstance(SetDetailDto, {
       set,
       metadata: this.getSetMetadata(set.cards),
     });
+  }
+
+  async saveAnswer(cardId: string, userId: string, isCorrect: boolean) {
+    const card = await CardEntity.findOneOrFail({
+      where: { id: cardId, createdBy: userId },
+      relations: ['set'],
+    });
+
+    if (isCorrect) {
+      card.correctCount = card.correctCount ? card.correctCount + 1 : 1;
+    } else {
+      card.correctCount = card.correctCount || 0;
+    }
+
+    await CardEntity.save(card);
   }
 
   async startLearning(setId: string, userId: string, dto: StartLearningDto) {
@@ -116,28 +143,6 @@ export class SetService {
       where: { id: newSet.id },
       relations: ['cards'],
     });
-  }
-
-  async saveAnswer(cardId: string, isCorrect: boolean) {
-    const card = await CardEntity.findOneOrFail({
-      where: { id: cardId },
-      relations: ['set'],
-      select: ['correctCount', 'set'],
-    });
-
-    if (isCorrect) {
-      card.correctCount = card.correctCount ? card.correctCount + 1 : 1;
-    } else {
-      card.correctCount = card.correctCount || 0;
-    }
-
-    await CardEntity.save(card);
-
-    const cards = await CardEntity.findBy({
-      set: { id: card.set.id },
-    });
-
-    return this.getSetMetadata(cards);
   }
 
   async create(userId: string, dto: CreateSetDto) {
@@ -241,5 +246,17 @@ export class SetService {
     });
 
     return plainToInstance(SetMetadataDto, metadata);
+  }
+
+  private reorderCards(cards: CardEntity[]) {
+    const notStudiedCards = cards.filter((card) => card.correctCount === null);
+    const zeroCards = cards.filter((card) => card.correctCount === 0);
+    const oneCards = cards.filter((card) => card.correctCount === 1);
+    const defaultCards = cards.filter(
+      (card) =>
+        card.correctCount && card.correctCount !== 0 && card.correctCount !== 1,
+    );
+
+    return [...notStudiedCards, ...zeroCards, ...oneCards, ...defaultCards];
   }
 }

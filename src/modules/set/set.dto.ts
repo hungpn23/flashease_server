@@ -1,4 +1,5 @@
 import {
+  BooleanValidators,
   ClassValidators,
   EnumValidators,
   StringValidators,
@@ -32,6 +33,11 @@ export class UpdateSetDto extends CreateSetDto {}
 export class StartLearningDto {
   @StringValidators({ minLength: 0 })
   passcode: string;
+}
+
+export class SaveAnswerDto {
+  @BooleanValidators()
+  isCorrect: boolean;
 }
 
 @Expose()

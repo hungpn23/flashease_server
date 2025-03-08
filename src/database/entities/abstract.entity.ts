@@ -15,8 +15,6 @@ import { ColumnMetadata } from 'typeorm/metadata/ColumnMetadata';
 // use Active Record pattern
 
 export abstract class AbstractEntity extends BaseEntity {
-  @ApiHideProperty()
-  @Exclude()
   @Order(9998)
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt: Date;

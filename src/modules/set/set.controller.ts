@@ -15,6 +15,7 @@ import {
 import { SetEntity } from './entities/set.entity';
 import {
   CreateSetDto,
+  SaveAnswerDto,
   SetDetailDto,
   StartLearningDto,
   UpdateSetDto,
@@ -52,13 +53,31 @@ export class SetController {
     return await this.setService.findMany(query, userId);
   }
 
-  @ApiEndpoint({ type: SetDetailDto })
+  @ApiEndpoint({ type: SetEntity })
   @Get('library/:setId')
   async findOne(
     @Param('setId') setId: string,
     @JwtPayload() { userId }: JwtPayloadType,
   ) {
     return await this.setService.findOne(setId, userId);
+  }
+
+  @ApiEndpoint({ type: SetDetailDto })
+  @Get('flashcard/:setId')
+  async findOneAndMetadata(
+    @Param('setId') setId: string,
+    @JwtPayload() { userId }: JwtPayloadType,
+  ) {
+    return await this.setService.findOneAndMetadata(setId, userId);
+  }
+
+  @Post('/flashcard/save-answer/:cardId')
+  async saveAnswer(
+    @Param('cardId') cardId: string,
+    @JwtPayload() { userId }: JwtPayloadType,
+    @Body() { isCorrect }: SaveAnswerDto,
+  ) {
+    return await this.setService.saveAnswer(cardId, userId, isCorrect);
   }
 
   @ApiEndpoint()
