@@ -74,9 +74,14 @@ export function StringValidators(options?: StringOptions): PropertyDecorator {
   let decorators = [Type(() => String), IsString({ each: options?.isArray })];
 
   decorators = checkCommonOptions(decorators, options);
-  decorators.push(
-    MinLength(options?.minLength || 1, { each: options?.isArray }),
-  );
+
+  if (options?.minLength === 0) {
+    decorators.push(MinLength(0, { each: options?.isArray }));
+  } else {
+    decorators.push(
+      MinLength(options?.minLength || 1, { each: options?.isArray }),
+    );
+  }
 
   if (options?.maxLength)
     decorators.push(MaxLength(options?.maxLength, { each: options?.isArray }));

@@ -13,7 +13,12 @@ import {
   Query,
 } from '@nestjs/common';
 import { SetEntity } from './entities/set.entity';
-import { CreateSetDto, SetDetailDto, UpdateSetDto } from './set.dto';
+import {
+  CreateSetDto,
+  SetDetailDto,
+  StartLearningDto,
+  UpdateSetDto,
+} from './set.dto';
 import { SetService } from './set.service';
 
 @Controller({ path: 'set', version: '1' })
@@ -47,7 +52,7 @@ export class SetController {
     return await this.setService.findMany(query, userId);
   }
 
-  @ApiEndpoint({ type: SetEntity })
+  @ApiEndpoint({ type: SetDetailDto })
   @Get('library/:setId')
   async findOne(
     @Param('setId') setId: string,
@@ -56,13 +61,23 @@ export class SetController {
     return await this.setService.findOne(setId, userId);
   }
 
+  @ApiEndpoint()
+  @Post('/start-learning/:setId')
+  async startLearning(
+    @Param('setId') setId: string,
+    @JwtPayload() { userId }: JwtPayloadType,
+    @Body() dto: StartLearningDto,
+  ) {
+    return await this.setService.startLearning(setId, userId, dto);
+  }
+
   @ApiEndpoint({ type: SetEntity })
   @Post('/create-set')
   async create(
-    @Body() dto: CreateSetDto,
     @JwtPayload() { userId }: JwtPayloadType,
+    @Body() dto: CreateSetDto,
   ) {
-    return await this.setService.create(dto, userId);
+    return await this.setService.create(userId, dto);
   }
 
   @ApiEndpoint({ type: SetEntity })
@@ -72,11 +87,11 @@ export class SetController {
     @Body() dto: UpdateSetDto,
     @JwtPayload() { userId }: JwtPayloadType,
   ) {
-    return await this.setService.update(setId, dto, userId);
+    return await this.setService.update(setId, userId, dto);
   }
 
   @ApiEndpoint({ type: SetEntity })
-  @Delete(':setId')
+  @Delete('/delete-set/:setId')
   async remove(
     @Param('setId') setId: string,
     @JwtPayload() { userId }: JwtPayloadType,

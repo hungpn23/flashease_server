@@ -15,6 +15,7 @@ import {
   CreateSetDto,
   SetDetailDto,
   SetMetadataDto,
+  StartLearningDto,
   UpdateSetDto,
 } from './set.dto';
 import { VisibleTo } from './set.enum';
@@ -24,11 +25,12 @@ export class SetService {
   async findManyPublic(query: OffsetPaginationQueryDto, userId: string) {
     const builder = SetEntity.createQueryBuilder('set')
       .leftJoin('set.user', 'user')
+      .leftJoin('set.cards', 'cards')
       .where('set.createdBy != :userId', { userId })
       .andWhere('set.visibleTo IN (:...visibleTos)', {
         visibleTos: [VisibleTo.EVERYONE, VisibleTo.PEOPLE_WITH_A_PASSCODE],
       })
-      .select(['set', 'user.username']);
+      .select(['set', 'cards', 'user.username']);
 
     return await paginate(builder, query);
   }
@@ -63,16 +65,58 @@ export class SetService {
   }
 
   async findOne(setId: string, userId: string) {
-    return await SetEntity.findOneOrFail({
+    const set = await SetEntity.findOneOrFail({
       where: {
         id: setId,
         createdBy: userId,
       },
       relations: ['cards'],
     });
+
+    return plainToInstance(SetDetailDto, {
+      set,
+      metadata: this.getSetMetadata(set.cards),
+    });
   }
 
-  async startLearning() {}
+  async startLearning(setId: string, userId: string, dto: StartLearningDto) {
+    const [user, set] = await Promise.all([
+      UserEntity.findOneByOrFail({ id: userId }),
+      SetEntity.findOneOrFail({
+        where: { id: setId },
+        relations: ['cards'],
+      }),
+    ]);
+
+    if (
+      set.visibleTo === VisibleTo.PEOPLE_WITH_A_PASSCODE &&
+      dto.passcode !== set.passcode
+    ) {
+      throw new BadRequestException('Invalid passcode');
+    }
+
+    const newCards = set.cards.map(
+      ({ term, definition }) =>
+        new CardEntity({ term, definition, createdBy: userId }),
+    );
+
+    const newSet = await SetEntity.save(
+      new SetEntity({
+        name: set.name,
+        description: set.description,
+        author: set.author,
+        visibleTo: VisibleTo.JUST_ME,
+        cards: newCards,
+        user,
+        createdBy: userId,
+      }),
+    );
+
+    return await SetEntity.findOne({
+      where: { id: newSet.id },
+      relations: ['cards'],
+    });
+  }
 
   async saveAnswer(cardId: string, isCorrect: boolean) {
     const card = await CardEntity.findOneOrFail({
@@ -96,7 +140,7 @@ export class SetService {
     return this.getSetMetadata(cards);
   }
 
-  async create(dto: CreateSetDto, userId: string) {
+  async create(userId: string, dto: CreateSetDto) {
     const [found, user] = await Promise.all([
       SetEntity.findOneBy({
         name: dto.name,
@@ -130,9 +174,11 @@ export class SetService {
     return await SetEntity.save(set);
   }
 
-  async update(setId: string, dto: UpdateSetDto, userId: string) {
+  async update(setId: string, userId: string, dto: UpdateSetDto) {
+    const { cards, passcode, ...rest } = dto;
     const set = await SetEntity.findOneOrFail({
       where: { id: setId, createdBy: userId },
+      relations: ['cards'],
     });
 
     switch (dto.visibleTo) {
@@ -141,13 +187,18 @@ export class SetService {
         set.passcode = null;
         break;
       case VisibleTo.PEOPLE_WITH_A_PASSCODE:
-        set.passcode = dto.passcode;
+        set.passcode = passcode;
         break;
     }
 
+    const newCards = cards.map(
+      (card) => new CardEntity({ ...card, createdBy: userId }),
+    );
+
     const updated = await SetEntity.save(
       Object.assign(set, {
-        ...dto,
+        ...rest,
+        cards: newCards,
         passcode: set.passcode,
         updatedBy: userId,
       } as SetEntity),

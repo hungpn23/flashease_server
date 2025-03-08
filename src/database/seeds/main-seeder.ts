@@ -12,35 +12,17 @@ export class MainSeeder implements Seeder {
     _dataSource: DataSource,
     factoryManager: SeederFactoryManager,
   ): Promise<void> {
-    const NounCardFactory = factoryManager.get<CardEntity, 'noun'>(CardEntity);
-
+    const CardFactory = factoryManager.get(CardEntity);
     const users = await this.seedUsers();
-
-    const sets = await this.seedSets(users);
-
-    await this.seedCards(sets[0], NounCardFactory);
+    await this.seedSets(users, CardFactory);
   }
 
-  private async seedCards<Meta = unknown>(
-    set: SetEntity,
-    factory: SeederFactory<CardEntity, Meta>,
+  private async seedSets(
+    users: UserEntity[],
+    cardFactory: SeederFactory<CardEntity>,
   ) {
-    for (let i = 0; i < 5; i++) {
-      const card = await factory.make({ set, createdBy: set.createdBy });
-      await CardEntity.save(card);
-    }
-  }
-
-  private async seedSets(users: UserEntity[]) {
     const [hungpn23, andy, red, rust, martin] = users;
-
-    const [
-      hungpn23PublicSet,
-      hungpn23ProtectedSet,
-      hungpn23PrivateSet,
-      andyPublicSet,
-      andyProtectedSet,
-    ] = await SetEntity.save([
+    const hungpn23PublicSet = await SetEntity.save([
       new SetEntity({
         name: 'hungpn23 public',
         description: 'hungpn23 public set',
@@ -49,18 +31,24 @@ export class MainSeeder implements Seeder {
         passcode: null,
         createdBy: hungpn23.id,
         user: hungpn23,
+        cards: await cardFactory.saveMany(20),
       }),
+    ]);
 
+    const hungpn23ProtectedSet = await SetEntity.save([
       new SetEntity({
         name: 'hungpn23 protected',
         description: 'hungpn23 protected set',
         author: hungpn23.username,
         visibleTo: VisibleTo.PEOPLE_WITH_A_PASSCODE,
-        passcode: 'password',
+        passcode: 'passcode',
         createdBy: hungpn23.id,
         user: hungpn23,
+        cards: await cardFactory.saveMany(30),
       }),
+    ]);
 
+    const hungpn23PrivateSet = await SetEntity.save([
       new SetEntity({
         name: 'hungpn23 private',
         description: 'hungpn23 private set',
@@ -69,36 +57,87 @@ export class MainSeeder implements Seeder {
         passcode: null,
         createdBy: hungpn23.id,
         user: hungpn23,
+        cards: await cardFactory.saveMany(10),
       }),
+    ]);
 
+    const andyPublicSet = await SetEntity.save([
       new SetEntity({
         name: 'andy public',
-        description: 'public set',
+        description: 'andy public set',
         author: andy.username,
         visibleTo: VisibleTo.EVERYONE,
         passcode: null,
         createdBy: andy.id,
         user: andy,
-      }),
-
-      new SetEntity({
-        name: 'andy protected',
-        description: 'protected set',
-        author: andy.username,
-        visibleTo: VisibleTo.PEOPLE_WITH_A_PASSCODE,
-        passcode: 'password',
-        createdBy: andy.id,
-        user: andy,
+        cards: await cardFactory.saveMany(12),
       }),
     ]);
 
-    return [
-      hungpn23PublicSet,
-      hungpn23ProtectedSet,
-      hungpn23PrivateSet,
-      andyPublicSet,
-      andyProtectedSet,
-    ];
+    const andyPrivateSet = await SetEntity.save([
+      new SetEntity({
+        name: 'andy private',
+        description: 'andy private set',
+        author: andy.username,
+        visibleTo: VisibleTo.JUST_ME,
+        passcode: null,
+        createdBy: andy.id,
+        user: andy,
+        cards: await cardFactory.saveMany(15),
+      }),
+    ]);
+
+    const redPublicSet = await SetEntity.save([
+      new SetEntity({
+        name: 'red public',
+        description: 'red public set',
+        author: red.username,
+        visibleTo: VisibleTo.EVERYONE,
+        passcode: null,
+        createdBy: red.id,
+        user: red,
+        cards: await cardFactory.saveMany(24),
+      }),
+    ]);
+
+    const redProtectedSet = await SetEntity.save([
+      new SetEntity({
+        name: 'red protected',
+        description: 'red protected set',
+        author: red.username,
+        visibleTo: VisibleTo.PEOPLE_WITH_A_PASSCODE,
+        passcode: 'passcode',
+        createdBy: red.id,
+        user: red,
+        cards: await cardFactory.saveMany(24),
+      }),
+    ]);
+
+    const rustPublicSet = await SetEntity.save([
+      new SetEntity({
+        name: 'rust public',
+        description: 'rust public set',
+        author: rust.username,
+        visibleTo: VisibleTo.EVERYONE,
+        passcode: null,
+        createdBy: rust.id,
+        user: rust,
+        cards: await cardFactory.saveMany(32),
+      }),
+    ]);
+
+    const martinPublicSet = await SetEntity.save([
+      new SetEntity({
+        name: 'martin public',
+        description: 'martin public set',
+        author: martin.username,
+        visibleTo: VisibleTo.EVERYONE,
+        passcode: null,
+        createdBy: martin.id,
+        user: martin,
+        cards: await cardFactory.saveMany(14),
+      }),
+    ]);
   }
 
   private async seedUsers() {
