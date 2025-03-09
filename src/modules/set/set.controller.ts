@@ -12,14 +12,14 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { SetEntity } from './entities/set.entity';
 import {
   CreateSetDto,
   SaveAnswerDto,
   SetDetailDto,
   StartLearningDto,
   UpdateSetDto,
-} from './set.dto';
+} from './dto/set.dto';
+import { SetEntity } from './entities/set.entity';
 import { SetService } from './set.service';
 
 @Controller({ path: 'set', version: '1' })

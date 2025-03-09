@@ -7,16 +7,22 @@ import {
 
 export class OffsetPaginationQueryDto {
   @NumberValidators({ isInt: true, min: 1, required: false })
-  page?: number = 1;
+  page?: number;
 
   @NumberValidators({ isInt: true, min: 10, required: false })
-  take?: number = 10;
+  take?: number;
 
   @EnumValidators(Order, { required: false })
-  order?: Order = Order.DESC;
+  order?: Order;
 
   @StringValidators({ required: false })
   search?: string;
+
+  constructor() {
+    this.page = 1;
+    this.take = 10;
+    this.order = Order.DESC;
+  }
 
   @NumberValidators({ isInt: true, required: false })
   get skip() {

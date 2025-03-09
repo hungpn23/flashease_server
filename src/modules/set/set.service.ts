@@ -1,6 +1,6 @@
+import paginate from '@/dto/offset-pagination/offset-paginate';
 import { OffsetPaginatedDto } from '@/dto/offset-pagination/paginated.dto';
 import { OffsetPaginationQueryDto } from '@/dto/offset-pagination/query.dto';
-import paginate from '@/utils/offset-paginate';
 import {
   BadRequestException,
   ConflictException,
@@ -9,15 +9,15 @@ import {
 import { plainToInstance } from 'class-transformer';
 import { In, Not } from 'typeorm';
 import { UserEntity } from '../user/entities/user.entity';
-import { CardEntity } from './entities/card.entity';
-import { SetEntity } from './entities/set.entity';
 import {
   CreateSetDto,
   SetDetailDto,
   SetMetadataDto,
   StartLearningDto,
   UpdateSetDto,
-} from './set.dto';
+} from './dto/set.dto';
+import { CardEntity } from './entities/card.entity';
+import { SetEntity } from './entities/set.entity';
 import { VisibleTo } from './set.enum';
 
 @Injectable()
@@ -61,7 +61,7 @@ export class SetService {
       });
     });
 
-    return new OffsetPaginatedDto<SetDetailDto>(formatted, metadata);
+    return plainToInstance(OffsetPaginatedDto, { data: formatted, metadata });
   }
 
   async findOne(setId: string, userId: string) {

@@ -1,8 +1,9 @@
 import { AbstractEntity } from '@/database/entities/abstract.entity';
-import { OffsetMetadataDto } from '@/dto/offset-pagination/metadata.dto';
 import { OffsetPaginatedDto } from '@/dto/offset-pagination/paginated.dto';
 import { OffsetPaginationQueryDto } from '@/dto/offset-pagination/query.dto';
+import { plainToInstance } from 'class-transformer';
 import { SelectQueryBuilder } from 'typeorm';
+import { genOffsetMetadata } from './gen-offset-metadata';
 
 export default async function paginate<Entity extends AbstractEntity>(
   builder: SelectQueryBuilder<Entity>,
@@ -21,7 +22,9 @@ export default async function paginate<Entity extends AbstractEntity>(
   builder.skip(skip).take(take).orderBy(`${builder.alias}.createdAt`, order);
 
   const [entities, totalRecords] = await builder.getManyAndCount();
-  const metadata = new OffsetMetadataDto(totalRecords, query);
 
-  return new OffsetPaginatedDto<Entity>(entities, metadata);
+  return plainToInstance(OffsetPaginatedDto<Entity>, {
+    data: entities,
+    metadata: genOffsetMetadata(totalRecords, query),
+  });
 }

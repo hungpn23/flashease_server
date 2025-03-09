@@ -6,9 +6,9 @@ import {
 } from '@/decorators/properties.decorator';
 import { Expose } from 'class-transformer';
 import { ValidateIf } from 'class-validator';
-import { CardDto } from '../core/dtos/card.dto';
-import { SetEntity } from './entities/set.entity';
-import { VisibleTo } from './set.enum';
+import { SetEntity } from '../entities/set.entity';
+import { VisibleTo } from '../set.enum';
+import { CardDto } from './card.dto';
 
 export class CreateSetDto {
   @StringValidators()

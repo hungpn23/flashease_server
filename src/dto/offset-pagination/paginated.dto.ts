@@ -1,16 +1,11 @@
+import { AbstractEntity } from '@/database/entities/abstract.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 import { OffsetMetadataDto } from './metadata.dto';
 
 @Expose()
-export class OffsetPaginatedDto<Data> {
+export class OffsetPaginatedDto<Entity extends AbstractEntity> {
   @ApiProperty({ type: Array<Object> }) // to avoid circular dependency
-  data: Data[];
-
+  data: Entity[];
   metadata: OffsetMetadataDto;
-
-  constructor(data: Data[], metadata: OffsetMetadataDto) {
-    this.data = data;
-    this.metadata = metadata;
-  }
 }

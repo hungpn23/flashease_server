@@ -1,5 +1,5 @@
+import paginate from '@/dto/offset-pagination/offset-paginate';
 import { OffsetPaginationQueryDto } from '@/dto/offset-pagination/query.dto';
-import paginate from '@/utils/offset-paginate';
 import { ConflictException, Injectable } from '@nestjs/common';
 import { In } from 'typeorm';
 import { SetEntity } from '../set/entities/set.entity';
