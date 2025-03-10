@@ -100,7 +100,7 @@ export class SetService {
     if (isCorrect) {
       card.correctCount = card.correctCount ? card.correctCount + 1 : 1;
     } else {
-      card.correctCount = card.correctCount || 0;
+      card.correctCount = card.correctCount - 1 || 0;
     }
 
     await CardEntity.save(card);
@@ -200,6 +200,11 @@ export class SetService {
       (card) => new CardEntity({ ...card, createdBy: userId }),
     );
 
+    // Xóa các card cũ trong set
+    if (set.cards && set.cards.length > 0) {
+      await CardEntity.delete({ set: { id: setId } });
+    }
+
     const updated = await SetEntity.save(
       Object.assign(set, {
         ...rest,
@@ -248,15 +253,15 @@ export class SetService {
     return plainToInstance(SetMetadataDto, metadata);
   }
 
-  private reorderCards(cards: CardEntity[]) {
-    const notStudiedCards = cards.filter((card) => card.correctCount === null);
-    const zeroCards = cards.filter((card) => card.correctCount === 0);
-    const oneCards = cards.filter((card) => card.correctCount === 1);
-    const defaultCards = cards.filter(
-      (card) =>
-        card.correctCount && card.correctCount !== 0 && card.correctCount !== 1,
-    );
+  // private reorderCards(cards: CardEntity[]) {
+  //   const notStudiedCards = cards.filter((card) => card.correctCount === null);
+  //   const zeroCards = cards.filter((card) => card.correctCount === 0);
+  //   const oneCards = cards.filter((card) => card.correctCount === 1);
+  //   const defaultCards = cards.filter(
+  //     (card) =>
+  //       card.correctCount && card.correctCount !== 0 && card.correctCount !== 1,
+  //   );
 
-    return [...notStudiedCards, ...zeroCards, ...oneCards, ...defaultCards];
-  }
+  //   return [...notStudiedCards, ...zeroCards, ...oneCards, ...defaultCards];
+  // }
 }

@@ -16,7 +16,7 @@ export function genOffsetMetadata(
 
   const previousPage =
     currentPage > 1 && currentPage - 1 < totalPages
-      ? this.currentPage - 1
+      ? currentPage - 1
       : undefined;
 
   return plainToInstance(OffsetMetadataDto, {
