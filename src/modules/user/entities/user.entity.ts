@@ -38,7 +38,7 @@ export class UserEntity extends AbstractEntity {
 
   @ApiHideProperty()
   @Exclude()
-  @Column()
+  @Column({ nullable: true })
   password: string;
 
   @Column({ type: 'text', nullable: true })

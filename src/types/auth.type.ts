@@ -6,6 +6,6 @@ type BaseJwtPayload = {
   exp?: number;
 };
 
-export type JwtPayloadType = BaseJwtPayload & { userId: string; role: Role };
+export type JwtPayload = BaseJwtPayload & { userId: string; role: Role };
 
-export type JwtRefreshPayloadType = JwtPayloadType & { signature: string };
+export type RefreshPayload = JwtPayload & { signature: string };

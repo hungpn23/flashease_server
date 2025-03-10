@@ -1,7 +1,7 @@
 import { ApiEndpoint } from '@/decorators/endpoint.decorator';
-import { JwtPayload } from '@/decorators/jwt-payload.decorator';
+import { Payload } from '@/decorators/jwt-payload.decorator';
 import { OffsetPaginationQueryDto } from '@/dto/offset-pagination/query.dto';
-import { JwtPayloadType } from '@/types/auth.type';
+import { JwtPayload } from '@/types/auth.type';
 import {
   Body,
   Controller,
@@ -30,7 +30,7 @@ export class SetController {
   @Get('explore')
   async findManyPublic(
     @Query() query: OffsetPaginationQueryDto,
-    @JwtPayload() { userId }: JwtPayloadType,
+    @Payload() { userId }: JwtPayload,
   ) {
     return await this.setService.findManyPublic(query, userId);
   }
@@ -39,7 +39,7 @@ export class SetController {
   @Get('explore/:setId')
   async findOnePublic(
     @Param('setId') setId: string,
-    @JwtPayload() { userId }: JwtPayloadType,
+    @Payload() { userId }: JwtPayload,
   ) {
     return await this.setService.findOnePublic(setId, userId);
   }
@@ -48,7 +48,7 @@ export class SetController {
   @Get('library')
   async findMany(
     @Query() query: OffsetPaginationQueryDto,
-    @JwtPayload() { userId }: JwtPayloadType,
+    @Payload() { userId }: JwtPayload,
   ) {
     return await this.setService.findMany(query, userId);
   }
@@ -57,7 +57,7 @@ export class SetController {
   @Get('library/:setId')
   async findOne(
     @Param('setId') setId: string,
-    @JwtPayload() { userId }: JwtPayloadType,
+    @Payload() { userId }: JwtPayload,
   ) {
     return await this.setService.findOne(setId, userId);
   }
@@ -66,7 +66,7 @@ export class SetController {
   @Get('flashcard/:setId')
   async findOneAndMetadata(
     @Param('setId') setId: string,
-    @JwtPayload() { userId }: JwtPayloadType,
+    @Payload() { userId }: JwtPayload,
   ) {
     return await this.setService.findOneAndMetadata(setId, userId);
   }
@@ -74,7 +74,7 @@ export class SetController {
   @Post('/flashcard/save-answer/:cardId')
   async saveAnswer(
     @Param('cardId') cardId: string,
-    @JwtPayload() { userId }: JwtPayloadType,
+    @Payload() { userId }: JwtPayload,
     @Body() { isCorrect }: SaveAnswerDto,
   ) {
     return await this.setService.saveAnswer(cardId, userId, isCorrect);
@@ -84,7 +84,7 @@ export class SetController {
   @Post('/start-learning/:setId')
   async startLearning(
     @Param('setId') setId: string,
-    @JwtPayload() { userId }: JwtPayloadType,
+    @Payload() { userId }: JwtPayload,
     @Body() dto: StartLearningDto,
   ) {
     return await this.setService.startLearning(setId, userId, dto);
@@ -92,10 +92,7 @@ export class SetController {
 
   @ApiEndpoint({ type: SetEntity })
   @Post('/create-set')
-  async create(
-    @JwtPayload() { userId }: JwtPayloadType,
-    @Body() dto: CreateSetDto,
-  ) {
+  async create(@Payload() { userId }: JwtPayload, @Body() dto: CreateSetDto) {
     return await this.setService.create(userId, dto);
   }
 
@@ -104,7 +101,7 @@ export class SetController {
   async update(
     @Param('setId') setId: string,
     @Body() dto: UpdateSetDto,
-    @JwtPayload() { userId }: JwtPayloadType,
+    @Payload() { userId }: JwtPayload,
   ) {
     return await this.setService.update(setId, userId, dto);
   }
@@ -113,7 +110,7 @@ export class SetController {
   @Delete('/delete-set/:setId')
   async remove(
     @Param('setId') setId: string,
-    @JwtPayload() { userId }: JwtPayloadType,
+    @Payload() { userId }: JwtPayload,
   ) {
     return await this.setService.remove(setId, userId);
   }

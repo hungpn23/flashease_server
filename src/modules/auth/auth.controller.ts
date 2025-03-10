@@ -1,9 +1,10 @@
 import { RefreshToken } from '@/decorators/auth/refresh-token.decorator';
 import { ApiEndpoint } from '@/decorators/endpoint.decorator';
-import { JwtPayload } from '@/decorators/jwt-payload.decorator';
-import { JwtPayloadType, JwtRefreshPayloadType } from '@/types/auth.type';
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Payload } from '@/decorators/jwt-payload.decorator';
+import { JwtPayload, RefreshPayload } from '@/types/auth.type';
+import { Body, Controller, Get, Post, Query, Res } from '@nestjs/common';
 import { ApiExcludeEndpoint } from '@nestjs/swagger';
+import { Response } from 'express';
 import { LoginDto, LoginResDto, RefreshResDto, RegisterDto } from './auth.dto';
 import { AuthService } from './auth.service';
 
@@ -32,7 +33,7 @@ export class AuthController {
 
   @ApiEndpoint({ summary: 'logout' })
   @Post('/logout')
-  async logout(@JwtPayload() payload: JwtPayloadType) {
+  async logout(@Payload() payload: JwtPayload) {
     return await this.authService.logout(payload);
   }
 
@@ -40,9 +41,26 @@ export class AuthController {
   @ApiEndpoint({ summary: 'get new access token', type: RefreshResDto })
   @Post('/refresh-token')
   async refreshToken(
-    @JwtPayload() payload: JwtRefreshPayloadType,
+    @Payload() payload: RefreshPayload,
   ): Promise<RefreshResDto> {
     return await this.authService.refreshToken(payload);
+  }
+
+  @ApiEndpoint({
+    isPublic: true,
+    summary: 'register a new account using Google',
+  })
+  @Get('google')
+  googleRedirect(@Res() res: Response) {
+    return this.authService.googleRedirect(res);
+  }
+
+  @ApiEndpoint({
+    isPublic: true,
+  })
+  @Get('google/callback')
+  async googleLogin(@Query('code') code: string, @Res() res: Response) {
+    return await this.authService.googleLogin(code, res);
   }
 
   // TODO auth api

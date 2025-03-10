@@ -1,7 +1,7 @@
 import { ApiEndpoint } from '@/decorators/endpoint.decorator';
-import { JwtPayload } from '@/decorators/jwt-payload.decorator';
+import { Payload } from '@/decorators/jwt-payload.decorator';
 import { OffsetPaginationQueryDto } from '@/dto/offset-pagination/query.dto';
-import { JwtPayloadType } from '@/types/auth.type';
+import { JwtPayload } from '@/types/auth.type';
 import {
   Body,
   Controller,
@@ -30,10 +30,7 @@ export class FolderController {
     summary: 'create a new folder',
   })
   @Post()
-  create(
-    @Body() dto: CreateFolderDto,
-    @JwtPayload() { userId }: JwtPayloadType,
-  ) {
+  create(@Body() dto: CreateFolderDto, @Payload() { userId }: JwtPayload) {
     return this.folderService.create(dto, userId);
   }
 
@@ -45,7 +42,7 @@ export class FolderController {
   @Get()
   async findAll(
     @Query() query: OffsetPaginationQueryDto,
-    @JwtPayload() { userId }: JwtPayloadType,
+    @Payload() { userId }: JwtPayload,
   ) {
     return await this.folderService.findAll(query, userId);
   }
@@ -55,10 +52,7 @@ export class FolderController {
     summary: 'find a folder',
   })
   @Get(':id')
-  findOne(
-    @Param('id') folderId: string,
-    @JwtPayload() { userId }: JwtPayloadType,
-  ) {
+  findOne(@Param('id') folderId: string, @Payload() { userId }: JwtPayload) {
     return this.folderService.findOne(folderId, userId);
   }
 
@@ -70,7 +64,7 @@ export class FolderController {
   update(
     @Param('id') folderId: string,
     @Body() dto: UpdateFolderDto,
-    @JwtPayload() { userId }: JwtPayloadType,
+    @Payload() { userId }: JwtPayload,
   ) {
     return this.folderService.update(folderId, dto, userId);
   }
@@ -80,10 +74,7 @@ export class FolderController {
     summary: 'remove a folder',
   })
   @Delete(':id')
-  remove(
-    @Param('id') folderId: string,
-    @JwtPayload() { userId }: JwtPayloadType,
-  ) {
+  remove(@Param('id') folderId: string, @Payload() { userId }: JwtPayload) {
     return this.folderService.remove(folderId, userId);
   }
 
@@ -95,7 +86,7 @@ export class FolderController {
   async addSets(
     @Param('id') folderId: string,
     @Body() { setIds }: AddSetsDto,
-    @JwtPayload() { userId }: JwtPayloadType,
+    @Payload() { userId }: JwtPayload,
   ) {
     return await this.folderService.addSets(folderId, setIds, userId);
   }
@@ -108,7 +99,7 @@ export class FolderController {
   async removeSets(
     @Param('id') folderId: string,
     @Body() { setIds }: RemoveSetsDto,
-    @JwtPayload() { userId }: JwtPayloadType,
+    @Payload() { userId }: JwtPayload,
   ) {
     return await this.folderService.removeSets(folderId, setIds, userId);
   }

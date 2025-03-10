@@ -1,9 +1,9 @@
 import { Role } from '@/constants';
 import { UseRole } from '@/decorators/auth/role.decorator';
 import { ApiEndpoint, ApiFile } from '@/decorators/endpoint.decorator';
-import { JwtPayload } from '@/decorators/jwt-payload.decorator';
+import { Payload } from '@/decorators/jwt-payload.decorator';
 import { validateImagePipe } from '@/pipes/validate-file.pipe';
-import { JwtPayloadType } from '@/types/auth.type';
+import { JwtPayload } from '@/types/auth.type';
 import {
   Body,
   Controller,
@@ -25,7 +25,7 @@ export class UserController {
   @SkipThrottle()
   @ApiEndpoint({ type: UserEntity, summary: 'get user by id' })
   @Get()
-  async getOne(@JwtPayload() { userId }: JwtPayloadType): Promise<UserEntity> {
+  async getOne(@Payload() { userId }: JwtPayload): Promise<UserEntity> {
     return await this.userService.findOne(userId);
   }
 
@@ -42,7 +42,7 @@ export class UserController {
   })
   @Patch()
   async updateProfile(
-    @JwtPayload() { userId }: JwtPayloadType,
+    @Payload() { userId }: JwtPayload,
     @Body() dto: UpdateUserDto,
   ): Promise<UserEntity> {
     return await this.userService.update(userId, dto);
@@ -57,14 +57,14 @@ export class UserController {
   async uploadAvatar(
     @UploadedFile(validateImagePipe())
     file: Express.Multer.File,
-    @JwtPayload() { userId }: JwtPayloadType,
+    @Payload() { userId }: JwtPayload,
   ): Promise<UploadAvatarResponseDto> {
     return await this.userService.uploadAvatar(userId, file);
   }
 
   @ApiEndpoint({ summary: 'delete user avatar' })
   @Delete('delete-avatar')
-  async deleteAvatar(@JwtPayload() { userId }: JwtPayloadType): Promise<void> {
+  async deleteAvatar(@Payload() { userId }: JwtPayload): Promise<void> {
     await this.userService.deleteAvatar(userId);
   }
 }
