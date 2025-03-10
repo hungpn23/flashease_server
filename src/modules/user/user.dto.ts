@@ -5,13 +5,13 @@ import {
 import { Expose } from 'class-transformer';
 
 export class UpdateUserDto {
-  @StringValidators({ required: false })
-  username?: string;
+  @StringValidators({ minLength: 6 })
+  username: string;
 
-  @EmailValidators({ required: false })
-  email?: string;
+  @EmailValidators()
+  email: string;
 
-  @StringValidators({ required: false })
+  @StringValidators({ minLength: 0 })
   bio?: string;
 }
 

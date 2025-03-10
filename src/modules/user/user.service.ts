@@ -20,6 +20,8 @@ export class UserService {
       where: { id: userId },
     });
 
+    if (user.avatar.includes('googleusercontent.com')) return user;
+
     user.avatar = this.cloudfrontService.getFileUrl(
       user.avatar,
       (7 * 24 * 60 * 60 * 1000) as Milliseconds,
