@@ -5,7 +5,7 @@ services:
     container_name: app
     restart: unless-stopped
     env_file:
-      - .env.docker
+      - .env
     build:
       context: .
       dockerfile: Dockerfile
@@ -15,18 +15,6 @@ services:
     volumes:
       - ./src:/app/src
     command: ['pnpm', 'start:dev']
-    # develop:
-    #   watch:
-    #     - action: sync
-    #       path: ./src
-    #       target: /app/src
-    #       ignore:
-    #         - metadata.ts
-    #     - action: rebuild
-    #       path: .
-    #       target: /app
-    #       ignore:
-    #         - src/
     depends_on:
       - mysql
       - redis
@@ -38,9 +26,9 @@ services:
     container_name: mysql
     restart: unless-stopped
     env_file:
-      - .env.docker
+      - .env
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DATABASE_PASSWORD}
     ports:
       - '3306:3306'
     volumes:
@@ -54,7 +42,7 @@ services:
     container_name: redis
     restart: unless-stopped
     env_file:
-      - .env.docker
+      - .env
     ports:
       - '6379:6379'
       - '8001:8001'

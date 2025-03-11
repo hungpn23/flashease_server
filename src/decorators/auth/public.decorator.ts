@@ -1,4 +1,4 @@
-import { IS_PUBLIC_KEY } from '@/constants/index';
+import { IS_PUBLIC } from '@/constants/index';
 import { SetMetadata } from '@nestjs/common';
 
-export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
+export const Public = () => SetMetadata(IS_PUBLIC, true);

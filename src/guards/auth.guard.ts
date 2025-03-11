@@ -1,4 +1,4 @@
-import { IS_PUBLIC_KEY, IS_REFRESH_TOKEN_KEY } from '@/constants/index';
+import { IS_PUBLIC, IS_REFRESH_TOKEN } from '@/constants/index';
 import { AuthService } from '@/modules/auth/auth.service';
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
@@ -12,14 +12,14 @@ export class AuthGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC, [
       context.getClass(),
       context.getHandler(),
     ]);
     if (isPublic) return true;
 
     const isRefreshToken = this.reflector.getAllAndOverride<boolean>(
-      IS_REFRESH_TOKEN_KEY,
+      IS_REFRESH_TOKEN,
       [context.getClass(), context.getHandler()],
     );
 

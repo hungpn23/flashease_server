@@ -1,6 +1,7 @@
 export const SYSTEM = '0';
-export const IS_PUBLIC_KEY = 'isPublic';
-export const IS_REFRESH_TOKEN_KEY = 'isRefreshToken';
+export const IS_PUBLIC = 'isPublic';
+export const IS_REFRESH_TOKEN = 'isRefreshToken';
+export const NO_CACHE = 'noCache';
 export const ROLE_KEY = 'role';
 
 export enum Environment {

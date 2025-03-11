@@ -1,8 +1,4 @@
-import {
-  CacheInterceptor,
-  CacheModule,
-  CacheStore,
-} from '@nestjs/cache-manager';
+import { CacheModule, CacheStore } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
@@ -26,6 +22,7 @@ import throttlerConfig, {
 } from './configs/throttler.config';
 import { DatabaseNamingStrategy } from './database/name-strategy';
 import { TypeOrmConfigService } from './database/typeorm-config.service';
+import { ExtraCacheInterceptor } from './interceptors/extra-cache.interceptor';
 import { Modules as ApiModule } from './modules';
 import { Milliseconds } from './types/branded.type';
 
@@ -130,7 +127,7 @@ import { Milliseconds } from './types/branded.type';
   providers: [
     {
       provide: APP_INTERCEPTOR,
-      useClass: CacheInterceptor, // auto cache responses
+      useClass: ExtraCacheInterceptor, // auto cache responses
     },
     {
       provide: APP_GUARD,
