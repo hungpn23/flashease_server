@@ -1,5 +1,6 @@
 Dockerfile
 .dockerignore
-node_modules
-dist
-test
+node_modules/
+dist/
+test/
+docs/
