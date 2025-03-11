@@ -15,6 +15,7 @@ import appConfig from './configs/app.config';
 import authConfig from './configs/auth.config';
 import cloudfrontConfig from './configs/cloudfront.config';
 import databaseConfig from './configs/database.config';
+import googleConfig from './configs/google.config';
 import redisConfig, { RedisEnvVariables } from './configs/redis.config';
 import s3Config from './configs/s3.config';
 import throttlerConfig, {
@@ -32,14 +33,15 @@ import { Milliseconds } from './types/branded.type';
       isGlobal: true,
       envFilePath: ['.env'],
       load: [
-        // load config factories to validate and transform the config values
+        //  load config factories to validate and transform the config values
         appConfig,
-        databaseConfig,
-        throttlerConfig,
         authConfig,
+        cloudfrontConfig,
+        databaseConfig,
+        googleConfig,
         redisConfig,
         s3Config,
-        cloudfrontConfig,
+        throttlerConfig,
       ],
       cache: true, // speed up the loading process
       expandVariables: true, // support variables in .env file
@@ -104,7 +106,7 @@ import { Milliseconds } from './types/branded.type';
           },
           username: configService.get('REDIS_USERNAME', { infer: true }),
           password: configService.get('REDIS_PASSWORD', { infer: true }),
-          ttl: 1 as Milliseconds,
+          ttl: 30000 as Milliseconds,
         });
 
         return {

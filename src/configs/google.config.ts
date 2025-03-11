@@ -1,7 +1,4 @@
-import {
-  NumberValidators,
-  StringValidators,
-} from '@/decorators/properties.decorator';
+import { StringValidators } from '@/decorators/properties.decorator';
 import { validateConfig } from '@/utils/validate-config';
 import process from 'node:process';
 
@@ -9,8 +6,8 @@ export class GoogleEnvVariables {
   @StringValidators()
   GOOGLE_CLIENT_ID: string;
 
-  @NumberValidators()
-  GOOGLE_CLIENT_SECRET: number;
+  @StringValidators()
+  GOOGLE_CLIENT_SECRET: string;
 
   @StringValidators()
   GOOGLE_REDIRECT_URI: string;
