@@ -34,7 +34,7 @@ async function bootstrap() {
   // ================= configs =================
   const appUrl = configService.get('APP_URL', { infer: true });
   app.enableCors({
-    origin: [appUrl, 'http://localhost:5173'],
+    origin: [appUrl],
     methods: ['GET', 'PUT', 'PATCH', 'POST', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,

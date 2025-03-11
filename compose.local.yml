@@ -1,3 +1,4 @@
+# docker compose -f compose.local.yml up --watch --build
 services:
   app:
     image: hungpn23/flashease:1.0
@@ -8,8 +9,24 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: development
     ports:
       - '${APP_PORT}:${APP_PORT}'
+    volumes:
+      - ./src:/app/src
+    command: ['pnpm', 'start:dev']
+    # develop:
+    #   watch:
+    #     - action: sync
+    #       path: ./src
+    #       target: /app/src
+    #       ignore:
+    #         - metadata.ts
+    #     - action: rebuild
+    #       path: .
+    #       target: /app
+    #       ignore:
+    #         - src/
     depends_on:
       - mysql
       - redis

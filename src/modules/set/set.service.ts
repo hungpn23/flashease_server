@@ -97,11 +97,10 @@ export class SetService {
       relations: ['set'],
     });
 
-    if (isCorrect) {
-      card.correctCount = card.correctCount ? card.correctCount + 1 : 1;
-    } else {
-      card.correctCount = card.correctCount - 1 || 0;
-    }
+    card.correctCount = card.correctCount ?? 0;
+    card.correctCount = isCorrect
+      ? card.correctCount + 1
+      : Math.max(0, card.correctCount - 1);
 
     await CardEntity.save(card);
   }
@@ -119,7 +118,7 @@ export class SetService {
       set.visibleTo === VisibleTo.PEOPLE_WITH_A_PASSCODE &&
       dto.passcode !== set.passcode
     ) {
-      throw new BadRequestException('Invalid passcode');
+      throw new BadRequestException('Invalid passcode!!!');
     }
 
     const newCards = set.cards.map(

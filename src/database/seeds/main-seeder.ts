@@ -31,7 +31,7 @@ export class MainSeeder implements Seeder {
         passcode: null,
         createdBy: hungpn23.id,
         user: hungpn23,
-        cards: await cardFactory.saveMany(20),
+        cards: await cardFactory.saveMany(20, { createdBy: hungpn23.id }),
       }),
     ]);
 
@@ -44,7 +44,7 @@ export class MainSeeder implements Seeder {
         passcode: 'passcode',
         createdBy: hungpn23.id,
         user: hungpn23,
-        cards: await cardFactory.saveMany(30),
+        cards: await cardFactory.saveMany(30, { createdBy: hungpn23.id }),
       }),
     ]);
 
@@ -57,7 +57,7 @@ export class MainSeeder implements Seeder {
         passcode: null,
         createdBy: hungpn23.id,
         user: hungpn23,
-        cards: await cardFactory.saveMany(10),
+        cards: await cardFactory.saveMany(10, { createdBy: hungpn23.id }),
       }),
     ]);
 
@@ -70,7 +70,7 @@ export class MainSeeder implements Seeder {
         passcode: null,
         createdBy: andy.id,
         user: andy,
-        cards: await cardFactory.saveMany(12),
+        cards: await cardFactory.saveMany(12, { createdBy: andy.id }),
       }),
     ]);
 
@@ -83,7 +83,7 @@ export class MainSeeder implements Seeder {
         passcode: null,
         createdBy: andy.id,
         user: andy,
-        cards: await cardFactory.saveMany(15),
+        cards: await cardFactory.saveMany(15, { createdBy: andy.id }),
       }),
     ]);
 
@@ -96,7 +96,7 @@ export class MainSeeder implements Seeder {
         passcode: null,
         createdBy: red.id,
         user: red,
-        cards: await cardFactory.saveMany(24),
+        cards: await cardFactory.saveMany(24, { createdBy: red.id }),
       }),
     ]);
 
@@ -109,7 +109,7 @@ export class MainSeeder implements Seeder {
         passcode: 'passcode',
         createdBy: red.id,
         user: red,
-        cards: await cardFactory.saveMany(24),
+        cards: await cardFactory.saveMany(24, { createdBy: red.id }),
       }),
     ]);
 
@@ -122,7 +122,7 @@ export class MainSeeder implements Seeder {
         passcode: null,
         createdBy: rust.id,
         user: rust,
-        cards: await cardFactory.saveMany(32),
+        cards: await cardFactory.saveMany(32, { createdBy: rust.id }),
       }),
     ]);
 
@@ -135,7 +135,7 @@ export class MainSeeder implements Seeder {
         passcode: null,
         createdBy: martin.id,
         user: martin,
-        cards: await cardFactory.saveMany(14),
+        cards: await cardFactory.saveMany(14, { createdBy: martin.id }),
       }),
     ]);
   }
