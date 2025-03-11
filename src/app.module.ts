@@ -31,7 +31,7 @@ import { Milliseconds } from './types/branded.type';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['.env'],
+      envFilePath: ['.env.local'],
       load: [
         //  load config factories to validate and transform the config values
         appConfig,

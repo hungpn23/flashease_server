@@ -1,17 +1,17 @@
-# docker compose -f compose.local.yml up --watch --build
+# docker compose -f compose.local.yml up --build
 services:
-  app:
+  server:
     image: hungpn23/flashease:1.0
-    container_name: app
+    container_name: server
     restart: unless-stopped
     env_file:
-      - .env.docker
+      - .env
     build:
       context: .
       dockerfile: Dockerfile
       target: development
     ports:
-      - '${APP_PORT}:${APP_PORT}'
+      - '${APP_PORT}:3000'
     volumes:
       - ./src:/app/src
     command: ['pnpm', 'start:dev']
@@ -26,7 +26,7 @@ services:
     container_name: mysql
     restart: unless-stopped
     env_file:
-      - .env.docker
+      - .env
     environment:
       MYSQL_ROOT_PASSWORD: ${DATABASE_PASSWORD}
       MYSQL_DATABASE: ${DATABASE_DATABASE_NAME}
@@ -45,7 +45,7 @@ services:
     container_name: redis
     restart: unless-stopped
     env_file:
-      - .env.docker
+      - .env
     ports:
       - '6379:6379'
       - '8001:8001'
@@ -62,4 +62,4 @@ volumes:
 
 networks:
   flashease:
-    driver: bridge
+    external: true

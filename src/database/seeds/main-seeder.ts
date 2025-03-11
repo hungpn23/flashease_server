@@ -17,7 +17,7 @@ export class MainSeeder implements Seeder {
   }
 
   private async seedSets(users: UserEntity[]) {
-    const [hungpn23, andy, red, rust, martin] = users;
+    const [hungpn23, andy, forrest, cooper, murphy] = users;
 
     await SetEntity.save([
       new SetEntity({
@@ -28,7 +28,7 @@ export class MainSeeder implements Seeder {
         passcode: null,
         createdBy: hungpn23.id,
         user: hungpn23,
-        cards: this.getRandomCards(),
+        cards: this.getRandomCards(hungpn23.id),
       }),
     ]);
 
@@ -41,7 +41,7 @@ export class MainSeeder implements Seeder {
         passcode: 'passcode',
         createdBy: hungpn23.id,
         user: hungpn23,
-        cards: this.getRandomCards(),
+        cards: this.getRandomCards(hungpn23.id),
       }),
     ]);
 
@@ -54,7 +54,7 @@ export class MainSeeder implements Seeder {
         passcode: null,
         createdBy: hungpn23.id,
         user: hungpn23,
-        cards: this.getRandomCards(),
+        cards: this.getRandomCards(hungpn23.id),
       }),
     ]);
 
@@ -67,7 +67,7 @@ export class MainSeeder implements Seeder {
         passcode: null,
         createdBy: andy.id,
         user: andy,
-        cards: this.getRandomCards(),
+        cards: this.getRandomCards(andy.id),
       }),
     ]);
 
@@ -80,7 +80,7 @@ export class MainSeeder implements Seeder {
         passcode: null,
         createdBy: andy.id,
         user: andy,
-        cards: this.getRandomCards(),
+        cards: this.getRandomCards(andy.id),
       }),
     ]);
 
@@ -88,12 +88,12 @@ export class MainSeeder implements Seeder {
       new SetEntity({
         name: 'Từ vựng IELTS Reading 22 - Test 2: Passage 1',
         description: 'Tập hợp các thuật ngữ trong đọc hiểu IELTS',
-        author: red.username,
+        author: forrest.username,
         visibleTo: VisibleTo.EVERYONE,
         passcode: null,
-        createdBy: red.id,
-        user: red,
-        cards: this.getRandomCards(),
+        createdBy: forrest.id,
+        user: forrest,
+        cards: this.getRandomCards(forrest.id),
       }),
     ]);
 
@@ -101,12 +101,12 @@ export class MainSeeder implements Seeder {
       new SetEntity({
         name: 'Từ vựng IELTS Reading 23 - Test 5: Passage 4',
         description: 'Bộ từ vựng chuyên sâu dành cho kỳ thi IELTS',
-        author: red.username,
+        author: forrest.username,
         visibleTo: VisibleTo.PEOPLE_WITH_A_PASSCODE,
         passcode: 'passcode',
-        createdBy: red.id,
-        user: red,
-        cards: this.getRandomCards(),
+        createdBy: forrest.id,
+        user: forrest,
+        cards: this.getRandomCards(forrest.id),
       }),
     ]);
 
@@ -114,12 +114,12 @@ export class MainSeeder implements Seeder {
       new SetEntity({
         name: 'Từ vựng IELTS Reading 24 - Test 3: Passage 3',
         description: 'Các từ vựng thường gặp trong phần đọc IELTS',
-        author: rust.username,
+        author: cooper.username,
         visibleTo: VisibleTo.EVERYONE,
         passcode: null,
-        createdBy: rust.id,
-        user: rust,
-        cards: this.getRandomCards(),
+        createdBy: cooper.id,
+        user: cooper,
+        cards: this.getRandomCards(cooper.id),
       }),
     ]);
 
@@ -127,12 +127,12 @@ export class MainSeeder implements Seeder {
       new SetEntity({
         name: 'Từ vựng IELTS Reading Cambridge 20 - Test 2',
         description: 'Danh sách từ vựng thiết yếu cho IELTS Reading',
-        author: martin.username,
+        author: murphy.username,
         visibleTo: VisibleTo.EVERYONE,
         passcode: null,
-        createdBy: martin.id,
-        user: martin,
-        cards: this.getRandomCards(),
+        createdBy: murphy.id,
+        user: murphy,
+        cards: this.getRandomCards(murphy.id),
       }),
     ]);
   }
@@ -176,7 +176,7 @@ export class MainSeeder implements Seeder {
   }
 
   // Hàm tạo danh sách card ngẫu nhiên (từ 10 đến 30 card) với các từ tiếng Anh ít gặp và định nghĩa bằng tiếng Việt.
-  private getRandomCards(): CardEntity[] {
+  private getRandomCards(userId: string): CardEntity[] {
     const rareWords = [
       { term: 'aberration', definition: 'sự lệch lạc, lệch chuẩn' },
       {
@@ -286,6 +286,7 @@ export class MainSeeder implements Seeder {
           term: word.term,
           definition: word.definition,
           correctCount: null,
+          createdBy: userId,
         }),
     );
   }

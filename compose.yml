@@ -4,12 +4,12 @@ services:
     container_name: app
     restart: unless-stopped
     env_file:
-      - .env.docker
+      - .env
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - '${APP_PORT}:${APP_PORT}'
+      - '${APP_PORT}:3000'
     depends_on:
       - mysql
       - redis
@@ -21,7 +21,7 @@ services:
     container_name: mysql
     restart: unless-stopped
     env_file:
-      - .env.docker
+      - .env
     environment:
       MYSQL_ROOT_PASSWORD: ${DATABASE_PASSWORD}
       MYSQL_DATABASE: ${DATABASE_DATABASE_NAME}
@@ -40,7 +40,7 @@ services:
     container_name: redis
     restart: unless-stopped
     env_file:
-      - .env.docker
+      - .env
     ports:
       - '6379:6379'
       - '8001:8001'
