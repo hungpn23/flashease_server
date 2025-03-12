@@ -27,11 +27,14 @@ import { ExtraCacheInterceptor } from './interceptors/extra-cache.interceptor';
 import { Modules as ApiModule } from './modules';
 import { Milliseconds } from './types/branded.type';
 
+const envFilePath =
+  process.env.ENVIRONMENT === 'docker' ? '.env.docker' : '.env.local';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['.env.local'],
+      envFilePath: [envFilePath],
       load: [
         //  load config factories to validate and transform the config values
         appConfig,

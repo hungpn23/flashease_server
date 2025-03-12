@@ -17,10 +17,10 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/jest/bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "db:create": "env-cmd ts-node ./node_modules/typeorm-extension/bin/cli.cjs db:create",
-    "db:drop": "env-cmd ts-node ./node_modules/typeorm-extension/bin/cli.cjs db:drop",
-    "seed:run": "env-cmd ts-node ./node_modules/typeorm-extension/bin/cli.cjs seed:run",
-    "seed:create": "env-cmd ts-node ./node_modules/typeorm-extension/bin/cli.cjs seed:create"
+    "db:create": "env-cmd -f ./.env.local ts-node ./node_modules/typeorm-extension/bin/cli.cjs db:create",
+    "db:drop": "env-cmd -f ./.env.local ts-node ./node_modules/typeorm-extension/bin/cli.cjs db:drop",
+    "seed:run": "env-cmd -f ./.env.local ts-node ./node_modules/typeorm-extension/bin/cli.cjs seed:run",
+    "seed:create": "env-cmd -f ./.env.local ts-node ./node_modules/typeorm-extension/bin/cli.cjs seed:create"
   },
   "dependencies": {
     "@aws-sdk/client-cloudfront": "^3.749.0",
