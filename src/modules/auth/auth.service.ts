@@ -82,7 +82,7 @@ export class AuthService {
       );
 
       return res.redirect(
-        'http://localhost:3000/login?' + returnSearchParams.toString(),
+        'http://localhost/login?' + returnSearchParams.toString(),
       );
     }
 
@@ -102,7 +102,7 @@ export class AuthService {
     );
 
     return res.redirect(
-      'http://localhost:3000/login?' + returnSearchParams.toString(),
+      'http://localhost/login?' + returnSearchParams.toString(),
     );
   }
   // ======================================================= //

@@ -1,7 +1,7 @@
 # docker compose -f compose.local.yml --env-file .env.docker up --build
 services:
   server:
-    image: hungpn23/flashease:1.0
+    image: flashease
     container_name: server
     restart: unless-stopped
     build:
@@ -11,7 +11,7 @@ services:
     environment:
       - ENVIRONMENT=docker
     ports:
-      - '${APP_PORT}:3000'
+      - '3001:3001'
     volumes:
       - ./src:/app/src
     command: ['pnpm', 'start:dev']
