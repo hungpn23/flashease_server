@@ -1,3 +1,4 @@
+# docker compose -f compose.yml --env-file .env.docker up -d --build
 services:
   app:
     image: flashease
@@ -6,8 +7,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    env_file:
-      - .env.docker
     environment:
       - ENVIRONMENT=docker
     ports:
@@ -57,4 +56,4 @@ volumes:
 
 networks:
   flashease:
-    driver: bridge
+    external: true
