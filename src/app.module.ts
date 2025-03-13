@@ -111,7 +111,7 @@ const envFilePath =
           },
           username: configService.get('REDIS_USERNAME', { infer: true }),
           password: configService.get('REDIS_PASSWORD', { infer: true }),
-          ttl: 100 as Milliseconds,
+          ttl: 1 as Milliseconds,
         });
 
         return {
