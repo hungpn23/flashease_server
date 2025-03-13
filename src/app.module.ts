@@ -28,7 +28,9 @@ import { Modules as ApiModule } from './modules';
 import { Milliseconds } from './types/branded.type';
 
 const envFilePath =
-  process.env.ENVIRONMENT === 'docker' ? '.env.docker' : '.env.local';
+  process.env.NODE_ENV === 'production'
+    ? '.env.production'
+    : '.env.development';
 
 @Module({
   imports: [

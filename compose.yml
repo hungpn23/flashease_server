@@ -1,4 +1,4 @@
-# docker compose -f compose.yml --env-file .env.docker up -d
+# docker compose -f compose.yml --env-file .env.production up -d
 services:
   server:
     image: flashease
@@ -7,8 +7,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    environment:
-      - ENVIRONMENT=docker
+    env_file:
+      - .env.production
     expose:
       - 3001
     depends_on:

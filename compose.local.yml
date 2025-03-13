@@ -1,15 +1,13 @@
-# docker compose -f compose.local.yml --env-file .env.docker up --build
+# docker compose -f compose.local.yml --env-file .env.development up --build
 services:
   server:
-    image: flashease
+    image: server_local
     container_name: server
     restart: unless-stopped
     build:
       context: .
       dockerfile: Dockerfile
       target: development
-    environment:
-      - ENVIRONMENT=docker
     ports:
       - '3001:3001'
     volumes:
