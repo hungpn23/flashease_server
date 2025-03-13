@@ -8,8 +8,8 @@ services:
       context: .
       dockerfile: Dockerfile
       target: development
-    ports:
-      - '3001:3001'
+    expose:
+      - 3001
     volumes:
       - ./src:/app/src
     command: ['pnpm', 'start:dev']

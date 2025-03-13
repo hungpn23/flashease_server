@@ -41,7 +41,6 @@ export class AuthService {
   // ==================== GOOGLE OAUTH ===================== //
   // ======================================================= //
   googleRedirect(res: Response) {
-    const rootUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
     const options = {
       redirect_uri: this.googleConfig.get('GOOGLE_REDIRECT_URI', {
         infer: true,
@@ -53,7 +52,10 @@ export class AuthService {
     };
 
     const searchParams = new URLSearchParams(options);
-    res.redirect(`${rootUrl}?${searchParams.toString()}`);
+
+    res.redirect(
+      'https://accounts.google.com/o/oauth2/v2/auth?' + searchParams.toString(),
+    );
   }
 
   async googleLogin(code: string, res: Response) {
