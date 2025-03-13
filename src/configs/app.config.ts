@@ -18,6 +18,9 @@ export class AppEnvVariables {
   @NumberValidators({ isInt: true, min: 1, max: 65535 })
   APP_PORT: number;
 
+  @StringValidators()
+  APP_HOST: string;
+
   @UrlValidators({ require_tld: false }) // to allow localhost
   APP_URL: string;
 
@@ -33,6 +36,7 @@ export default () => {
     NODE_ENV: process.env.NODE_ENV as Environment,
     APP_NAME: process.env.APP_NAME,
     APP_PORT: +process.env.APP_PORT,
+    APP_HOST: process.env.APP_HOST,
     APP_URL: process.env.APP_URL,
     APP_PREFIX: process.env.API_PREFIX,
   };

@@ -1,3 +1,4 @@
+import { AppEnvVariables } from '@/configs/app.config';
 import { AuthEnvVariables } from '@/configs/auth.config';
 import { GoogleEnvVariables } from '@/configs/google.config';
 import { AuthError, SYSTEM } from '@/constants/index';
@@ -27,7 +28,9 @@ import { LoginDto, RegisterDto } from './auth.dto';
 @Injectable()
 export class AuthService {
   private logger = new Logger(AuthService.name);
+
   constructor(
+    private appConfig: ConfigService<AppEnvVariables>,
     private configService: ConfigService<AuthEnvVariables>,
     private googleConfig: ConfigService<GoogleEnvVariables>,
     private jwtService: JwtService,
@@ -82,7 +85,7 @@ export class AuthService {
       );
 
       return res.redirect(
-        'http://localhost/login?' + returnSearchParams.toString(),
+        `${this.appConfig.get('APP_HOST', { infer: true })}/login?${returnSearchParams.toString()}`,
       );
     }
 
@@ -102,7 +105,7 @@ export class AuthService {
     );
 
     return res.redirect(
-      'http://localhost/login?' + returnSearchParams.toString(),
+      `${this.appConfig.get('APP_HOST', { infer: true })}/login?${returnSearchParams.toString()}`,
     );
   }
   // ======================================================= //
