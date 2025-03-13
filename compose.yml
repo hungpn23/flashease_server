@@ -1,7 +1,7 @@
 # docker compose -f compose.yml --env-file .env.production up -d
 services:
   server:
-    image: flashease
+    image: server
     container_name: server
     restart: unless-stopped
     build:
