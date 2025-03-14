@@ -105,6 +105,18 @@ export class SetService {
     await CardEntity.save(card);
   }
 
+  async resetFlashcard(setId: string, userId: string) {
+    const cards = await CardEntity.find({
+      where: { set: { id: setId }, createdBy: userId },
+    });
+
+    cards.forEach((card) => {
+      card.correctCount = null;
+    });
+
+    await CardEntity.save(cards);
+  }
+
   async startLearning(setId: string, userId: string, dto: StartLearningDto) {
     const [user, set] = await Promise.all([
       UserEntity.findOneByOrFail({ id: userId }),

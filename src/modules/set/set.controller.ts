@@ -71,6 +71,7 @@ export class SetController {
     return await this.setService.findOneAndMetadata(setId, userId);
   }
 
+  @ApiEndpoint()
   @Post('/flashcard/save-answer/:cardId')
   async saveAnswer(
     @Param('cardId') cardId: string,
@@ -78,6 +79,15 @@ export class SetController {
     @Body() { isCorrect }: SaveAnswerDto,
   ) {
     return await this.setService.saveAnswer(cardId, userId, isCorrect);
+  }
+
+  @ApiEndpoint()
+  @Post('/flashcard/reset/:setId')
+  async resetFlashcard(
+    @Param('setId') setId: string,
+    @Payload() { userId }: JwtPayload,
+  ) {
+    return await this.setService.resetFlashcard(setId, userId);
   }
 
   @ApiEndpoint()
