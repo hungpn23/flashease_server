@@ -14,6 +14,7 @@ export class MainSeeder implements Seeder {
   ): Promise<void> {
     const users = await this.seedUsers();
     await this.seedSets(users);
+    console.log('>>>>>>>> Seeding completed!');
   }
 
   private async seedSets(users: UserEntity[]) {

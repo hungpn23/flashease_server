@@ -12,7 +12,6 @@ export const dataSource = new DataSource({
   database: process.env.DATABASE_DATABASE_NAME,
 
   synchronize: true,
-  logging: true,
   entities: [__dirname + '/../**/*.entity{.ts,.js}'],
   migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
   namingStrategy: new DatabaseNamingStrategy(),
