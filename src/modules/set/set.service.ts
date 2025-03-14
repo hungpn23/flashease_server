@@ -190,14 +190,17 @@ export class SetService {
     return await SetEntity.save(set);
   }
 
-  async update(setId: string, userId: string, dto: UpdateSetDto) {
-    const { cards, passcode, ...rest } = dto;
+  async update(
+    setId: string,
+    userId: string,
+    { cards, passcode, ...rest }: UpdateSetDto,
+  ) {
     const set = await SetEntity.findOneOrFail({
       where: { id: setId, createdBy: userId },
       relations: ['cards'],
     });
 
-    switch (dto.visibleTo) {
+    switch (rest.visibleTo) {
       case VisibleTo.EVERYONE:
       case VisibleTo.JUST_ME:
         set.passcode = null;
@@ -207,9 +210,29 @@ export class SetService {
         break;
     }
 
-    const newCards = cards.map(
-      (card) => new CardEntity({ ...card, createdBy: userId }),
-    );
+    const cardMap = new Map(set.cards.map((card) => [String(card.id), card]));
+    const newCards: CardEntity[] = [];
+
+    for (const { id, term, definition } of cards) {
+      if (id) {
+        const card = cardMap.get(id);
+        if (card.term !== term || card.definition !== definition) {
+          card.term = term;
+          card.definition = definition;
+          card.correctCount = null;
+        }
+
+        newCards.push(card);
+      } else {
+        const newCard = new CardEntity({
+          term: term,
+          definition: definition,
+          createdBy: userId,
+        });
+
+        newCards.push(newCard);
+      }
+    }
 
     // Xóa các card cũ trong set
     if (set.cards && set.cards.length > 0) {
