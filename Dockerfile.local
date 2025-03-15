@@ -1,0 +1,20 @@
+FROM node:23-alpine
+
+RUN npm install -g pnpm
+
+WORKDIR /app
+
+RUN chown -R node:node /app
+USER node
+
+COPY --chown=node:node package.json pnpm-lock.yaml ./
+RUN pnpm install
+
+COPY --chown=node:node tsconfig.json ./
+COPY --chown=node:node tsconfig.build.json ./
+COPY --chown=node:node nest-cli.json ./
+COPY --chown=node:node src/ ./src/
+
+ENV NODE_ENV=development
+
+CMD ["pnpm", "start:dev"]
