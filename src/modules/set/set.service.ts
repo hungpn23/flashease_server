@@ -83,8 +83,6 @@ export class SetService {
       relations: ['cards'],
     });
 
-    // set.cards = this.reorderCards(set.cards);
-
     return plainToInstance(SetDetailDto, {
       set,
       metadata: this.getSetMetadata(set.cards),
