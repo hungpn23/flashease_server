@@ -9,8 +9,8 @@ services:
       dockerfile: Dockerfile.local
     env_file:
       - .env.development
-    expose:
-      - 3001
+    ports:
+      - '3001:3001'
     volumes:
       - ./src:/app/src
     depends_on:
@@ -46,7 +46,7 @@ services:
     volumes:
       - redis:/data
     environment:
-      REDIS_ARGS: '--requirepass ${REDIS_DEFAULT_PASSWORD} --user ${REDIS_USERNAME} on >${REDIS_PASSWORD} ${REDIS_PERMISSIONS}'
+      REDIS_ARGS: '--user default off --user ${REDIS_USERNAME} on >${REDIS_PASSWORD} ${REDIS_PERMISSIONS}'
     networks:
       - flashease
 

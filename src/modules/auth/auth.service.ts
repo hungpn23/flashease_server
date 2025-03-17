@@ -308,7 +308,7 @@ export class AuthService {
   }
 
   private async checkBlacklist(userId: string, key: string) {
-    const isInBlacklist = await this.cacheManager.store.get<boolean>(key);
+    const isInBlacklist = await this.cacheManager.get<boolean>(key);
 
     if (isInBlacklist) {
       const sessions = await SessionEntity.findBy({
@@ -321,7 +321,7 @@ export class AuthService {
 
   private async addToBlacklist(key: string, exp: number) {
     const ttl = exp * 1000 - Date.now(); // remaining time in milliseconds
-    await this.cacheManager.store.set<boolean>(key, true, ttl);
+    await this.cacheManager.set<boolean>(key, true, ttl);
   }
 
   private getUniqueUsername(givenName: string, familyName: string) {

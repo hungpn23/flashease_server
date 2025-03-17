@@ -1,5 +1,5 @@
 import { Role, ROLE_KEY } from '@/constants/index';
-import { IRequestUser } from '@/interfaces/request-user.interface';
+import { RequestUser } from '@/interfaces/request-user.interface';
 import {
   CanActivate,
   ExecutionContext,
@@ -20,7 +20,7 @@ export class RoleGuard implements CanActivate {
 
     if (!requiredRole) return true;
 
-    const request = context.switchToHttp().getRequest<IRequestUser>();
+    const request = context.switchToHttp().getRequest<RequestUser>();
     if (!request['user']) throw new ForbiddenException();
 
     return requiredRole === request['user'].role;

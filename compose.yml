@@ -44,7 +44,7 @@ services:
     volumes:
       - redis:/data
     environment:
-      REDIS_ARGS: '--requirepass ${REDIS_DEFAULT_PASSWORD} --user ${REDIS_USERNAME} on >${REDIS_PASSWORD} ${REDIS_PERMISSIONS}'
+      REDIS_ARGS: '--user default off --user ${REDIS_USERNAME} on >${REDIS_PASSWORD} ${REDIS_PERMISSIONS}'
     networks:
       - flashease
 

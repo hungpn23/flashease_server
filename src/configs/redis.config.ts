@@ -9,7 +9,7 @@ export class RedisEnvVariables {
   @StringValidators()
   REDIS_HOST: string;
 
-  @NumberValidators()
+  @NumberValidators({ isInt: true, min: 1, max: 65535 })
   REDIS_PORT: number;
 
   @StringValidators()
@@ -17,9 +17,6 @@ export class RedisEnvVariables {
 
   @StringValidators()
   REDIS_PASSWORD: string;
-
-  @StringValidators()
-  REDIS_DEFAULT_PASSWORD: string;
 
   @StringValidators()
   REDIS_PERMISSIONS: string;
@@ -34,7 +31,6 @@ export default () => {
     REDIS_PORT: +process.env.REDIS_PORT,
     REDIS_USERNAME: process.env.REDIS_USERNAME,
     REDIS_PASSWORD: process.env.REDIS_PASSWORD,
-    REDIS_DEFAULT_PASSWORD: process.env.REDIS_DEFAULT_PASSWORD,
     REDIS_PERMISSIONS: process.env.REDIS_PERMISSIONS,
   };
 };

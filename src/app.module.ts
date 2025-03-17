@@ -1,12 +1,12 @@
-import { CacheModule, CacheStore } from '@nestjs/cache-manager';
+import KeyvRedis from '@keyv/redis';
+import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_GUARD } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { RedisStore, redisStore } from 'cache-manager-redis-yet';
 import { IncomingMessage, ServerResponse } from 'http';
 import { LoggerModule } from 'nestjs-pino';
 import { join } from 'path';
@@ -23,9 +23,7 @@ import throttlerConfig, {
 } from './configs/throttler.config';
 import { DatabaseNamingStrategy } from './database/name-strategy';
 import { TypeOrmConfigService } from './database/typeorm-config.service';
-import { ExtraCacheInterceptor } from './interceptors/extra-cache.interceptor';
 import { Modules as ApiModule } from './modules';
-import { Milliseconds } from './types/branded.type';
 
 const envFilePath =
   process.env.NODE_ENV === 'production'
@@ -104,18 +102,15 @@ const envFilePath =
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService<RedisEnvVariables>) => {
-        const store = await redisStore({
-          socket: {
-            host: configService.get('REDIS_HOST', { infer: true }),
-            port: configService.get('REDIS_PORT', { infer: true }),
-          },
-          username: configService.get('REDIS_USERNAME', { infer: true }),
-          password: configService.get('REDIS_PASSWORD', { infer: true }),
-          ttl: 1 as Milliseconds,
-        });
+        const host = configService.get('REDIS_HOST', { infer: true });
+        const port = configService.get('REDIS_PORT', { infer: true });
+        const username = configService.get('REDIS_USERNAME', { infer: true });
+        const password = configService.get('REDIS_PASSWORD', { infer: true });
 
         return {
-          store: store as RedisStore as CacheStore,
+          stores: new KeyvRedis({
+            url: `redis://${username}:${password}@${host}:${port}`,
+          }),
         };
       },
       isGlobal: true,
@@ -132,10 +127,6 @@ const envFilePath =
   ],
 
   providers: [
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: ExtraCacheInterceptor, // auto cache responses
-    },
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,

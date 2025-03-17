@@ -5,7 +5,7 @@ import { OffsetMetadataDto } from './metadata.dto';
 
 @Expose()
 export class OffsetPaginatedDto<Entity extends AbstractEntity> {
-  @ApiProperty({ type: Array<Object> }) // to avoid circular dependency
+  @ApiProperty({ type: Array<object> }) // to avoid circular dependency
   data: Entity[];
   metadata: OffsetMetadataDto;
 }
