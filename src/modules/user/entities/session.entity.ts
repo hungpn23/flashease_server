@@ -21,7 +21,7 @@ export class SessionEntity extends AbstractEntity {
   }
 
   @ApiProperty({ type: () => String })
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   id: UUID;
 
   @ApiHideProperty()

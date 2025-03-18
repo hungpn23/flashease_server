@@ -1,4 +1,4 @@
-import { Role, SYSTEM } from '@/constants';
+import { Role } from '@/constants';
 import { CardEntity } from '@/modules/set/entities/card.entity';
 import { SetEntity } from '@/modules/set/entities/set.entity';
 import { VisibleTo } from '@/modules/set/set.enum';
@@ -32,9 +32,7 @@ export class MainSeeder implements Seeder {
         user: hungpn23,
         cards: this.getRandomCards(hungpn23.id),
       }),
-    ]);
 
-    await SetEntity.save([
       new SetEntity({
         name: 'Từ vựng IELTS Reading 20 - Test 4: Passage 1',
         description: 'Các từ vựng chuyên ngành trong bài đọc IELTS',
@@ -45,9 +43,7 @@ export class MainSeeder implements Seeder {
         user: hungpn23,
         cards: this.getRandomCards(hungpn23.id),
       }),
-    ]);
 
-    await SetEntity.save([
       new SetEntity({
         name: 'Từ vựng IELTS Reading 21 - Test 2: Passage 3',
         description: 'Tập hợp từ vựng nâng cao cho luyện thi IELTS',
@@ -58,9 +54,7 @@ export class MainSeeder implements Seeder {
         user: hungpn23,
         cards: this.getRandomCards(hungpn23.id),
       }),
-    ]);
 
-    await SetEntity.save([
       new SetEntity({
         name: 'Từ vựng IELTS Reading Cambridge 18 - Test 3',
         description: 'Danh sách từ vựng cơ bản cho IELTS Reading',
@@ -71,9 +65,7 @@ export class MainSeeder implements Seeder {
         user: andy,
         cards: this.getRandomCards(andy.id),
       }),
-    ]);
 
-    await SetEntity.save([
       new SetEntity({
         name: 'Từ vựng IELTS Reading Cambridge 19 - Test 1',
         description: 'Các từ vựng khó trong phần đọc IELTS',
@@ -84,9 +76,7 @@ export class MainSeeder implements Seeder {
         user: andy,
         cards: this.getRandomCards(andy.id),
       }),
-    ]);
 
-    await SetEntity.save([
       new SetEntity({
         name: 'Từ vựng IELTS Reading 22 - Test 2: Passage 1',
         description: 'Tập hợp các thuật ngữ trong đọc hiểu IELTS',
@@ -97,9 +87,7 @@ export class MainSeeder implements Seeder {
         user: forrest,
         cards: this.getRandomCards(forrest.id),
       }),
-    ]);
 
-    await SetEntity.save([
       new SetEntity({
         name: 'Từ vựng IELTS Reading 23 - Test 5: Passage 4',
         description: 'Bộ từ vựng chuyên sâu dành cho kỳ thi IELTS',
@@ -110,9 +98,7 @@ export class MainSeeder implements Seeder {
         user: forrest,
         cards: this.getRandomCards(forrest.id),
       }),
-    ]);
 
-    await SetEntity.save([
       new SetEntity({
         name: 'Từ vựng IELTS Reading 24 - Test 3: Passage 3',
         description: 'Các từ vựng thường gặp trong phần đọc IELTS',
@@ -123,9 +109,7 @@ export class MainSeeder implements Seeder {
         user: cooper,
         cards: this.getRandomCards(cooper.id),
       }),
-    ]);
 
-    await SetEntity.save([
       new SetEntity({
         name: 'Từ vựng IELTS Reading Cambridge 20 - Test 2',
         description: 'Danh sách từ vựng thiết yếu cho IELTS Reading',
@@ -146,7 +130,6 @@ export class MainSeeder implements Seeder {
         email: 'hungpn23@gmail.com',
         isEmailVerified: true,
         password: await argon2.hash('password'),
-        createdBy: SYSTEM,
         role: Role.ADMIN,
       }),
       new UserEntity({
@@ -154,28 +137,24 @@ export class MainSeeder implements Seeder {
         email: 'andy@gmail.com',
         bio: 'Chuyên gia thiết kế giao diện và phát triển frontend.',
         password: await argon2.hash('password'),
-        createdBy: SYSTEM,
       }),
       new UserEntity({
         username: 'forrest_gump',
         email: 'forrest@gmail.com',
         bio: 'Nhà phát triển full-stack với đam mê công nghệ mới.',
         password: await argon2.hash('password'),
-        createdBy: SYSTEM,
       }),
       new UserEntity({
         username: 'cooper',
         email: 'cooper@gmail.com',
         bio: 'Kỹ sư phần mềm với kinh nghiệm đa dạng về hệ thống.',
         password: await argon2.hash('password'),
-        createdBy: SYSTEM,
       }),
       new UserEntity({
         username: 'murphy',
         email: 'murphy@gmail.com',
         bio: 'Kiến trúc sư hệ thống, yêu thích học hỏi và đổi mới.',
         password: await argon2.hash('password'),
-        createdBy: SYSTEM,
       }),
     ]);
 

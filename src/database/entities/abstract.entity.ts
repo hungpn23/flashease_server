@@ -33,7 +33,7 @@ export abstract class AbstractEntity extends BaseEntity {
   updatedAt: Date;
 
   @Order(9998)
-  @Column({ name: 'created_by', type: 'uuid' })
+  @Column({ name: 'created_by', type: 'uuid', nullable: true, default: null })
   createdBy: UUID;
 
   @Order(9998)

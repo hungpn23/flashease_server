@@ -19,7 +19,7 @@ export class CardEntity extends AbstractEntity {
     Object.assign(this, data);
   }
 
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   id: UUID;
 
   @Column()

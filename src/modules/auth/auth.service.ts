@@ -1,7 +1,7 @@
 import { AppEnvVariables } from '@/configs/app.config';
 import { AuthEnvVariables } from '@/configs/auth.config';
 import { GoogleEnvVariables } from '@/configs/google.config';
-import { AuthError, SYSTEM } from '@/constants/index';
+import { AuthError } from '@/constants/index';
 import { AuthException } from '@/exceptions/auth.exception';
 import { JwtPayload, RefreshPayload } from '@/types/auth.type';
 import { UUID } from '@/types/branded.type';
@@ -274,7 +274,7 @@ export class AuthService {
         signature,
         user,
         expiresAt: new Date(Date.now() + ms(refreshTokenTtl)),
-        createdBy: SYSTEM,
+        createdBy: user.id,
       }),
     );
 
