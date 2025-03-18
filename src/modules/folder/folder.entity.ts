@@ -1,4 +1,5 @@
 import { AbstractEntity } from '@/database/entities/abstract.entity';
+import { UUID } from '@/types/branded.type';
 import { Expose } from 'class-transformer';
 import {
   Column,
@@ -18,7 +19,7 @@ export class FolderEntity extends AbstractEntity {
   }
 
   @PrimaryGeneratedColumn()
-  id: string;
+  id: UUID;
 
   @Column()
   name: string;

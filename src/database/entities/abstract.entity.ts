@@ -1,5 +1,5 @@
-import { SYSTEM } from '@/constants';
 import { getOrder, Order } from '@/decorators/order.decorator';
+import { UUID } from '@/types/branded.type';
 import { ApiHideProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 import {
@@ -13,29 +13,32 @@ import {
 import { ColumnMetadata } from 'typeorm/metadata/ColumnMetadata';
 
 // use Active Record pattern
-
 export abstract class AbstractEntity extends BaseEntity {
   @Order(9998)
-  @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
+  @CreateDateColumn({
+    name: 'created_at',
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+    nullable: false,
+  })
   createdAt: Date;
 
-  @ApiHideProperty()
-  @Exclude()
   @Order(9998)
-  @UpdateDateColumn({ name: 'updated_at', type: 'timestamp' })
+  @UpdateDateColumn({
+    name: 'updated_at',
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+    nullable: false,
+  })
   updatedAt: Date;
 
-  @ApiHideProperty()
-  @Exclude()
   @Order(9998)
-  @Column({ name: 'created_by', default: SYSTEM })
-  createdBy: string;
+  @Column({ name: 'created_by' })
+  createdBy: UUID;
 
-  @ApiHideProperty()
-  @Exclude()
   @Order(9998)
   @Column({ name: 'updated_by', nullable: true, default: null })
-  updatedBy: string;
+  updatedBy: UUID;
 
   // issue: https://github.com/typeorm/typeorm/issues/541#issuecomment-2358776943
   static useDataSource(dataSource: DataSource) {

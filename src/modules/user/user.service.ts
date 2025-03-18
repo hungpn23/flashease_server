@@ -1,4 +1,4 @@
-import { Milliseconds } from '@/types/branded.type';
+import { Milliseconds, UUID } from '@/types/branded.type';
 import { Injectable, Logger } from '@nestjs/common';
 import sharp from 'sharp';
 import { CloudfrontService } from '../aws/cloudfront.service';
@@ -15,7 +15,7 @@ export class UserService {
     private cloudfrontService: CloudfrontService,
   ) {}
 
-  async findOne(userId: string): Promise<UserEntity> {
+  async findOne(userId: UUID): Promise<UserEntity> {
     const user = await UserEntity.findOneOrFail({
       where: { id: userId },
     });
@@ -36,7 +36,7 @@ export class UserService {
     return await UserEntity.find();
   }
 
-  async update(userId: string, dto: UpdateUserDto) {
+  async update(userId: UUID, dto: UpdateUserDto) {
     const found = await UserEntity.findOneOrFail({ where: { id: userId } });
 
     return await UserEntity.save(
@@ -44,7 +44,7 @@ export class UserService {
     );
   }
 
-  async uploadAvatar(userId: string, file: Express.Multer.File) {
+  async uploadAvatar(userId: UUID, file: Express.Multer.File) {
     file.buffer = await sharp(file.buffer)
       .resize({ height: 200, width: 200, fit: 'contain' })
       .toBuffer();
@@ -69,7 +69,7 @@ export class UserService {
     } as UploadAvatarResponseDto;
   }
 
-  async deleteAvatar(userId: string) {
+  async deleteAvatar(userId: UUID) {
     const user = await UserEntity.findOneByOrFail({ id: userId });
     await this.s3Service.deleteFile(user.avatar);
     await UserEntity.save(

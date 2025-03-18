@@ -103,13 +103,12 @@ const envFilePath =
       inject: [ConfigService],
       useFactory: async (configService: ConfigService<RedisEnvVariables>) => {
         const host = configService.get('REDIS_HOST', { infer: true });
-        const port = configService.get('REDIS_PORT', { infer: true });
         const username = configService.get('REDIS_USERNAME', { infer: true });
         const password = configService.get('REDIS_PASSWORD', { infer: true });
 
         return {
           stores: new KeyvRedis({
-            url: `redis://${username}:${password}@${host}:${port}`,
+            url: `redis://${username}:${password}@${host}`,
           }),
         };
       },

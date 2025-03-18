@@ -1,8 +1,9 @@
-import { Role } from '@/constants';
+import { Role, SYSTEM } from '@/constants';
 import { CardEntity } from '@/modules/set/entities/card.entity';
 import { SetEntity } from '@/modules/set/entities/set.entity';
 import { VisibleTo } from '@/modules/set/set.enum';
 import { UserEntity } from '@/modules/user/entities/user.entity';
+import { UUID } from '@/types/branded.type';
 import argon2 from 'argon2';
 import { DataSource } from 'typeorm';
 import { Seeder, SeederFactoryManager } from 'typeorm-extension';
@@ -145,6 +146,7 @@ export class MainSeeder implements Seeder {
         email: 'hungpn23@gmail.com',
         isEmailVerified: true,
         password: await argon2.hash('password'),
+        createdBy: SYSTEM,
         role: Role.ADMIN,
       }),
       new UserEntity({
@@ -152,24 +154,28 @@ export class MainSeeder implements Seeder {
         email: 'andy@gmail.com',
         bio: 'Chuyên gia thiết kế giao diện và phát triển frontend.',
         password: await argon2.hash('password'),
+        createdBy: SYSTEM,
       }),
       new UserEntity({
         username: 'forrest_gump',
         email: 'forrest@gmail.com',
         bio: 'Nhà phát triển full-stack với đam mê công nghệ mới.',
         password: await argon2.hash('password'),
+        createdBy: SYSTEM,
       }),
       new UserEntity({
         username: 'cooper',
         email: 'cooper@gmail.com',
         bio: 'Kỹ sư phần mềm với kinh nghiệm đa dạng về hệ thống.',
         password: await argon2.hash('password'),
+        createdBy: SYSTEM,
       }),
       new UserEntity({
         username: 'murphy',
         email: 'murphy@gmail.com',
         bio: 'Kiến trúc sư hệ thống, yêu thích học hỏi và đổi mới.',
         password: await argon2.hash('password'),
+        createdBy: SYSTEM,
       }),
     ]);
 
@@ -177,7 +183,7 @@ export class MainSeeder implements Seeder {
   }
 
   // Hàm tạo danh sách card ngẫu nhiên (từ 10 đến 30 card) với các từ tiếng Anh ít gặp và định nghĩa bằng tiếng Việt.
-  private getRandomCards(userId: string): CardEntity[] {
+  private getRandomCards(userId: UUID): CardEntity[] {
     const rareWords = [
       { term: 'aberration', definition: 'sự lệch lạc, lệch chuẩn' },
       {

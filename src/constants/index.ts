@@ -1,4 +1,6 @@
-export const SYSTEM = '0';
+import { UUID } from '@/types/branded.type';
+
+export const SYSTEM = '0' as UUID;
 export const IS_PUBLIC = 'isPublic';
 export const IS_REFRESH_TOKEN = 'isRefreshToken';
 export const NO_CACHE = 'noCache';

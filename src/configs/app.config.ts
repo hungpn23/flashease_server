@@ -1,7 +1,6 @@
 import { Environment } from '@/constants';
 import {
   EnumValidators,
-  NumberValidators,
   StringValidators,
   UrlValidators,
 } from '@/decorators/properties.decorator';
@@ -15,14 +14,8 @@ export class AppEnvVariables {
   @StringValidators()
   APP_NAME: string;
 
-  @NumberValidators({ isInt: true, min: 1, max: 65535 })
-  APP_PORT: number;
-
-  @StringValidators()
-  APP_HOST: string;
-
   @UrlValidators({ require_tld: false }) // to allow localhost
-  APP_URL: string;
+  APP_HOST: string;
 
   @StringValidators()
   APP_PREFIX: string;
@@ -35,9 +28,7 @@ export default () => {
   return {
     NODE_ENV: process.env.NODE_ENV as Environment,
     APP_NAME: process.env.APP_NAME,
-    APP_PORT: +process.env.APP_PORT,
     APP_HOST: process.env.APP_HOST,
-    APP_URL: process.env.APP_URL,
     APP_PREFIX: process.env.API_PREFIX,
   };
 };

@@ -1,6 +1,7 @@
 import { Role } from '@/constants';
 import { AbstractEntity } from '@/database/entities/abstract.entity';
 import { SetEntity } from '@/modules/set/entities/set.entity';
+import { UUID } from '@/types/branded.type';
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose } from 'class-transformer';
 import {
@@ -22,7 +23,7 @@ export class UserEntity extends AbstractEntity {
 
   @ApiProperty({ type: () => String })
   @PrimaryGeneratedColumn()
-  id: string;
+  id: UUID;
 
   @Column({ type: 'enum', enum: Role, default: Role.USER })
   role: Role;

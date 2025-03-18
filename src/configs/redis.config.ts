@@ -1,16 +1,10 @@
-import {
-  NumberValidators,
-  StringValidators,
-} from '@/decorators/properties.decorator';
+import { StringValidators } from '@/decorators/properties.decorator';
 import { validateConfig } from '@/utils/validate-config';
 import process from 'node:process';
 
 export class RedisEnvVariables {
   @StringValidators()
   REDIS_HOST: string;
-
-  @NumberValidators({ isInt: true, min: 1, max: 65535 })
-  REDIS_PORT: number;
 
   @StringValidators()
   REDIS_USERNAME: string;
@@ -28,7 +22,6 @@ export default () => {
 
   return {
     REDIS_HOST: process.env.REDIS_HOST,
-    REDIS_PORT: +process.env.REDIS_PORT,
     REDIS_USERNAME: process.env.REDIS_USERNAME,
     REDIS_PASSWORD: process.env.REDIS_PASSWORD,
     REDIS_PERMISSIONS: process.env.REDIS_PERMISSIONS,

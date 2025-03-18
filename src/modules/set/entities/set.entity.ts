@@ -2,6 +2,7 @@ import { AbstractEntity } from '@/database/entities/abstract.entity';
 import { FolderEntity } from '@/modules/folder/folder.entity';
 import { CardEntity } from '@/modules/set/entities/card.entity';
 import { UserEntity } from '@/modules/user/entities/user.entity';
+import { UUID } from '@/types/branded.type';
 import { Expose } from 'class-transformer';
 import {
   Column,
@@ -23,7 +24,7 @@ export class SetEntity extends AbstractEntity {
   }
 
   @PrimaryGeneratedColumn()
-  id: string;
+  id: UUID;
 
   @Column()
   name: string;

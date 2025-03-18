@@ -1,4 +1,5 @@
 import { AbstractEntity } from '@/database/entities/abstract.entity';
+import { UUID } from '@/types/branded.type';
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose } from 'class-transformer';
 import {
@@ -21,7 +22,7 @@ export class SessionEntity extends AbstractEntity {
 
   @ApiProperty({ type: () => String })
   @PrimaryGeneratedColumn()
-  id: string;
+  id: UUID;
 
   @ApiHideProperty()
   @Exclude()

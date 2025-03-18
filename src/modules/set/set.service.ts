@@ -1,6 +1,7 @@
 import paginate from '@/dto/offset-pagination/offset-paginate';
 import { OffsetPaginatedDto } from '@/dto/offset-pagination/paginated.dto';
 import { OffsetPaginationQueryDto } from '@/dto/offset-pagination/query.dto';
+import { UUID } from '@/types/branded.type';
 import {
   BadRequestException,
   ConflictException,
@@ -22,7 +23,7 @@ import { VisibleTo } from './set.enum';
 
 @Injectable()
 export class SetService {
-  async findManyPublic(query: OffsetPaginationQueryDto, userId: string) {
+  async findManyPublic(query: OffsetPaginationQueryDto, userId: UUID) {
     const builder = SetEntity.createQueryBuilder('set')
       .leftJoin('set.user', 'user')
       .leftJoin('set.cards', 'cards')
@@ -35,7 +36,7 @@ export class SetService {
     return await paginate(builder, query);
   }
 
-  async findOnePublic(setId: string, userId: string) {
+  async findOnePublic(setId: UUID, userId: UUID) {
     return await SetEntity.findOneOrFail({
       where: {
         id: setId,
@@ -46,7 +47,7 @@ export class SetService {
     });
   }
 
-  async findMany(query: OffsetPaginationQueryDto, userId: string) {
+  async findMany(query: OffsetPaginationQueryDto, userId: UUID) {
     const builder = SetEntity.createQueryBuilder('set')
       .leftJoin('set.user', 'user')
       .leftJoin('set.cards', 'cards')
@@ -64,7 +65,7 @@ export class SetService {
     return plainToInstance(OffsetPaginatedDto, { data: formatted, metadata });
   }
 
-  async findOne(setId: string, userId: string) {
+  async findOne(setId: UUID, userId: UUID) {
     return await SetEntity.findOneOrFail({
       where: {
         id: setId,
@@ -74,7 +75,7 @@ export class SetService {
     });
   }
 
-  async findOneAndMetadata(setId: string, userId: string) {
+  async findOneAndMetadata(setId: UUID, userId: UUID) {
     const set = await SetEntity.findOneOrFail({
       where: {
         id: setId,
@@ -89,7 +90,7 @@ export class SetService {
     });
   }
 
-  async saveAnswer(cardId: string, userId: string, isCorrect: boolean) {
+  async saveAnswer(cardId: UUID, userId: UUID, isCorrect: boolean) {
     const card = await CardEntity.findOneOrFail({
       where: { id: cardId, createdBy: userId },
       relations: ['set'],
@@ -103,7 +104,7 @@ export class SetService {
     await CardEntity.save(card);
   }
 
-  async resetFlashcard(setId: string, userId: string) {
+  async resetFlashcard(setId: UUID, userId: UUID) {
     const cards = await CardEntity.find({
       where: { set: { id: setId }, createdBy: userId },
     });
@@ -115,7 +116,7 @@ export class SetService {
     await CardEntity.save(cards);
   }
 
-  async startLearning(setId: string, userId: string, dto: StartLearningDto) {
+  async startLearning(setId: UUID, userId: UUID, dto: StartLearningDto) {
     const [user, set] = await Promise.all([
       UserEntity.findOneByOrFail({ id: userId }),
       SetEntity.findOneOrFail({
@@ -154,7 +155,7 @@ export class SetService {
     });
   }
 
-  async create(userId: string, dto: CreateSetDto) {
+  async create(userId: UUID, dto: CreateSetDto) {
     const [found, user] = await Promise.all([
       SetEntity.findOneBy({
         name: dto.name,
@@ -189,8 +190,8 @@ export class SetService {
   }
 
   async update(
-    setId: string,
-    userId: string,
+    setId: UUID,
+    userId: UUID,
     { cards, passcode, ...rest }: UpdateSetDto,
   ) {
     const set = await SetEntity.findOneOrFail({
@@ -252,7 +253,7 @@ export class SetService {
     });
   }
 
-  async remove(setId: string, userId: string) {
+  async remove(setId: UUID, userId: UUID) {
     const found = await SetEntity.findOneByOrFail({
       id: setId,
       createdBy: userId,

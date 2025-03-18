@@ -1,7 +1,6 @@
 import { RefreshToken } from '@/decorators/auth/refresh-token.decorator';
 import { ApiEndpoint } from '@/decorators/endpoint.decorator';
 import { Payload } from '@/decorators/jwt-payload.decorator';
-import { NoCache } from '@/decorators/no-cache.decorator';
 import { JwtPayload, RefreshPayload } from '@/types/auth.type';
 import { Body, Controller, Get, Post, Query, Res } from '@nestjs/common';
 import { ApiExcludeEndpoint } from '@nestjs/swagger';
@@ -47,7 +46,6 @@ export class AuthController {
     return await this.authService.refreshToken(payload);
   }
 
-  @NoCache()
   @ApiEndpoint({
     isPublic: true,
     summary: 'register a new account using Google',
@@ -57,7 +55,6 @@ export class AuthController {
     return this.authService.googleRedirect(res);
   }
 
-  @NoCache()
   @ApiEndpoint({
     isPublic: true,
   })

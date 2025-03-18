@@ -5,3 +5,4 @@ type Branded<T, B> = T & Brand<B>;
 
 export type Seconds = Branded<number, 'seconds'>;
 export type Milliseconds = Branded<number, 'milliseconds'>;
+export type UUID = Branded<string, 'uuid'>;

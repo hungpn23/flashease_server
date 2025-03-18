@@ -2,6 +2,7 @@ import { ApiEndpoint } from '@/decorators/endpoint.decorator';
 import { Payload } from '@/decorators/jwt-payload.decorator';
 import { OffsetPaginationQueryDto } from '@/dto/offset-pagination/query.dto';
 import { JwtPayload } from '@/types/auth.type';
+import { UUID } from '@/types/branded.type';
 import {
   Body,
   Controller,
@@ -52,7 +53,7 @@ export class FolderController {
     summary: 'find a folder',
   })
   @Get(':id')
-  findOne(@Param('id') folderId: string, @Payload() { userId }: JwtPayload) {
+  findOne(@Param('id') folderId: UUID, @Payload() { userId }: JwtPayload) {
     return this.folderService.findOne(folderId, userId);
   }
 
@@ -62,7 +63,7 @@ export class FolderController {
   })
   @Patch(':id')
   update(
-    @Param('id') folderId: string,
+    @Param('id') folderId: UUID,
     @Body() dto: UpdateFolderDto,
     @Payload() { userId }: JwtPayload,
   ) {
@@ -74,7 +75,7 @@ export class FolderController {
     summary: 'remove a folder',
   })
   @Delete(':id')
-  remove(@Param('id') folderId: string, @Payload() { userId }: JwtPayload) {
+  remove(@Param('id') folderId: UUID, @Payload() { userId }: JwtPayload) {
     return this.folderService.remove(folderId, userId);
   }
 
@@ -84,7 +85,7 @@ export class FolderController {
   })
   @Post(':id/add-sets')
   async addSets(
-    @Param('id') folderId: string,
+    @Param('id') folderId: UUID,
     @Body() { setIds }: AddSetsDto,
     @Payload() { userId }: JwtPayload,
   ) {
@@ -97,7 +98,7 @@ export class FolderController {
   })
   @Post(':id/remove-sets')
   async removeSets(
-    @Param('id') folderId: string,
+    @Param('id') folderId: UUID,
     @Body() { setIds }: RemoveSetsDto,
     @Payload() { userId }: JwtPayload,
   ) {

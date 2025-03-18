@@ -2,6 +2,7 @@ import { ApiEndpoint } from '@/decorators/endpoint.decorator';
 import { Payload } from '@/decorators/jwt-payload.decorator';
 import { OffsetPaginationQueryDto } from '@/dto/offset-pagination/query.dto';
 import { JwtPayload } from '@/types/auth.type';
+import { UUID } from '@/types/branded.type';
 import {
   Body,
   Controller,
@@ -38,7 +39,7 @@ export class SetController {
   @ApiEndpoint({ type: SetEntity })
   @Get('explore/:setId')
   async findOnePublic(
-    @Param('setId') setId: string,
+    @Param('setId') setId: UUID,
     @Payload() { userId }: JwtPayload,
   ) {
     return await this.setService.findOnePublic(setId, userId);
@@ -56,7 +57,7 @@ export class SetController {
   @ApiEndpoint({ type: SetEntity })
   @Get('library/:setId')
   async findOne(
-    @Param('setId') setId: string,
+    @Param('setId') setId: UUID,
     @Payload() { userId }: JwtPayload,
   ) {
     return await this.setService.findOne(setId, userId);
@@ -65,7 +66,7 @@ export class SetController {
   @ApiEndpoint({ type: SetDetailDto })
   @Get('flashcard/:setId')
   async findOneAndMetadata(
-    @Param('setId') setId: string,
+    @Param('setId') setId: UUID,
     @Payload() { userId }: JwtPayload,
   ) {
     return await this.setService.findOneAndMetadata(setId, userId);
@@ -74,7 +75,7 @@ export class SetController {
   @ApiEndpoint()
   @Post('/flashcard/save-answer/:cardId')
   async saveAnswer(
-    @Param('cardId') cardId: string,
+    @Param('cardId') cardId: UUID,
     @Payload() { userId }: JwtPayload,
     @Body() { isCorrect }: SaveAnswerDto,
   ) {
@@ -84,7 +85,7 @@ export class SetController {
   @ApiEndpoint()
   @Post('/flashcard/reset/:setId')
   async resetFlashcard(
-    @Param('setId') setId: string,
+    @Param('setId') setId: UUID,
     @Payload() { userId }: JwtPayload,
   ) {
     return await this.setService.resetFlashcard(setId, userId);
@@ -93,7 +94,7 @@ export class SetController {
   @ApiEndpoint()
   @Post('/start-learning/:setId')
   async startLearning(
-    @Param('setId') setId: string,
+    @Param('setId') setId: UUID,
     @Payload() { userId }: JwtPayload,
     @Body() dto: StartLearningDto,
   ) {
@@ -109,7 +110,7 @@ export class SetController {
   @ApiEndpoint({ type: SetEntity })
   @Patch('/edit-set/:setId')
   async update(
-    @Param('setId') setId: string,
+    @Param('setId') setId: UUID,
     @Body() dto: UpdateSetDto,
     @Payload() { userId }: JwtPayload,
   ) {
@@ -118,10 +119,7 @@ export class SetController {
 
   @ApiEndpoint({ type: SetEntity })
   @Delete('/delete-set/:setId')
-  async remove(
-    @Param('setId') setId: string,
-    @Payload() { userId }: JwtPayload,
-  ) {
+  async remove(@Param('setId') setId: UUID, @Payload() { userId }: JwtPayload) {
     return await this.setService.remove(setId, userId);
   }
 }

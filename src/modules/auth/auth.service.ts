@@ -4,6 +4,7 @@ import { GoogleEnvVariables } from '@/configs/google.config';
 import { AuthError, SYSTEM } from '@/constants/index';
 import { AuthException } from '@/exceptions/auth.exception';
 import { JwtPayload, RefreshPayload } from '@/types/auth.type';
+import { UUID } from '@/types/branded.type';
 import { GoogleJwtPayload, GoogleTokenResponse } from '@/types/google.type';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import {
@@ -307,7 +308,7 @@ export class AuthService {
     return crypto.randomBytes(16).toString('hex');
   }
 
-  private async checkBlacklist(userId: string, key: string) {
+  private async checkBlacklist(userId: UUID, key: string) {
     const isInBlacklist = await this.cacheManager.get<boolean>(key);
 
     if (isInBlacklist) {

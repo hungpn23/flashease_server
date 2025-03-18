@@ -1,5 +1,6 @@
 import { AbstractEntity } from '@/database/entities/abstract.entity';
 import { SetEntity } from '@/modules/set/entities/set.entity';
+import { UUID } from '@/types/branded.type';
 import { Expose } from 'class-transformer';
 import {
   Column,
@@ -19,7 +20,7 @@ export class CardEntity extends AbstractEntity {
   }
 
   @PrimaryGeneratedColumn()
-  id: string;
+  id: UUID;
 
   @Column()
   term: string;

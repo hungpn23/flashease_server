@@ -1,4 +1,5 @@
-# COMPOSE_BAKE=true docker compose -f compose.local.yml --env-file .env.development up --build
+# COMPOSE_BAKE=true docker compose -f compose.local.yml --env-file .env.development up -d --build
+# COMPOSE_BAKE=true docker compose -f compose.local.yml --env-file .env.development down
 services:
   server:
     image: server_local
@@ -9,32 +10,30 @@ services:
       dockerfile: Dockerfile.local
     env_file:
       - .env.development
-    ports:
-      - '3001:3001'
     volumes:
       - ./src:/app/src
+    ports:
+      - '3001:3001'
     depends_on:
-      - mysql
+      - postgres
       - redis
     networks:
       - flashease
 
-  mysql:
-    image: mysql:8.0
-    container_name: mysql
+  postgres:
+    image: postgres:17.4
+    container_name: postgres
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: ${DATABASE_PASSWORD}
-      MYSQL_DATABASE: ${DATABASE_DATABASE_NAME}
-      MYSQL_USER: ${DATABASE_USERNAME}
-      MYSQL_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - '3306:3306'
+      - '5432:5432'
     volumes:
-      - mysql:/var/lib/mysql
+      - postgres:/var/lib/postgresql/data
     networks:
       - flashease
-    command: --default-authentication-plugin=mysql_native_password
 
   redis:
     image: redis/redis-stack:6.2.6-v17
@@ -51,7 +50,7 @@ services:
       - flashease
 
 volumes:
-  mysql:
+  postgres:
   redis:
 
 networks:

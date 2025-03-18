@@ -18,7 +18,7 @@ import {
   MinLength,
   ValidateNested,
 } from 'class-validator';
-import { ToLowerCase, ToUpperCase } from './transforms.decorator';
+import { ToBoolean, ToLowerCase, ToUpperCase } from './transforms.decorator';
 import { IsPassword } from './validators/is-password.decorator';
 
 type CommonOptions = {
@@ -70,16 +70,20 @@ export function NumberValidators(options?: NumberOptions): PropertyDecorator {
   return applyDecorators(...decorators);
 }
 
+export function PortValidators() {
+  return NumberValidators({ isInt: true, min: 1, max: 65535 });
+}
+
 export function StringValidators(options?: StringOptions): PropertyDecorator {
   let decorators = [Type(() => String), IsString({ each: options?.isArray })];
 
   decorators = checkCommonOptions(decorators, options);
 
-  if (options?.minLength === 0) {
+  if (decorators.indexOf(IsOptional)) {
     decorators.push(MinLength(0, { each: options?.isArray }));
   } else {
     decorators.push(
-      MinLength(options?.minLength || 1, { each: options?.isArray }),
+      MinLength(options?.minLength ?? 1, { each: options?.isArray }),
     );
   }
 
@@ -119,7 +123,7 @@ export function PasswordValidators(options?: StringOptions): PropertyDecorator {
 }
 
 export function BooleanValidators(options?: CommonOptions): PropertyDecorator {
-  let decorators = [IsBoolean({ each: options?.isArray })];
+  let decorators = [ToBoolean(), IsBoolean({ each: options?.isArray })];
 
   decorators = checkCommonOptions(decorators, options);
 

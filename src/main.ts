@@ -32,9 +32,9 @@ async function bootstrap() {
   app.use(compression());
 
   // ================= configs =================
-  const appUrl = configService.get('APP_URL', { infer: true });
+  const appHost = configService.get('APP_HOST', { infer: true });
   app.enableCors({
-    origin: [appUrl],
+    origin: [appHost],
     methods: ['GET', 'PUT', 'PATCH', 'POST', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
@@ -74,8 +74,8 @@ async function bootstrap() {
   await swaggerConfig(app, configService);
 
   // ================= start app =================
-  await app.listen(configService.get('APP_PORT', { infer: true }));
-  logger.log(`🚀🚀🚀 App is running on: ${appUrl}`);
+  await app.listen(3001);
+  logger.log(`🚀🚀🚀 App is running on: ${appHost}:3001`);
 }
 
 void bootstrap();

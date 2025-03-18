@@ -23,8 +23,10 @@ export default () => {
 
   return {
     AUTH_JWT_SECRET: process.env.AUTH_JWT_SECRET,
-    AUTH_JWT_TOKEN_EXPIRES_IN: process.env.AUTH_JWT_TOKEN_EXPIRES_IN,
-    AUTH_REFRESH_SECRET: process.env.APP_PORT,
-    AUTH_REFRESH_TOKEN_EXPIRES_IN: process.env.AUTH_REFRESH_TOKEN_EXPIRES_IN,
+    AUTH_JWT_TOKEN_EXPIRES_IN: process.env
+      .AUTH_JWT_TOKEN_EXPIRES_IN as StringValue,
+    AUTH_REFRESH_SECRET: process.env.AUTH_REFRESH_SECRET,
+    AUTH_REFRESH_TOKEN_EXPIRES_IN: process.env
+      .AUTH_REFRESH_TOKEN_EXPIRES_IN as StringValue,
   };
 };

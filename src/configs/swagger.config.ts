@@ -16,7 +16,7 @@ export default async function swaggerConfig(
     .setTitle(appName)
     .setDescription(`### description for ${appName} `)
     .addServer(
-      configService.get('APP_URL', { infer: true }),
+      configService.get('APP_HOST', { infer: true }),
       'Application Server',
     )
     .addBearerAuth()
