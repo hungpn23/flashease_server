@@ -33,11 +33,11 @@ export abstract class AbstractEntity extends BaseEntity {
   updatedAt: Date;
 
   @Order(9998)
-  @Column({ name: 'created_by' })
+  @Column({ name: 'created_by', type: 'uuid' })
   createdBy: UUID;
 
   @Order(9998)
-  @Column({ name: 'updated_by', nullable: true, default: null })
+  @Column({ name: 'updated_by', type: 'uuid', nullable: true, default: null })
   updatedBy: UUID;
 
   // issue: https://github.com/typeorm/typeorm/issues/541#issuecomment-2358776943
