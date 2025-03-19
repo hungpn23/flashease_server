@@ -4,7 +4,7 @@ import { GoogleEnvVariables } from '@/configs/google.config';
 import { AuthError } from '@/constants/index';
 import { AuthException } from '@/exceptions/auth.exception';
 import { JwtPayload, RefreshPayload } from '@/types/auth.type';
-import { UUID } from '@/types/branded.type';
+import { Milliseconds, UUID } from '@/types/branded.type';
 import { GoogleJwtPayload, GoogleTokenResponse } from '@/types/google.type';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import {
@@ -20,11 +20,11 @@ import argon2 from 'argon2';
 import { Cache } from 'cache-manager';
 import crypto from 'crypto';
 import { Response } from 'express';
-import ms from 'ms';
+import ms, { StringValue } from 'ms';
 import { nanoid } from 'nanoid';
 import { SessionEntity } from '../user/entities/session.entity';
 import { UserEntity } from '../user/entities/user.entity';
-import { LoginDto, RegisterDto } from './auth.dto';
+import { ChangePasswordDto, LoginDto, RegisterDto } from './auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -38,9 +38,9 @@ export class AuthService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
-  // ======================================================= //
-  // ==================== GOOGLE OAUTH ===================== //
-  // ======================================================= //
+  // ********
+  // * GOOGLE
+  // ********
   googleRedirect(res: Response) {
     const options = {
       redirect_uri: this.googleConfig.get('GOOGLE_REDIRECT_URI', {
@@ -111,15 +111,10 @@ export class AuthService {
       `${this.appConfig.get('APP_HOST', { infer: true })}/login?${returnSearchParams.toString()}`,
     );
   }
-  // ======================================================= //
-  // ================== END GOOGLE OAUTH =================== //
-  // ======================================================= //
 
-  // ======================================================= //
-
-  // ======================================================= //
-  // ==================== START ROUTE ====================== //
-  // ======================================================= //
+  // *************
+  // * CREDENTIALS
+  // *************
   async register(dto: RegisterDto) {
     const { username, email, password, confirmPassword } = dto;
     const user = await UserEntity.findOne({
@@ -153,8 +148,12 @@ export class AuthService {
 
   async logout(payload: JwtPayload) {
     const { sessionId, exp, userId } = payload;
-    const key = `SESSION_BLACKLIST:${userId}:${sessionId}`;
-    await this.addToBlacklist(key, exp);
+    const ttl = (exp * 1000 - Date.now()) as Milliseconds;
+    await this.cacheManager.set<boolean>(
+      `SESSION_BLACKLIST:${userId}:${sessionId}`,
+      true,
+      ttl,
+    );
 
     const found = await SessionEntity.findOneByOrFail({ id: sessionId });
     await SessionEntity.remove(found);
@@ -168,7 +167,7 @@ export class AuthService {
 
     if (!session) throw new UnauthorizedException();
     if (session.signature !== signature) {
-      // ** remove all sessions
+      // * remove all sessions
       const sessions = await SessionEntity.findBy({
         user: { id: userId },
       });
@@ -188,21 +187,35 @@ export class AuthService {
 
     const [accessToken, refreshToken] = await Promise.all([
       this.createAccessToken(payload),
-      this.createRefreshToken({
-        ...payload,
-        signature: newSignature,
-      } satisfies RefreshPayload),
+      this.createRefreshToken(
+        {
+          ...payload,
+          signature: newSignature,
+        } satisfies RefreshPayload,
+        session.expiresIn as StringValue,
+      ),
     ]);
 
     return { accessToken, refreshToken };
   }
-  // ======================================================= //
-  // ====================== END ROUTE ====================== //
-  // ======================================================= //
 
-  // ======================================================= //
+  async changePassword(userId: UUID, dto: ChangePasswordDto) {
+    const { oldPassword, newPassword, confirmPassword } = dto;
+    if (newPassword !== confirmPassword)
+      throw new BadRequestException('passwords do not match');
 
-  // *** START GUARD ***
+    const user = await UserEntity.findOneByOrFail({ id: userId });
+    const isValid = await this.verifyPassword(user.password, oldPassword);
+    if (!isValid) throw new UnauthorizedException(AuthError.V02);
+
+    await UserEntity.update(user.id, {
+      password: await argon2.hash(newPassword),
+    });
+  }
+
+  // *******
+  // * GUARD
+  // *******
   async verifyAccessToken(accessToken: string): Promise<JwtPayload> {
     let payload: JwtPayload;
     try {
@@ -215,8 +228,17 @@ export class AuthService {
     }
 
     const { userId, sessionId } = payload;
-    const key = `SESSION_BLACKLIST:${userId}:${sessionId}`;
-    await this.checkBlacklist(userId, key);
+    const isInBlacklist = await this.cacheManager.get<boolean>(
+      `SESSION_BLACKLIST:${userId}:${sessionId}`,
+    );
+
+    if (isInBlacklist) {
+      const sessions = await SessionEntity.findBy({
+        user: { id: userId },
+      });
+      await SessionEntity.remove(sessions); // delete all user's sessions
+      throw new UnauthorizedException(AuthError.E03);
+    }
 
     return payload;
   }
@@ -232,48 +254,42 @@ export class AuthService {
       throw new UnauthorizedException('session expired');
     }
 
-    const { userId, sessionId, signature, exp } = payload;
-    const key = `REFRESH_TOKEN_BLACKLIST:${userId}:${sessionId}:${signature}`;
-    await this.checkBlacklist(userId, key);
-    await this.addToBlacklist(key, exp);
-
     return payload;
   }
-  // *** END GUARD ***
 
-  // ======================================================= //
-
-  // *** START PRIVATE ***
+  // *********
+  // * PRIVATE
+  // *********
   private async createAccessToken(payload: JwtPayload): Promise<string> {
+    const expiresIn = this.configService.get('AUTH_JWT_TOKEN_EXPIRES_IN', {
+      infer: true,
+    });
+
     return await this.jwtService.signAsync(payload, {
       secret: this.configService.get('AUTH_JWT_SECRET', { infer: true }),
-      expiresIn: this.configService.get('AUTH_JWT_TOKEN_EXPIRES_IN', {
-        infer: true,
-      }),
+      expiresIn: ms(expiresIn) / 1000,
     });
   }
 
-  private async createRefreshToken(payload: RefreshPayload): Promise<string> {
+  private async createRefreshToken(
+    payload: RefreshPayload,
+    expiresIn: StringValue,
+  ): Promise<string> {
     return await this.jwtService.signAsync(payload, {
       secret: this.configService.get('AUTH_REFRESH_SECRET', { infer: true }),
-      expiresIn: this.configService.get('AUTH_REFRESH_TOKEN_EXPIRES_IN', {
-        infer: true,
-      }),
+      expiresIn: ms(expiresIn) / 1000,
     });
   }
 
   private async createTokenPair(user: UserEntity) {
-    const refreshTokenTtl = this.configService.get(
-      'AUTH_REFRESH_TOKEN_EXPIRES_IN',
-      { infer: true },
-    );
-
     const signature = this.createSignature();
     const session = await SessionEntity.save(
       new SessionEntity({
         signature,
         user,
-        expiresAt: new Date(Date.now() + ms(refreshTokenTtl)),
+        expiresIn: this.configService.get('AUTH_REFRESH_TOKEN_EXPIRES_IN', {
+          infer: true,
+        }),
         createdBy: user.id,
       }),
     );
@@ -286,7 +302,13 @@ export class AuthService {
 
     const [accessToken, refreshToken] = await Promise.all([
       this.createAccessToken(payload),
-      this.createRefreshToken({ ...payload, signature }),
+      this.createRefreshToken(
+        {
+          ...payload,
+          signature,
+        } satisfies RefreshPayload,
+        session.expiresIn as StringValue,
+      ),
     ]);
 
     return { accessToken, refreshToken };
@@ -308,18 +330,6 @@ export class AuthService {
     return crypto.randomBytes(16).toString('hex');
   }
 
-  private async checkBlacklist(userId: UUID, key: string) {
-    const isInBlacklist = await this.cacheManager.get<boolean>(key);
-
-    if (isInBlacklist) {
-      const sessions = await SessionEntity.findBy({
-        user: { id: userId },
-      });
-      await SessionEntity.remove(sessions); // delete all user's sessions
-      throw new UnauthorizedException(AuthError.E03);
-    }
-  }
-
   private async addToBlacklist(key: string, exp: number) {
     const ttl = exp * 1000 - Date.now(); // remaining time in milliseconds
     await this.cacheManager.set<boolean>(key, true, ttl);
@@ -334,5 +344,4 @@ export class AuthService {
     const randomSuffix = nanoid(6); // Tạo chuỗi ngẫu nhiên 6 ký tự
     return `${baseUsername}${randomSuffix}`;
   }
-  // *** END PRIVATE ***
 }

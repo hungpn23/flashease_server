@@ -179,7 +179,7 @@ export class SetService {
 
     const set = new SetEntity({
       ...dto,
-      author: user.username,
+      author: user,
       passcode,
       cards,
       user,

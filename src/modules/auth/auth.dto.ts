@@ -27,6 +27,17 @@ export class RegisterDto {
   confirmPassword: string;
 }
 
+export class ChangePasswordDto {
+  @PasswordValidators()
+  oldPassword: string;
+
+  @PasswordValidators()
+  newPassword: string;
+
+  @PasswordValidators()
+  confirmPassword: string;
+}
+
 @Expose()
 export class LoginResDto {
   accessToken: string;

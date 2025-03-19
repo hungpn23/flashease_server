@@ -1,10 +1,10 @@
 import { Role } from '@/constants';
-import { UUID } from './branded.type';
+import { Seconds, UUID } from './branded.type';
 
 type BaseJwtPayload = {
   sessionId: UUID;
   iat?: number;
-  exp?: number;
+  exp?: Seconds;
 };
 
 export type JwtPayload = BaseJwtPayload & { userId: UUID; role: Role };

@@ -29,8 +29,8 @@ export class SessionEntity extends AbstractEntity {
   @Column()
   signature: string;
 
-  @Column({ name: 'expires_at', type: 'timestamp' })
-  expiresAt: Date;
+  @Column({ name: 'expires_in' })
+  expiresIn: string;
 
   @ManyToOne(() => UserEntity, (user) => user.sessions, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })

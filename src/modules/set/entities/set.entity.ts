@@ -32,9 +32,6 @@ export class SetEntity extends AbstractEntity {
   @Column({ nullable: true })
   description?: string;
 
-  @Column()
-  author: string;
-
   @Column({
     name: 'visible_to',
     type: 'enum',
@@ -60,4 +57,10 @@ export class SetEntity extends AbstractEntity {
   })
   @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
   user: Relation<UserEntity>;
+
+  @ManyToOne(() => UserEntity, (user) => user.sets, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'author_id', referencedColumnName: 'id' })
+  author: Relation<UserEntity>;
 }
