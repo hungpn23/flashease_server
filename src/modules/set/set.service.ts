@@ -25,13 +25,13 @@ import { VisibleTo } from './set.enum';
 export class SetService {
   async findManyPublic(query: OffsetPaginationQueryDto, userId: UUID) {
     const builder = SetEntity.createQueryBuilder('set')
-      .leftJoin('set.user', 'user')
       .leftJoin('set.cards', 'cards')
+      .leftJoin('set.author', 'author')
       .where('set.createdBy != :userId', { userId })
       .andWhere('set.visibleTo IN (:...visibleTos)', {
         visibleTos: [VisibleTo.EVERYONE, VisibleTo.PEOPLE_WITH_A_PASSCODE],
       })
-      .select(['set', 'cards', 'user.username']);
+      .select(['set', 'cards', 'author']);
 
     return await paginate(builder, query);
   }
@@ -43,16 +43,16 @@ export class SetService {
         visibleTo: In([VisibleTo.EVERYONE, VisibleTo.PEOPLE_WITH_A_PASSCODE]),
         user: { id: Not(userId) },
       },
-      relations: ['cards', 'user'],
+      relations: ['cards', 'author'],
     });
   }
 
   async findMany(query: OffsetPaginationQueryDto, userId: UUID) {
     const builder = SetEntity.createQueryBuilder('set')
-      .leftJoin('set.user', 'user')
+      .leftJoin('set.author', 'author')
       .leftJoin('set.cards', 'cards')
       .where('set.createdBy = :userId', { userId })
-      .select(['set', 'cards', 'user.username']);
+      .select(['set', 'cards', 'author']);
 
     const { data, metadata } = await paginate(builder, query);
     const formatted = data.map((set) => {
@@ -66,13 +66,16 @@ export class SetService {
   }
 
   async findOne(setId: UUID, userId: UUID) {
-    return await SetEntity.findOneOrFail({
+    const set = await SetEntity.findOneOrFail({
       where: {
         id: setId,
         createdBy: userId,
       },
-      relations: ['cards'],
+      relations: ['cards', 'author'],
     });
+    console.log('🚀 ~ SetService ~ findOne ~ set:', set);
+
+    return set;
   }
 
   async findOneAndMetadata(setId: UUID, userId: UUID) {
@@ -81,7 +84,7 @@ export class SetService {
         id: setId,
         createdBy: userId,
       },
-      relations: ['cards'],
+      relations: ['cards', 'author'],
     });
 
     return plainToInstance(SetDetailDto, {
@@ -121,7 +124,7 @@ export class SetService {
       UserEntity.findOneByOrFail({ id: userId }),
       SetEntity.findOneOrFail({
         where: { id: setId },
-        relations: ['cards'],
+        relations: ['cards', 'author'],
       }),
     ]);
 
