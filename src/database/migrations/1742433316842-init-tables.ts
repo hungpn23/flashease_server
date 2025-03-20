@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class InitTables1742387213934 implements MigrationInterface {
-    name = 'InitTables1742387213934'
+export class InitTables1742433316842 implements MigrationInterface {
+    name = 'InitTables1742433316842'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`
@@ -22,7 +22,7 @@ export class InitTables1742387213934 implements MigrationInterface {
             CREATE TABLE "session" (
                 "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
                 "signature" character varying NOT NULL,
-                "expires_in" character varying NOT NULL,
+                "expires_at" TIMESTAMP WITH TIME ZONE NOT NULL,
                 "user_id" uuid,
                 "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
                 "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),

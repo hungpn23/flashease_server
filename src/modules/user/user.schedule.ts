@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import ms, { StringValue } from 'ms';
+import { LessThan } from 'typeorm';
 import { SessionEntity } from './entities/session.entity';
 
 @Injectable()
@@ -9,18 +9,11 @@ export class UserSchedule {
 
   @Cron(CronExpression.EVERY_1ST_DAY_OF_MONTH_AT_MIDNIGHT)
   async cleanSessions() {
-    const sessions = await SessionEntity.find();
-    if (!sessions.length) return;
-
-    const sessionsToRemove = await Promise.all(
-      sessions.map((session) => {
-        const expiresInMs = ms(session.expiresIn as StringValue);
-        if (Date.now() > session.createdAt.getTime() + expiresInMs)
-          return session;
-      }),
-    );
-
-    await SessionEntity.remove(sessionsToRemove);
-    this.logger.log(`Removed ${sessionsToRemove.length} sessions`);
+    const now = new Date();
+    const found = await SessionEntity.findBy({ expiresAt: LessThan(now) });
+    if (found) {
+      await SessionEntity.remove(found);
+      this.logger.log('Cleaned expired sessions');
+    }
   }
 }

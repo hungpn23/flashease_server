@@ -4,7 +4,7 @@ import { GoogleEnvVariables } from '@/configs/google.config';
 import { AuthError } from '@/constants/index';
 import { AuthException } from '@/exceptions/auth.exception';
 import { JwtPayload, RefreshPayload } from '@/types/auth.type';
-import { Milliseconds, UUID } from '@/types/branded.type';
+import { Milliseconds, Seconds, UUID } from '@/types/branded.type';
 import { GoogleJwtPayload, GoogleTokenResponse } from '@/types/google.type';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import {
@@ -20,7 +20,7 @@ import argon2 from 'argon2';
 import { Cache } from 'cache-manager';
 import crypto from 'crypto';
 import { Response } from 'express';
-import ms, { StringValue } from 'ms';
+import ms from 'ms';
 import { nanoid } from 'nanoid';
 import { SessionEntity } from '../user/entities/session.entity';
 import { UserEntity } from '../user/entities/user.entity';
@@ -185,6 +185,9 @@ export class AuthService {
 
     await SessionEntity.update(session.id, { signature: newSignature });
 
+    const refreshTokenExpiresIn = ((session.expiresAt.getTime() - Date.now()) /
+      1000) as Seconds;
+
     const [accessToken, refreshToken] = await Promise.all([
       this.createAccessToken(payload),
       this.createRefreshToken(
@@ -192,7 +195,7 @@ export class AuthService {
           ...payload,
           signature: newSignature,
         } satisfies RefreshPayload,
-        session.expiresIn as StringValue,
+        refreshTokenExpiresIn,
       ),
     ]);
 
@@ -267,29 +270,32 @@ export class AuthService {
 
     return await this.jwtService.signAsync(payload, {
       secret: this.configService.get('AUTH_JWT_SECRET', { infer: true }),
-      expiresIn: ms(expiresIn) / 1000,
+      expiresIn: (ms(expiresIn) / 1000) as Seconds,
     });
   }
 
   private async createRefreshToken(
     payload: RefreshPayload,
-    expiresIn: StringValue,
+    expiresIn: Seconds,
   ): Promise<string> {
     return await this.jwtService.signAsync(payload, {
       secret: this.configService.get('AUTH_REFRESH_SECRET', { infer: true }),
-      expiresIn: ms(expiresIn) / 1000,
+      expiresIn,
     });
   }
 
   private async createTokenPair(user: UserEntity) {
+    const sessionExpiresIn = this.configService.get(
+      'AUTH_REFRESH_TOKEN_EXPIRES_IN',
+      { infer: true },
+    );
+
     const signature = this.createSignature();
     const session = await SessionEntity.save(
       new SessionEntity({
         signature,
         user,
-        expiresIn: this.configService.get('AUTH_REFRESH_TOKEN_EXPIRES_IN', {
-          infer: true,
-        }),
+        expiresAt: new Date(Date.now() + ms(sessionExpiresIn)),
         createdBy: user.id,
       }),
     );
@@ -300,6 +306,8 @@ export class AuthService {
       role: user.role,
     };
 
+    const refreshTokenExpiresIn = (ms(sessionExpiresIn) / 1000) as Seconds;
+
     const [accessToken, refreshToken] = await Promise.all([
       this.createAccessToken(payload),
       this.createRefreshToken(
@@ -307,7 +315,7 @@ export class AuthService {
           ...payload,
           signature,
         } satisfies RefreshPayload,
-        session.expiresIn as StringValue,
+        refreshTokenExpiresIn,
       ),
     ]);
 
@@ -328,11 +336,6 @@ export class AuthService {
 
   private createSignature() {
     return crypto.randomBytes(16).toString('hex');
-  }
-
-  private async addToBlacklist(key: string, exp: number) {
-    const ttl = exp * 1000 - Date.now(); // remaining time in milliseconds
-    await this.cacheManager.set<boolean>(key, true, ttl);
   }
 
   private getUniqueUsername(givenName: string, familyName: string) {
