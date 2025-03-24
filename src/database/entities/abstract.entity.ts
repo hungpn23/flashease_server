@@ -40,7 +40,7 @@ export abstract class AbstractEntity extends BaseEntity {
   @Column({ name: 'updated_by', type: 'uuid', nullable: true, default: null })
   updatedBy: UUID;
 
-  // issue: https://github.com/typeorm/typeorm/issues/541#issuecomment-2358776943
+  // ref: https://github.com/typeorm/typeorm/issues/541#issuecomment-2358776943
   static useDataSource(dataSource: DataSource) {
     BaseEntity.useDataSource.call(this, dataSource);
     const meta = dataSource.entityMetadatasMap.get(this);

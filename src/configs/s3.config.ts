@@ -19,7 +19,6 @@ export class S3EnvVariables {
   CLOUDFRONT_DISTRIBUTION_DOMAIN: string;
 }
 
-// config factory
 export default () => {
   validateConfig(process.env, S3EnvVariables);
 

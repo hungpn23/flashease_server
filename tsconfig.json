@@ -1,6 +1,6 @@
 {
   "ts-node": {
-    // see: https://www.npmjs.com/package/tsconfig-paths
+    // ref: https://www.npmjs.com/package/tsconfig-paths
     // configuration for alias path (@) in ts-node runtime to avoid path errors
     "require": ["tsconfig-paths/register"]
   },

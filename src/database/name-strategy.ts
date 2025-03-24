@@ -1,9 +1,9 @@
 import { DefaultNamingStrategy, NamingStrategyInterface, Table } from 'typeorm';
 
-// see: https://dev.mysql.com/doc/refman/8.4/en/identifier-length.html
+// ref: https://dev.mysql.com/doc/refman/8.4/en/identifier-length.html
 export const LENGTH_LIMIT = 64;
 
-// see: https://dev.to/emtiajium/a-journey-to-simplify-debugging-automate-generating-human-friendly-database-constraints-using-typeorm-kap
+// ref: https://dev.to/emtiajium/a-journey-to-simplify-debugging-automate-generating-human-friendly-database-constraints-using-typeorm-kap
 export class DatabaseNamingStrategy
   extends DefaultNamingStrategy
   implements NamingStrategyInterface
@@ -12,7 +12,6 @@ export class DatabaseNamingStrategy
     return columnNames.join('_');
   }
 
-  // TODO: learn about mysql index
   private getPartialIndexNameSuffix(
     tableOrName: Table | string,
     columnNames: string[],

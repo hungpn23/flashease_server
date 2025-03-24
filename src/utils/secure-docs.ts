@@ -5,7 +5,7 @@ const apiDocumentationCredentials = {
   pass: 'admin',
 };
 
-// see: https://trilon.io/blog/nestjs-swagger-tips-tricks#secure-openapi-documentation-usernamepassword
+// ref: https://trilon.io/blog/nestjs-swagger-tips-tricks#secure-openapi-documentation-usernamepassword
 export function secureApiDocs(httpAdapter: HttpServer) {
   httpAdapter.use('/api-docs', (req, res, next) => {
     function parseAuthHeader(input: string): { name: string; pass: string } {

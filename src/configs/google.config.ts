@@ -13,7 +13,6 @@ export class GoogleEnvVariables {
   GOOGLE_REDIRECT_URI: string;
 }
 
-// config factory
 export default () => {
   validateConfig(process.env, GoogleEnvVariables);
 

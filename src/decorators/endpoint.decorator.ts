@@ -1,6 +1,5 @@
 import { MAX_FILES_UPLOAD } from '@/constants';
 import { CommonErrorDto, ErrorDto } from '@/dto/error/error.dto';
-import { FunctionConstructor } from '@/types/constructor-function.type';
 import {
   applyDecorators,
   HttpCode,
@@ -22,6 +21,7 @@ import {
   ApiResponse,
   getSchemaPath,
 } from '@nestjs/swagger';
+import { ClassConstructor } from 'class-transformer';
 import { STATUS_CODES } from 'node:http';
 import { Public } from './auth/public.decorator';
 import { ApiPaginatedResponse } from './swagger.decorator';
@@ -31,7 +31,7 @@ const DEFAULT_STATUS_CODE = HttpStatus.OK;
 export type EndpointOptions = {
   type?: Type<any>;
   isPublic?: boolean;
-  summary?: string;
+  summary?: string; // for swagger documentation
   description?: string; // for success response
   statusCode?: HttpStatus;
   errorStatusCodes?: HttpStatus[];
@@ -112,7 +112,7 @@ export function ApiFile(fileName: string): MethodDecorator {
 
 export function ApiArrayFiles<TClass>(
   fileName: string,
-  extraModels: FunctionConstructor<TClass>, // function constructor
+  extraModels: ClassConstructor<TClass>,
   maxCount: number = MAX_FILES_UPLOAD,
 ): MethodDecorator {
   return applyDecorators(

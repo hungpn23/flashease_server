@@ -73,7 +73,6 @@ export class SetService {
       },
       relations: ['cards', 'author'],
     });
-    console.log('🚀 ~ SetService ~ findOne ~ set:', set);
 
     return set;
   }
@@ -236,7 +235,6 @@ export class SetService {
       }
     }
 
-    // Xóa các card cũ trong set
     if (set.cards && set.cards.length > 0) {
       await CardEntity.delete({ set: { id: setId } });
     }
@@ -265,9 +263,6 @@ export class SetService {
     return await SetEntity.remove(found);
   }
 
-  // ================================================= //
-  // ================ PRIVATE METHODS ================ //
-  // ================================================= //
   private getSetMetadata(cards: CardEntity[]) {
     const metadata: SetMetadataDto = {
       totalCards: cards.length,
@@ -288,16 +283,4 @@ export class SetService {
 
     return plainToInstance(SetMetadataDto, metadata);
   }
-
-  // private reorderCards(cards: CardEntity[]) {
-  //   const notStudiedCards = cards.filter((card) => card.correctCount === null);
-  //   const zeroCards = cards.filter((card) => card.correctCount === 0);
-  //   const oneCards = cards.filter((card) => card.correctCount === 1);
-  //   const defaultCards = cards.filter(
-  //     (card) =>
-  //       card.correctCount && card.correctCount !== 0 && card.correctCount !== 1,
-  //   );
-
-  //   return [...notStudiedCards, ...zeroCards, ...oneCards, ...defaultCards];
-  // }
 }

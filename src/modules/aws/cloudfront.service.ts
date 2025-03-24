@@ -68,7 +68,7 @@ export class CloudfrontService {
     });
   }
 
-  // see: https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/cloudfront/command/CreateInvalidationCommand/
+  // ref: https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/cloudfront/command/CreateInvalidationCommand/
   async invalidateCache(fileName: string) {
     const command = new CreateInvalidationCommand({
       DistributionId: this.cloudfrontDistributionId,

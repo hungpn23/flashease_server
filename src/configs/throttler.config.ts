@@ -10,7 +10,6 @@ export class ThrottlerEnvVariables {
   THROTTLER_LIMIT: number;
 }
 
-// config factory
 export default () => {
   validateConfig(process.env, ThrottlerEnvVariables);
 

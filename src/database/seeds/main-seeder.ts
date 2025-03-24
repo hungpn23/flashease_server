@@ -133,7 +133,7 @@ export class MainSeeder implements Seeder {
         role: Role.ADMIN,
       }),
       new UserEntity({
-        username: 'andy_dufresne', // tối thiểu 6 ký tự
+        username: 'andy_dufresne',
         email: 'andy@gmail.com',
         bio: 'Chuyên gia thiết kế giao diện và phát triển frontend.',
         password: await argon2.hash('password'),
@@ -161,7 +161,6 @@ export class MainSeeder implements Seeder {
     return [hungpn23, andy, forrest, cooper, murphy];
   }
 
-  // Hàm tạo danh sách card ngẫu nhiên (từ 10 đến 30 card) với các từ tiếng Anh ít gặp và định nghĩa bằng tiếng Việt.
   private getRandomCards(userId: UUID): CardEntity[] {
     const rareWords = [
       { term: 'aberration', definition: 'sự lệch lạc, lệch chuẩn' },

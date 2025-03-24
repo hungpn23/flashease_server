@@ -9,7 +9,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { CloudfrontService } from './cloudfront.service';
 
-// see: https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/Package/-aws-sdk-cloudfront-signer/
+// ref: https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/Package/-aws-sdk-cloudfront-signer/
 
 @Injectable()
 export class S3Service {
@@ -57,7 +57,6 @@ export class S3Service {
       }),
     );
 
-    // invalidate cloudfront cache
     await this.cloudfrontService.invalidateCache(fileName);
   }
 }

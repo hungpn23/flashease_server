@@ -46,7 +46,6 @@ export class DatabaseEnvVariables {
   POSTGRES_CERT?: string;
 }
 
-// config factory
 export default () => {
   validateConfig(process.env, DatabaseEnvVariables);
 

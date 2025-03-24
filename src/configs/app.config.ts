@@ -21,7 +21,6 @@ export class AppEnvVariables {
   APP_PREFIX: string;
 }
 
-// config factory
 export default () => {
   validateConfig(process.env, AppEnvVariables);
 

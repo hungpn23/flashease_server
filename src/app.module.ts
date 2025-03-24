@@ -23,7 +23,7 @@ import throttlerConfig, {
 } from './configs/throttler.config';
 import { DatabaseNamingStrategy } from './database/name-strategy';
 import { TypeOrmConfigService } from './database/typeorm-config.service';
-import { Modules as ApiModule } from './modules';
+import { ApiModules } from './modules';
 
 const envFilePath =
   process.env.NODE_ENV === 'production'
@@ -122,7 +122,7 @@ const envFilePath =
       serveRoot: '/uploads',
     }),
 
-    ApiModule,
+    ApiModules,
   ],
 
   providers: [

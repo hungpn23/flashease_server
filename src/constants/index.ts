@@ -1,6 +1,5 @@
 export const IS_PUBLIC = 'isPublic';
 export const IS_REFRESH_TOKEN = 'isRefreshToken';
-export const NO_CACHE = 'noCache';
 export const ROLE_KEY = 'role';
 
 export enum Environment {

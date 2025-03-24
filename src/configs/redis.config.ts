@@ -16,7 +16,6 @@ export class RedisEnvVariables {
   REDIS_PERMISSIONS: string;
 }
 
-// config factory
 export default () => {
   validateConfig(process.env, RedisEnvVariables);
 

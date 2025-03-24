@@ -23,10 +23,8 @@ export const AppDataSource = new DataSource({
           cert: process.env.POSTGRES_CERT,
         }
       : undefined,
-
   namingStrategy: new DatabaseNamingStrategy(),
 
-  // * SeederOptions
   seeds: [__dirname + '/seeds/**/*{.ts,.js}'],
   seedTracking: true,
   factories: [__dirname + '/factories/**/*{.ts,.js}'],

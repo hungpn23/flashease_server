@@ -17,7 +17,6 @@ export class AuthEnvVariables {
   AUTH_REFRESH_TOKEN_EXPIRES_IN: StringValue;
 }
 
-// config factory
 export default () => {
   validateConfig(process.env, AuthEnvVariables);
 

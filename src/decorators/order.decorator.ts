@@ -1,4 +1,4 @@
-// issue: https://github.com/typeorm/typeorm/issues/541#issuecomment-2014291439
+// ref: https://github.com/typeorm/typeorm/issues/541#issuecomment-2014291439
 
 const ORDER_KEY = Symbol.for('order_key');
 export function Order(value: number): PropertyDecorator {

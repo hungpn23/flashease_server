@@ -26,13 +26,13 @@ async function bootstrap() {
     bufferLogs: true, // buffering logs before nestjs-pino logger ready
   });
   const configService = app.get(ConfigService<AppEnvVariables, true>);
+  const appHost = configService.get('APP_HOST', { infer: true });
+  const logger = app.get(Logger);
 
-  // ================= middlewares =================
   app.use(helmet());
   app.use(compression());
+  app.useLogger(logger);
 
-  // ================= configs =================
-  const appHost = configService.get('APP_HOST', { infer: true });
   app.enableCors({
     origin: [appHost],
     methods: ['GET', 'PUT', 'PATCH', 'POST', 'DELETE'],
@@ -41,10 +41,6 @@ async function bootstrap() {
   });
   app.enableVersioning({ type: VersioningType.URI });
 
-  // ================= apply global components & logger  =================
-  const logger = app.get(Logger);
-  app.useLogger(logger);
-
   app.setGlobalPrefix(configService.get('APP_PREFIX', { infer: true }));
 
   app.useGlobalGuards(new AuthGuard(app.get(Reflector), app.get(AuthService)));
@@ -52,8 +48,8 @@ async function bootstrap() {
 
   app.useGlobalPipes(
     new ValidationPipe({
-      transform: true,
-      whitelist: true,
+      transform: true, // auto transform payload to DTO instance
+      whitelist: true, // more strict
       errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
       exceptionFactory: (errors: ValidationError[]) => {
         return new UnprocessableEntityException(errors);
@@ -69,11 +65,9 @@ async function bootstrap() {
 
   app.useGlobalFilters(new GlobalExceptionFilter());
 
-  // ================= swagger =================
   secureApiDocs(app.getHttpAdapter());
   await swaggerConfig(app, configService);
 
-  // ================= start app =================
   await app.listen(3001);
   logger.log(`🚀🚀🚀 App is running on: ${appHost}:3001`);
 }

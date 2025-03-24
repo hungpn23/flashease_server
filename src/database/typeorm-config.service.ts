@@ -11,10 +11,10 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
 
   createTypeOrmOptions(): TypeOrmModuleOptions {
     return {
-      // * TypeOrmModuleOptions
+      // TypeOrmModuleOptions
       retryAttempts: 1,
 
-      // * PostgresConnectionCredentialsOptions
+      // PostgresConnectionCredentialsOptions
       type: 'postgres',
       host: this.configService.get('POSTGRES_HOST', { infer: true }),
       username: this.configService.get('POSTGRES_USER', { infer: true }),
@@ -23,7 +23,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
         infer: true,
       }),
 
-      // * BaseDataSourceOptions
+      // BaseDataSourceOptions
       synchronize: this.configService.get('POSTGRES_SYNCHRONIZE', {
         infer: true,
       }),
@@ -40,7 +40,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       entities: [__dirname + '/../**/*.entity{.ts,.js}'],
       migrations: [__dirname + '/../**/migrations/**/*.{.ts,.js}'],
 
-      // * ref: https://node-postgres.com/features/ssl
+      // ref: https://node-postgres.com/features/ssl
       ssl: this.configService.get('POSTGRES_SSL_ENABLED', { infer: true })
         ? {
             rejectUnauthorized: this.configService.get(

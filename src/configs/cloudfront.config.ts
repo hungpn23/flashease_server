@@ -16,7 +16,6 @@ export class CloudfrontEnvVariables {
   CLOUDFRONT_KEY_PAIR_ID: string;
 }
 
-// config factory
 export default () => {
   validateConfig(process.env, CloudfrontEnvVariables);
 

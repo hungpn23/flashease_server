@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Logger } from '@nestjs/common';
 import {
   QueryRunner,
@@ -8,6 +7,7 @@ import {
   type LoggerOptions,
 } from 'typeorm';
 
+// ref: https://github.com/vndevteam/nestjs-boilerplate/blob/main/src/utils/typeorm-custom-logger.ts
 export default class TypeOrmCustomLogger implements TypeOrmLogger {
   static getInstance(connectionName: string, options: LoggerOptions) {
     const logger = new Logger(`TypeORM[${connectionName}]`);
@@ -22,7 +22,7 @@ export default class TypeOrmCustomLogger implements TypeOrmLogger {
   /**
    * Logs query and parameters used in it.
    */
-  logQuery(query: string, parameters?: any[], queryRunner?: QueryRunner) {
+  logQuery(query: string, parameters?: any[], _queryRunner?: QueryRunner) {
     if (!this.isLogEnabledFor('query')) {
       return;
     }
@@ -42,7 +42,7 @@ export default class TypeOrmCustomLogger implements TypeOrmLogger {
     error: string,
     query: string,
     parameters?: any[],
-    queryRunner?: QueryRunner,
+    _queryRunner?: QueryRunner,
   ) {
     if (!this.isLogEnabledFor('query-error')) {
       return;
@@ -64,7 +64,7 @@ export default class TypeOrmCustomLogger implements TypeOrmLogger {
     time: number,
     query: string,
     parameters?: any[],
-    queryRunner?: QueryRunner,
+    _queryRunner?: QueryRunner,
   ) {
     if (!this.isLogEnabledFor('query-slow')) {
       return;
@@ -82,7 +82,7 @@ export default class TypeOrmCustomLogger implements TypeOrmLogger {
   /**
    * Logs events from the schema build process.
    */
-  logSchemaBuild(message: string, queryRunner?: QueryRunner) {
+  logSchemaBuild(message: string, _queryRunner?: QueryRunner) {
     if (!this.isLogEnabledFor('schema-build')) {
       return;
     }
@@ -93,7 +93,7 @@ export default class TypeOrmCustomLogger implements TypeOrmLogger {
   /**
    * Logs events from the migrations run process.
    */
-  logMigration(message: string, queryRunner?: QueryRunner) {
+  logMigration(message: string, _queryRunner?: QueryRunner) {
     if (!this.isLogEnabledFor('migration')) {
       return;
     }
@@ -105,7 +105,11 @@ export default class TypeOrmCustomLogger implements TypeOrmLogger {
    * Perform logging using given logger, or by default to the this.logger.
    * Log has its own level and message.
    */
-  log(level: 'log' | 'info' | 'warn', message: any, queryRunner?: QueryRunner) {
+  log(
+    level: 'log' | 'info' | 'warn',
+    message: any,
+    _queryRunner?: QueryRunner,
+  ) {
     switch (level) {
       case 'log':
         if (!this.isLogEnabledFor('log')) {
@@ -194,7 +198,7 @@ export default class TypeOrmCustomLogger implements TypeOrmLogger {
   protected stringifyParams(parameters: any[]) {
     try {
       return JSON.stringify(parameters);
-    } catch (error) {
+    } catch (_error) {
       // most probably circular objects in parameters
       return parameters;
     }

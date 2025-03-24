@@ -78,8 +78,7 @@ export class AuthController {
     return await this.authService.changePassword(userId, dto);
   }
 
-  // TODO auth api
-
+  // TODO: auth api
   @ApiExcludeEndpoint()
   @Post('forgot-password')
   async forgotPassword() {

@@ -1,10 +1,10 @@
-import { MigrationInterface, QueryRunner } from "typeorm";
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class InitTables1742433316842 implements MigrationInterface {
-    name = 'InitTables1742433316842'
+  name = 'InitTables1742433316842';
 
-    public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`
             CREATE TABLE "card" (
                 "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
                 "term" character varying NOT NULL,
@@ -18,7 +18,7 @@ export class InitTables1742433316842 implements MigrationInterface {
                 CONSTRAINT "PK_card_id" PRIMARY KEY ("id")
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "session" (
                 "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
                 "signature" character varying NOT NULL,
@@ -31,10 +31,10 @@ export class InitTables1742433316842 implements MigrationInterface {
                 CONSTRAINT "PK_session_id" PRIMARY KEY ("id")
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TYPE "public"."user_role_enum" AS ENUM('user', 'admin')
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "user" (
                 "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
                 "role" "public"."user_role_enum" NOT NULL DEFAULT 'user',
@@ -53,10 +53,10 @@ export class InitTables1742433316842 implements MigrationInterface {
                 CONSTRAINT "PK_user_id" PRIMARY KEY ("id")
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TYPE "public"."set_visible_to_enum" AS ENUM('everyone', 'just me', 'people with a passcode')
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "set" (
                 "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
                 "name" character varying NOT NULL,
@@ -73,7 +73,7 @@ export class InitTables1742433316842 implements MigrationInterface {
                 CONSTRAINT "PK_set_id" PRIMARY KEY ("id")
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "folder" (
                 "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
                 "name" character varying NOT NULL,
@@ -85,65 +85,64 @@ export class InitTables1742433316842 implements MigrationInterface {
                 CONSTRAINT "PK_folder_id" PRIMARY KEY ("id")
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "card"
             ADD CONSTRAINT "FK_card_set_id_set_id" FOREIGN KEY ("set_id") REFERENCES "set"("id") ON DELETE CASCADE ON UPDATE NO ACTION
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "session"
             ADD CONSTRAINT "FK_session_user_id_user_id" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE NO ACTION
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "set"
             ADD CONSTRAINT "FK_set_folder_id_folder_id" FOREIGN KEY ("folder_id") REFERENCES "folder"("id") ON DELETE CASCADE ON UPDATE NO ACTION
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "set"
             ADD CONSTRAINT "FK_set_user_id_user_id" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE NO ACTION
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "set"
             ADD CONSTRAINT "FK_set_author_id_user_id" FOREIGN KEY ("author_id") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE NO ACTION
         `);
-    }
+  }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`
             ALTER TABLE "set" DROP CONSTRAINT "FK_set_author_id_user_id"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "set" DROP CONSTRAINT "FK_set_user_id_user_id"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "set" DROP CONSTRAINT "FK_set_folder_id_folder_id"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "session" DROP CONSTRAINT "FK_session_user_id_user_id"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "card" DROP CONSTRAINT "FK_card_set_id_set_id"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "folder"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "set"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TYPE "public"."set_visible_to_enum"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "user"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TYPE "public"."user_role_enum"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "session"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "card"
         `);
-    }
-
+  }
 }

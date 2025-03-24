@@ -344,7 +344,7 @@ export class AuthService {
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
       .replace(/\s+/g, '');
-    const randomSuffix = nanoid(6); // Tạo chuỗi ngẫu nhiên 6 ký tự
+    const randomSuffix = nanoid(6);
     return `${baseUsername}${randomSuffix}`;
   }
 }

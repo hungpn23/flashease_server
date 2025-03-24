@@ -101,7 +101,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     } as ErrorDto;
   }
 
-  // see: https://www.yasint.dev/flatten-error-constraints
+  // ref: https://www.yasint.dev/flatten-error-constraints
   private handleValidationErrors(errors: ValidationError[]) {
     const errorDetails: ErrorDetailDto[] = [];
     for (const error of errors) {

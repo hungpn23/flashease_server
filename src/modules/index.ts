@@ -7,4 +7,4 @@ import { UserModule } from './user/user.module';
 @Module({
   imports: [UserModule, AuthModule, SetModule, FolderModule],
 })
-export class Modules {}
+export class ApiModules {}

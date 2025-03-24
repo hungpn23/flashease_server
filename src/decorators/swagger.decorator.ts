@@ -5,7 +5,7 @@ import { ApiExtraModels, ApiOkResponse, getSchemaPath } from '@nestjs/swagger';
 export function ApiPaginatedResponse<DataDto extends Type<unknown>>(
   data: DataDto,
 ): MethodDecorator {
-  // see: https://aalonso.dev/blog/2021/how-to-generate-generics-dtos-with-nestjsswagger-422g
+  // ref: https://aalonso.dev/blog/2021/how-to-generate-generics-dtos-with-nestjsswagger-422g
   return applyDecorators(
     ApiExtraModels(OffsetPaginatedDto, data),
     ApiOkResponse({
