@@ -4,7 +4,6 @@
   "sourceRoot": "src",
   "compilerOptions": {
     "builder": "swc",
-    "webpack": true,
     "typeCheck": true,
     "deleteOutDir": true,
     "plugins": [

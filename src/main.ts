@@ -7,7 +7,6 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { ThrottlerGuard } from '@nestjs/throttler';
 import { ValidationError } from 'class-validator';
 import compression from 'compression';
 import helmet from 'helmet';
@@ -45,7 +44,6 @@ async function bootstrap() {
 
   app.useGlobalGuards(new AuthGuard(app.get(Reflector), app.get(AuthService)));
   app.useGlobalGuards(new RoleGuard(app.get(Reflector)));
-  app.useGlobalGuards(app.get(ThrottlerGuard));
 
   app.useGlobalPipes(
     new ValidationPipe({

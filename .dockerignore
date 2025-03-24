@@ -3,11 +3,8 @@ dist
 *.log
 *.md
 .git
-.env*
-.env.example
 .env.development
 .env.production
-.env.seeding
 Dockerfile*
 compose.local.yml
 docs/
