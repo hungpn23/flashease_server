@@ -1,4 +1,4 @@
-import { getOrder, Order } from '@/decorators/order.decorator';
+import { getOrder, Order } from '@/decorators/column-order.decorator';
 import { UUID } from '@/types/branded.type';
 import { ApiHideProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';

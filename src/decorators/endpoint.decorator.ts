@@ -1,5 +1,6 @@
 import { MAX_FILES_UPLOAD } from '@/constants';
-import { CommonErrorDto, ErrorDto } from '@/dto/error/error.dto';
+import { ErrorDto } from '@/dto/error.dto';
+import { OffsetPaginatedDto } from '@/dto/offset-pagination/paginated.dto';
 import {
   applyDecorators,
   HttpCode,
@@ -24,7 +25,6 @@ import {
 import { ClassConstructor } from 'class-transformer';
 import { STATUS_CODES } from 'node:http';
 import { Public } from './auth/public.decorator';
-import { ApiPaginatedResponse } from './swagger.decorator';
 
 const DEFAULT_STATUS_CODE = HttpStatus.OK;
 
@@ -77,10 +77,7 @@ export function ApiEndpoint(options: EndpointOptions = {}): MethodDecorator {
     (statusCode) => {
       decorators.push(
         ApiResponse({
-          type:
-            statusCode === HttpStatus.UNPROCESSABLE_ENTITY
-              ? ErrorDto
-              : CommonErrorDto,
+          type: ErrorDto,
           status: statusCode,
           description: STATUS_CODES[statusCode],
         }),
@@ -150,8 +147,8 @@ function handleErrorResponse(
 ) {
   const errorCodes = [
     HttpStatus.BAD_REQUEST,
-    HttpStatus.UNPROCESSABLE_ENTITY,
     HttpStatus.UNAUTHORIZED,
+    HttpStatus.UNPROCESSABLE_ENTITY,
     HttpStatus.INTERNAL_SERVER_ERROR,
   ];
 
@@ -161,4 +158,30 @@ function handleErrorResponse(
     return errorCodes.filter((code) => code !== HttpStatus.UNAUTHORIZED);
 
   return errorCodes;
+}
+
+function ApiPaginatedResponse<DataDto extends Type<unknown>>(
+  data: DataDto,
+): MethodDecorator {
+  // ref: https://aalonso.dev/blog/2021/how-to-generate-generics-dtos-with-nestjsswagger-422g
+  return applyDecorators(
+    ApiExtraModels(OffsetPaginatedDto, data),
+    ApiOkResponse({
+      schema: {
+        allOf: [
+          {
+            $ref: getSchemaPath(OffsetPaginatedDto),
+          },
+          {
+            properties: {
+              data: {
+                type: 'array',
+                items: { $ref: getSchemaPath(data) },
+              },
+            },
+          },
+        ],
+      },
+    }),
+  );
 }

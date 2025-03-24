@@ -1,8 +1,6 @@
 import { AppEnvVariables } from '@/configs/app.config';
 import { AuthEnvVariables } from '@/configs/auth.config';
 import { GoogleEnvVariables } from '@/configs/google.config';
-import { AuthError } from '@/constants/index';
-import { AuthException } from '@/exceptions/auth.exception';
 import { JwtPayload, RefreshPayload } from '@/types/auth.type';
 import { Milliseconds, Seconds, UUID } from '@/types/branded.type';
 import { GoogleJwtPayload, GoogleTokenResponse } from '@/types/google.type';
@@ -38,9 +36,6 @@ export class AuthService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
-  // ********
-  // * GOOGLE
-  // ********
   googleRedirect(res: Response) {
     const options = {
       redirect_uri: this.googleConfig.get('GOOGLE_REDIRECT_URI', {
@@ -112,9 +107,6 @@ export class AuthService {
     );
   }
 
-  // *************
-  // * CREDENTIALS
-  // *************
   async register(dto: RegisterDto) {
     const { username, email, password, confirmPassword } = dto;
     const user = await UserEntity.findOne({
@@ -141,7 +133,7 @@ export class AuthService {
 
     const isValid =
       user && (await this.verifyPassword(user.password, password));
-    if (!isValid) throw new AuthException(AuthError.V02);
+    if (!isValid) throw new BadRequestException('invalid credentials');
 
     return await this.createTokenPair(user);
   }
@@ -167,12 +159,11 @@ export class AuthService {
 
     if (!session) throw new UnauthorizedException();
     if (session.signature !== signature) {
-      // * remove all sessions
       const sessions = await SessionEntity.findBy({
         user: { id: userId },
       });
       await SessionEntity.remove(sessions);
-      throw new UnauthorizedException(AuthError.E03);
+      throw new UnauthorizedException();
     }
 
     const newSignature = this.createSignature();
@@ -209,16 +200,13 @@ export class AuthService {
 
     const user = await UserEntity.findOneByOrFail({ id: userId });
     const isValid = await this.verifyPassword(user.password, oldPassword);
-    if (!isValid) throw new UnauthorizedException(AuthError.V02);
+    if (!isValid) throw new UnauthorizedException();
 
     await UserEntity.update(user.id, {
       password: await argon2.hash(newPassword),
     });
   }
 
-  // *******
-  // * GUARD
-  // *******
   async verifyAccessToken(accessToken: string): Promise<JwtPayload> {
     let payload: JwtPayload;
     try {
@@ -239,8 +227,8 @@ export class AuthService {
       const sessions = await SessionEntity.findBy({
         user: { id: userId },
       });
-      await SessionEntity.remove(sessions); // delete all user's sessions
-      throw new UnauthorizedException(AuthError.E03);
+      await SessionEntity.remove(sessions);
+      throw new UnauthorizedException();
     }
 
     return payload;
@@ -260,9 +248,6 @@ export class AuthService {
     return payload;
   }
 
-  // *********
-  // * PRIVATE
-  // *********
   private async createAccessToken(payload: JwtPayload): Promise<string> {
     const expiresIn = this.configService.get('AUTH_JWT_TOKEN_EXPIRES_IN', {
       infer: true,

@@ -1,6 +1,5 @@
-import { FunctionConstructor } from '@/types/constructor-function.type';
 import { applyDecorators } from '@nestjs/common';
-import { Type } from 'class-transformer';
+import { ClassConstructor, Type } from 'class-transformer';
 import {
   IsBoolean,
   IsDefined,
@@ -151,8 +150,8 @@ export function EnumValidators(
   return applyDecorators(...decorators);
 }
 
-export function ClassValidators<TClass extends FunctionConstructor>(
-  className: TClass,
+export function ClassValidators<ClassName>(
+  className: ClassConstructor<ClassName>,
   options?: CommonOptions,
 ) {
   let decorators = [
@@ -164,8 +163,6 @@ export function ClassValidators<TClass extends FunctionConstructor>(
 
   return applyDecorators(...decorators);
 }
-
-/* =================================================================== */
 
 function checkCommonOptions(
   decorators: PropertyDecorator[],

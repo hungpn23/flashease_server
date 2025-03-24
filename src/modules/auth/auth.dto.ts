@@ -3,7 +3,6 @@ import {
   PasswordValidators,
   StringValidators,
 } from '@/decorators/properties.decorator';
-import { Expose } from 'class-transformer';
 
 export class LoginDto {
   @EmailValidators()
@@ -38,13 +37,11 @@ export class ChangePasswordDto {
   confirmPassword: string;
 }
 
-@Expose()
 export class LoginResDto {
   accessToken: string;
   refreshToken: string;
 }
 
-@Expose()
 export class RefreshResDto {
   accessToken: string;
 }

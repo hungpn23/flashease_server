@@ -1,6 +1,3 @@
-import { Expose } from 'class-transformer';
-
-@Expose()
 export class OffsetMetadataDto {
   take: number;
   totalRecords: number;

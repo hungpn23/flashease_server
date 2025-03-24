@@ -1,5 +1,5 @@
 import { S3EnvVariables } from '@/configs/s3.config';
-import { generateFileName } from '@/utils/generate-file-name';
+import { createUniqueFileName } from '@/utils/generate-file-name';
 import {
   DeleteObjectCommand,
   PutObjectCommand,
@@ -36,7 +36,7 @@ export class S3Service {
   }
 
   async uploadFile({ buffer, mimetype }: Express.Multer.File): Promise<string> {
-    const fileName = generateFileName();
+    const fileName = createUniqueFileName();
 
     const command = new PutObjectCommand({
       Bucket: this.bucketName,

@@ -4,7 +4,6 @@ import {
   EnumValidators,
   StringValidators,
 } from '@/decorators/properties.decorator';
-import { Expose } from 'class-transformer';
 import { ValidateIf } from 'class-validator';
 import { SetEntity } from '../entities/set.entity';
 import { VisibleTo } from '../set.enum';
@@ -40,7 +39,6 @@ export class SaveAnswerDto {
   isCorrect: boolean;
 }
 
-@Expose()
 export class SetMetadataDto {
   totalCards: number;
   notStudiedCount: number;
@@ -48,7 +46,6 @@ export class SetMetadataDto {
   knownCount: number;
 }
 
-@Expose()
 export class SetDetailDto {
   set: SetEntity;
   metadata: SetMetadataDto;

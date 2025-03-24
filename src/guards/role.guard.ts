@@ -1,4 +1,4 @@
-import { Role, ROLE_KEY } from '@/constants/index';
+import { Role, ROLE } from '@/constants/index';
 import { RequestUser } from '@/interfaces/request-user.interface';
 import {
   CanActivate,
@@ -13,7 +13,7 @@ export class RoleGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const requiredRole = this.reflector.getAllAndOverride<Role>(ROLE_KEY, [
+    const requiredRole = this.reflector.getAllAndOverride<Role>(ROLE, [
       context.getHandler(),
       context.getClass(),
     ]);

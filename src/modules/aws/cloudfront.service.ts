@@ -19,7 +19,7 @@ export class CloudfrontService {
   private cloudfrontKeyPairId: string;
 
   constructor(
-    private configService: ConfigService<CloudfrontEnvVariables>,
+    private cloudfrontConfig: ConfigService<CloudfrontEnvVariables>,
     private s3Config: ConfigService<S3EnvVariables>,
   ) {
     this.cloudfrontClient = new CloudFrontClient({
@@ -32,22 +32,22 @@ export class CloudfrontService {
       },
     });
 
-    this.cloudfrontDistributionDomain = this.configService.get(
+    this.cloudfrontDistributionDomain = this.cloudfrontConfig.get(
       'CLOUDFRONT_DISTRIBUTION_DOMAIN',
       { infer: true },
     );
 
-    this.cloudfrontDistributionId = this.configService.get(
+    this.cloudfrontDistributionId = this.cloudfrontConfig.get(
       'CLOUDFRONT_DISTRIBUTION_ID',
       { infer: true },
     );
 
-    this.cloudfrontPrivateKey = this.configService.get(
+    this.cloudfrontPrivateKey = this.cloudfrontConfig.get(
       'CLOUDFRONT_PRIVATE_KEY',
       { infer: true },
     );
 
-    this.cloudfrontKeyPairId = this.configService.get(
+    this.cloudfrontKeyPairId = this.cloudfrontConfig.get(
       'CLOUDFRONT_KEY_PAIR_ID',
       { infer: true },
     );

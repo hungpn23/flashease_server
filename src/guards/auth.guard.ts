@@ -12,20 +12,16 @@ export class AuthGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC, [
-      context.getClass(),
-      context.getHandler(),
-    ]);
-    if (isPublic) return true;
-
-    const isRefreshToken = this.reflector.getAllAndOverride<boolean>(
-      IS_REFRESH_TOKEN,
-      [context.getClass(), context.getHandler()],
-    );
-
     const request = context.switchToHttp().getRequest<ExpressRequest>();
 
-    if (isRefreshToken) {
+    const hasPublicDecorator = this.hasDecorator(IS_PUBLIC, context);
+    if (hasPublicDecorator) return true;
+
+    const hasRefreshTokenDecorator = this.hasDecorator(
+      IS_REFRESH_TOKEN,
+      context,
+    );
+    if (hasRefreshTokenDecorator) {
       const refreshToken = this.extractTokenFromHeader(request);
       request['user'] = this.authService.verifyRefreshToken(refreshToken);
 
@@ -36,6 +32,13 @@ export class AuthGuard implements CanActivate {
     request['user'] = await this.authService.verifyAccessToken(accessToken);
 
     return true;
+  }
+
+  private hasDecorator(key: string, context: ExecutionContext): boolean {
+    return this.reflector.getAllAndOverride<boolean>(key, [
+      context.getClass(),
+      context.getHandler(),
+    ]);
   }
 
   private extractTokenFromHeader(request: ExpressRequest): string | undefined {

@@ -3,7 +3,6 @@ import { FolderEntity } from '@/modules/folder/folder.entity';
 import { CardEntity } from '@/modules/set/entities/card.entity';
 import { UserEntity } from '@/modules/user/entities/user.entity';
 import { UUID } from '@/types/branded.type';
-import { Expose } from 'class-transformer';
 import {
   Column,
   Entity,
@@ -15,7 +14,6 @@ import {
 } from 'typeorm';
 import { VisibleTo } from '../set.enum';
 
-@Expose()
 @Entity('set')
 export class SetEntity extends AbstractEntity {
   constructor(data?: Partial<SetEntity>) {

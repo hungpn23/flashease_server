@@ -1,6 +1,5 @@
 import { AbstractEntity } from '@/database/entities/abstract.entity';
 import { UUID } from '@/types/branded.type';
-import { Expose } from 'class-transformer';
 import {
   Column,
   Entity,
@@ -10,7 +9,6 @@ import {
 } from 'typeorm';
 import { SetEntity } from '../set/entities/set.entity';
 
-@Expose()
 @Entity('folder')
 export class FolderEntity extends AbstractEntity {
   constructor(data?: Partial<FolderEntity>) {

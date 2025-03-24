@@ -1,7 +1,7 @@
 import { AbstractEntity } from '@/database/entities/abstract.entity';
 import { UUID } from '@/types/branded.type';
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
-import { Exclude, Expose } from 'class-transformer';
+import { Exclude } from 'class-transformer';
 import {
   Column,
   Entity,
@@ -12,7 +12,6 @@ import {
 } from 'typeorm';
 import { UserEntity } from './user.entity';
 
-@Expose()
 @Entity('session')
 export class SessionEntity extends AbstractEntity {
   constructor(data?: Partial<SessionEntity>) {

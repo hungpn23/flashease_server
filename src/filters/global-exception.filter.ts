@@ -1,7 +1,4 @@
-import { ApiError } from '@/constants';
-import { ErrorDetailDto } from '@/dto/error/error-detail.dto';
-import { ErrorDto } from '@/dto/error/error.dto';
-import { AuthException } from '@/exceptions/auth.exception';
+import { ErrorDetailDto, ErrorDto } from '@/dto/error.dto';
 import {
   ArgumentsHost,
   Catch,
@@ -12,8 +9,8 @@ import {
   UnprocessableEntityException,
   ValidationError,
 } from '@nestjs/common';
+import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 import { Response } from 'express';
-import { EntityNotFoundError, QueryFailedError } from 'typeorm';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
@@ -30,14 +27,8 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     if (exception instanceof UnprocessableEntityException) {
       // this exception is thrown from main.ts (ValidationPipe)
       error = this.handleUnprocessableEntityException(exception);
-    } else if (exception instanceof AuthException) {
-      error = this.handleAuthException(exception);
     } else if (exception instanceof HttpException) {
       error = this.handleHttpException(exception);
-    } else if (exception instanceof QueryFailedError) {
-      error = this.handleQueryFailedError(exception);
-    } else if (exception instanceof EntityNotFoundError) {
-      error = this.handleEntityNotFoundError(exception);
     } else {
       error = this.handleError(exception);
     }
@@ -61,14 +52,6 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     return errorResponse as ErrorDto;
   }
 
-  private handleAuthException(exception: AuthException) {
-    return {
-      timestamp: new Date().toISOString(),
-      statusCode: exception.getStatus(),
-      message: exception.message,
-    } as ErrorDto;
-  }
-
   private handleHttpException(exception: HttpException) {
     return {
       timestamp: new Date().toISOString(),
@@ -77,27 +60,12 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     } as ErrorDto;
   }
 
-  private handleQueryFailedError(error: QueryFailedError) {
-    return {
-      timestamp: new Date().toISOString(),
-      statusCode: error.message.includes('Duplicate entry') ? 409 : 400,
-      message: error.message,
-    } as ErrorDto;
-  }
-
-  private handleEntityNotFoundError(error: EntityNotFoundError) {
-    return {
-      timestamp: new Date().toISOString(),
-      statusCode: HttpStatus.NOT_FOUND,
-      message: error.message,
-    } as ErrorDto;
-  }
-
   private handleError(error: any) {
     return {
       timestamp: new Date().toISOString(),
       statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      message: error?.message || ApiError.Unknown,
+      message:
+        error?.message || HttpErrorByCode[HttpStatus.INTERNAL_SERVER_ERROR],
     } as ErrorDto;
   }
 
