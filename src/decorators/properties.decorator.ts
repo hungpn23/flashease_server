@@ -78,13 +78,9 @@ export function StringValidators(options?: StringOptions): PropertyDecorator {
 
   decorators = checkCommonOptions(decorators, options);
 
-  if (decorators.indexOf(IsOptional)) {
-    decorators.push(MinLength(0, { each: options?.isArray }));
-  } else {
-    decorators.push(
-      MinLength(options?.minLength ?? 1, { each: options?.isArray }),
-    );
-  }
+  decorators.push(
+    MinLength(options?.minLength ?? 0, { each: options?.isArray }),
+  );
 
   if (options?.maxLength)
     decorators.push(MaxLength(options?.maxLength, { each: options?.isArray }));
