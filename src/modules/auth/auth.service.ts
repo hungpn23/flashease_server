@@ -176,8 +176,9 @@ export class AuthService {
 
     await SessionEntity.update(session.id, { signature: newSignature });
 
-    const refreshTokenExpiresIn = ((session.expiresAt.getTime() - Date.now()) /
-      1000) as Seconds;
+    const refreshTokenExpiresIn = Math.floor(
+      (session.expiresAt.getTime() - Date.now()) / 1000,
+    ) as Seconds;
 
     const [accessToken, refreshToken] = await Promise.all([
       this.createAccessToken(payload),
