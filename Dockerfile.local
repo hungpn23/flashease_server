@@ -18,4 +18,4 @@ COPY --chown=node:node src/ ./src/
 
 ENV NODE_ENV=development
 
-CMD pnpm migration:up && pnpm seed:run && pnpm start:dev
+CMD ["pnpm", "start:dev"]

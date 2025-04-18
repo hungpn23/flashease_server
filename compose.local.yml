@@ -1,5 +1,5 @@
-# COMPOSE_BAKE=true docker compose -f compose.local.yml --env-file .env.development up -d --build
-# COMPOSE_BAKE=true docker compose -f compose.local.yml --env-file .env.development down
+# docker compose -f compose.local.yml --env-file .env.development up --build
+# docker compose -f compose.local.yml --env-file .env.development down
 services:
   server:
     image: server_local
